@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<PROJECT DESCRIPTION="">
+ <KEYWORDS/>
+ <FILES>
+  <FILE GROUP="Source Files" NAME="main.asm"/>
+  <FILE GROUP="Source Files" NAME="TIM0.asm"/>
+  <FILE GROUP="Source Files" NAME="RamMapping.asm"/>
+ </FILES>
+ <CONFIGURATION TARGET="Debug" COMPILER="AVRASM (Proteus)" NAME="Debug">
+  <CONTROLLER FAMILY="AVR" CLOCK="8MHz" TYPE="ATmega8"/>
+  <FILE TOOL="ASM" NAME="Debug/Debug.hex">
+   <FILE NAME="main.asm"/>
+  </FILE>
+  <FILE NAME="TIM0.asm"/>
+  <FILE NAME="RamMapping.asm"/>
+  <OPTION TOOL="ASM" NAME="-i" VALUE="&quot;%COMPILER_DIR_DOS%\appnotes\m8def.inc&quot;"/>
+  <OPTION TOOL="ASM" NAME="-f" VALUE="I"/>
+ </CONFIGURATION>
+ <CONFIGURATION TARGET="Release" COMPILER="AVRASM (Proteus)" NAME="Release">
+  <CONTROLLER FAMILY="AVR" CLOCK="8000000" TYPE="ATmega8"/>
+  <FILE TOOL="ASM">
+   <FILE NAME="main.asm"/>
+  </FILE>
+  <FILE NAME="TIM0.asm"/>
+  <FILE NAME="RamMapping.asm"/>
+  <OPTION TOOL="ASM" NAME="-i" VALUE="&quot;%COMPILER_DIR_DOS%\appnotes\m8def.inc&quot;"/>
+  <OPTION TOOL="ASM" NAME="-f" VALUE="I"/>
+ </CONFIGURATION>
+</PROJECT>
