@@ -6,7 +6,7 @@
 ;.ORG 0x03 rjmp TIM2_COMP ; Timer2 Compare Handler
 ;.ORG 0x04 rjmp TIM2_OVF ; Timer2 Overflow Handler
 ;.ORG 0x05 rjmp TIM1_CAPT ; Timer1 Capture Handler
-;.ORG 0x06 rjmp TIM1_COMPA ; Timer1 CompareA Handler
+.ORG 0x06 rjmp TIM1_COMPA ; Timer1 CompareA Handler
 ;.ORG 0x07 rjmp TIM1_COMPB ; Timer1 CompareB Handler
 ;.ORG 0x08 rjmp TIM1_OVF ; Timer1 Overflow Handler
 .ORG 0x09 rjmp TIM0_OVF ; Timer0 Overflow Handler
@@ -21,6 +21,7 @@
 ;.ORG 0x12 rjmp SPM_RDY ; Store Program Memory Ready Handler
 
 #include "TIM0.asm"
+#include "TIM1.asm"
 
 RESET:
 ;stack
@@ -30,7 +31,7 @@ ldi r16, low(RAMEND)
 out SPL, r16
 ;const
 clr r16
-ser r17
+ldi r17, 10
 movw r2, r16
 ;gpio
 ldi r16, 0b11111111
@@ -46,21 +47,45 @@ out PORTD, r16
 ldi r16, 0b11110110
 out DDRD, r16
 ;ram
-ldi r16, 0b00000001
+ser r16
 sts SEG1, r16
-ldi r16, 0b00000011
 sts SEG2, r16
-ldi r16, 0b00000111
 sts SEG3, r16
-ldi r16, 0b00001111
 sts SEG4, r16
 sts SEGNUMBER, r2
-;T0
+;T0 - indication
 ldi r16, 0b00000011
 out TCCR0, r16
-ldi r16, 0b00000001
+;T1 - systick
+out TCCR1A, r2
+ldi r16, 0b00001100
+out TCCR1B, r16
+ldi r16, 0x7A
+out OCR1AH, r16
+ldi r16, 0x12
+out OCR1AL, r16
+ldi r16, 0b00010001
 out TIMSK, r16
 ;
+rcall init_18b20
+brtc l0
+ ldi r16, 1
+ rjmp writeError
+l0:
 sei
-l1:
-rjmp l1
+l_cycle:
+;
+rcall process_18b20
+brtc l2
+ ldi r16, 1
+ rjmp writeError
+l2:
+;
+rcall process_display
+brtc l_cycle
+ ldi r16, 2
+ rjmp writeError
+
+#include "1Wire.asm"
+#include "18b20.asm"
+#include "Display.asm"

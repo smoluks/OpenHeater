@@ -1,9 +1,13 @@
 
-AVRASM ver. 2.1.42  main.asm Fri Feb 22 01:25:10 2019
+AVRASM ver. 2.1.42  main.asm Thu Apr 18 22:07:17 2019
 
 [builtin](2): Including file 'C:\Program Files (x86)\Labcenter Electronics\Proteus 7 Professional\tools\AVRASM\appnotes\m8def.inc'
 main.asm(1): Including file 'RamMapping.asm'
 main.asm(23): Including file 'TIM0.asm'
+main.asm(24): Including file 'TIM1.asm'
+main.asm(89): Including file '1Wire.asm'
+main.asm(90): Including file '18b20.asm'
+main.asm(91): Including file 'Display.asm'
                  
                  #include "RamMapping.asm"
                  
@@ -746,19 +750,27 @@ main.asm(23): Including file 'TIM0.asm'
                  ; ***** END OF FILE ******************************************************
                  
                  
+                 #define SEG1 0x60
                  #define SEG2 0x61 
                  #define SEG3 0x62 
                  #define SEG4 0x63
-                 ;T0
                  #define SEGNUMBER 0x64
+                 ;Temperature
+                 #define TLow 0x65
+                 #define THigh 0x66
+                 ;systick
+                 #define Systick 0x67
+                 ;-18b20
+                 #define state18b20 0x68
+                 #define pt18b20 0x69
                  
-000000 c05c      .ORG 0x00 rjmp RESET ; Reset Handler
+000000 c068      .ORG 0x00 rjmp RESET ; Reset Handler
                  ;.ORG 0x01 rjmp EXT_INT0 ; IRQ0 Handler
                  ;.ORG 0x02 rjmp EXT_INT1 ; IRQ1 Handler
                  ;.ORG 0x03 rjmp TIM2_COMP ; Timer2 Compare Handler
                  ;.ORG 0x04 rjmp TIM2_OVF ; Timer2 Overflow Handler
                  ;.ORG 0x05 rjmp TIM1_CAPT ; Timer1 Capture Handler
-                 ;.ORG 0x06 rjmp TIM1_COMPA ; Timer1 CompareA Handler
+000006 c056      .ORG 0x06 rjmp TIM1_COMPA ; Timer1 CompareA Handler
                  ;.ORG 0x07 rjmp TIM1_COMPB ; Timer1 CompareB Handler
                  ;.ORG 0x08 rjmp TIM1_OVF ; Timer1 Overflow Handler
 000009 c000      .ORG 0x09 rjmp TIM0_OVF ; Timer0 Overflow Handler
@@ -872,48 +884,561 @@ main.asm(23): Including file 'TIM0.asm'
 000059 bf0f      out SREG, r16
 00005a 911f      pop r17
 00005b 910f      pop r16
+                 #include "TIM1.asm"
 00005c 9518      
+00005d 930f      push r16
+00005e b70f      IN r16, SREG
+00005f 930f      push r16
+                 ;
+000060 9100 0067 lds r16, Systick
+000062 9503      inc r16
+000063 9300 0067 sts Systick, r16
+                 ;
+000065 910f      pop r16
+000066 bf0f      out SREG, r16
+000067 910f      pop r16
+000068 9518      reti
+                 
                  RESET:
                  ;stack
-00005d e004      ldi r16, high(RAMEND)
-00005e bf0e      out SPH, r16
-00005f e50f      ldi r16, low(RAMEND)
-000060 bf0d      out SPL, r16
+000069 e004      ldi r16, high(RAMEND)
+00006a bf0e      out SPH, r16
+00006b e50f      ldi r16, low(RAMEND)
+00006c bf0d      out SPL, r16
                  ;const
-000061 2700      clr r16
-000062 ef1f      ser r17
-000063 0118      movw r2, r16
+00006d 2700      clr r16
+00006e e01a      ldi r17, 10
+00006f 0118      movw r2, r16
                  ;gpio
-000064 ef0f      ldi r16, 0b11111111
-000065 bb08      out PORTB, r16
-000066 ef0f      ldi r16, 0b11111111
-000067 bb07      out DDRB, r16
-000068 e300      ldi r16, 0b00110000
-000069 bb05      out PORTC, r16
-00006a e005      ldi r16, 0b00000101
-00006b bb04      out DDRC, r16
-00006c ef0b      ldi r16, 0b11111011
-00006d bb02      out PORTD, r16
-00006e ef06      ldi r16, 0b11110110
-00006f bb01      out DDRD, r16
+000070 ef0f      ldi r16, 0b11111111
+000071 bb08      out PORTB, r16
+000072 ef0f      ldi r16, 0b11111111
+000073 bb07      out DDRB, r16
+000074 e300      ldi r16, 0b00110000
+000075 bb05      out PORTC, r16
+000076 e005      ldi r16, 0b00000101
+000077 bb04      out DDRC, r16
+000078 ef0b      ldi r16, 0b11111011
+000079 bb02      out PORTD, r16
+00007a ef06      ldi r16, 0b11110110
+00007b bb01      out DDRD, r16
                  ;ram
-000070 e001      ldi r16, 0b00000001
-000071 9300 0060 sts SEG1, r16
-000073 e003      ldi r16, 0b00000011
-000074 9300 0061 sts SEG2, r16
-000076 e007      ldi r16, 0b00000111
-000077 9300 0062 sts SEG3, r16
-000079 e00f      ldi r16, 0b00001111
-00007a 9300 0063 sts SEG4, r16
-00007c 9220 0064 sts SEGNUMBER, r2
-                 ;T0
-00007e e003      ldi r16, 0b00000011
-00007f bf03      out TCCR0, r16
-000080 e001      ldi r16, 0b00000001
-000081 bf09      out TIMSK, r16
+00007c ef0f      ser r16
+00007d 9300 0060 sts SEG1, r16
+00007f 9300 0061 sts SEG2, r16
+000081 9300 0062 sts SEG3, r16
+000083 9300 0063 sts SEG4, r16
+000085 9220 0064 sts SEGNUMBER, r2
+                 ;T0 - indication
+000087 e003      ldi r16, 0b00000011
+000088 bf03      out TCCR0, r16
+                 ;T1 - systick
+000089 bc2f      out TCCR1A, r2
+00008a e00c      ldi r16, 0b00001100
+00008b bd0e      out TCCR1B, r16
+00008c e70a      ldi r16, 0x7A
+00008d bd0b      out OCR1AH, r16
+00008e e102      ldi r16, 0x12
+00008f bd0a      out OCR1AL, r16
+000090 e101      ldi r16, 0b00010001
+000091 bf09      out TIMSK, r16
                  ;
-000082 9478      sei
-                 l1:
+000092 d066      rcall init_18b20
+000093 f416      brtc l0
+000094 e001       ldi r16, 1
+000095 c10b       rjmp writeError
+                 l0:
+000096 9478      sei
+                 l_cycle:
+                 ;
+000097 d076      rcall process_18b20
+000098 f416      brtc l2
+000099 e001       ldi r16, 1
+00009a c106       rjmp writeError
+                 l2:
+                 ;
+00009b d0a5      rcall process_display
+00009c f7d6      brtc l_cycle
+00009d e002       ldi r16, 2
+00009e c102       rjmp writeError
+                 
+                 #include "1Wire.asm"
+                 
+                 ;---init---
+00009f 930f      push r16
+0000a0 931f      push r17
+                 ;Tx
+0000a1 9a8b      sbi ddrd, 3
+0000a2 9893      cbi portd, 3
+0000a3 ed0f      ldi r16, 0xDF
+0000a4 e011      ldi r17, 0x01
+0000a5 d049      rcall ipause
+0000a6 988b      cbi ddrd, 3
+0000a7 9a93      sbi portd, 3
+                 ;Rx
+0000a8 e30b      ldi r16, 59
+0000a9 2711      clr r17
+0000aa d044      rcall ipause
+0000ab 9468      set
+0000ac 9983      sbic pind, 3
+0000ad c006       rjmp ow_resetexit
+0000ae 94e8      clt
+0000af ea03      ldi r16, 0xA3
+0000b0 e011      ldi r17, 0x01
+0000b1 d03d      rcall ipause
+                 ow_reset1:
+0000b2 9b83      sbis pind, 3
+0000b3 cffe      rjmp ow_reset1;
+                 ;
+                 ow_resetexit:
+0000b4 911f      pop r17
+0000b5 910f      pop r16
+0000b6 9508      ret
+                 
+                 ow_read_bit:
+0000b7 930f      push r16
+0000b8 931f      push r17
+                 ;
+0000b9 9a8b      sbi ddrd, 3
+0000ba 9893      cbi portd, 3
+0000bb d03b      rcall pause_1us
+                 ;
+0000bc 988b      cbi ddrd, 3
+0000bd 9a93      sbi portd,3
+0000be e00c      ldi r16, 12
+0000bf 2711      clr r17
+0000c0 d02e      rcall ipause
+                 ;
+0000c1 94e8      clt
+0000c2 9983      sbic pind, 3
+0000c3 9468      set
+                 ;
+0000c4 e206      ldi r16, 38
+0000c5 2711      clr r17
+0000c6 d028      rcall ipause
+                 ;
+0000c7 911f      pop r17
+0000c8 910f      pop r16
+0000c9 9508      ret
+                 
+                 ow_write_bit:
+0000ca 930f      push r16 
+0000cb 931f      push r17
+                 ;
+0000cc 9a8b      sbi ddrd, 3
+0000cd 9893      cbi portd, 3
+0000ce d028      rcall pause_1us
+                 ;
+0000cf f416      brtc w1
+0000d0 9a93       sbi portd, 3
+0000d1 988b       cbi ddrd, 3
+                 w1:
+0000d2 2711      clr r17
+0000d3 e306      ldi r16, 54
+0000d4 d01a      rcall ipause
+                 ;
+0000d5 9a93      sbi portd, 3
+0000d6 988b      cbi ddrd, 3
+                 ;
+0000d7 911f      pop r17
+0000d8 910f      pop r16
+0000d9 9508      ret
+                 
+                 ow_read_byte:
+0000da 931f      push r17
+                 ;
+0000db e018      ldi r17, 8
+                 rr1:
+0000dc dfda      rcall ow_read_bit;
+0000dd 9507      ror r16
+0000de f907      bld r16, 7
+0000df 951a      dec r17
+0000e0 f7d9      brne rr1;
+                 ;
+0000e1 911f      pop r17
+0000e2 9508      ret
+                 
+                 ow_write_byte:
+0000e3 931f      push r17
+                 ;
+0000e4 e018      ldi r17, 8
+                 rw1:
+0000e5 fb00      bst r16, 0
+0000e6 9507      ror r16
+0000e7 dfe2      rcall ow_write_bit;
+0000e8 951a      dec r17
+0000e9 f7d9      brne rw1;
+                 ;
+0000ea e005      ldi r16, 5
+0000eb 2711      clr r17
+0000ec d002      rcall ipause
+0000ed 911f      pop r17
+0000ee 9508      ret
+                 
+                 ipause:
+0000ef 0000      nop
+0000f0 0000      nop
+0000f1 0000      nop
+0000f2 0000      nop
+0000f3 5001      subi r16, 1
+0000f4 0912      sbc r17, r2
+0000f5 f7c8      brcc ipause;
+0000f6 9508      ret
+                 
+                 pause_1us:
+0000f7 0000      nop
+                 #include "18b20.asm"
+0000f8 9508      
+                 
+                 #define CONVERT_TEMPERATURE 0x44
+                 #define COPY_SCRATCHPAD 0x48
+                 #define READ_POWER_SUPPLY 0xB4
+                 #define RECALL_E2 0xB8
+                 #define READ_SCRATCHPAD 0xBE
+                 #define WRITE_SCRATCHPAD 0x4E
+                 
+                 #define STATE18B20_WAIT_MEASURING 0x00
+                 #define STATE18B20_WAIT_TIMEOUT 0x01
+                 
+                 #define MEAS_TIME 0
+                 
+                 init_18b20:
+0000f9 9220 0068 sts state18b20, r2
+                 
+                 ;set resolution
+0000fb dfa3      rcall ow_reset
+0000fc f086      brts init_18b20_exit
+0000fd ec0c      ldi r16, SKIP_ROM
+0000fe dfe4      rcall ow_write_byte
+0000ff e40e      ldi r16, WRITE_SCRATCHPAD
+000100 dfe2      rcall ow_write_byte
+000101 2700      clr r16
+000102 dfe0      rcall ow_write_byte
+000103 2700      clr r16
+000104 dfde      rcall ow_write_byte
+000105 e10f      ldi r16, 0b00011111
+000106 dfdc      rcall ow_write_byte
+                 
+                 ;read scrathpad
+                 
+                 ;start conversion
+000107 df97      rcall ow_reset
+000108 f026      brts init_18b20_exit
+000109 ec0c      ldi r16, SKIP_ROM
+00010a dfd8      rcall ow_write_byte
+00010b e404      ldi r16, CONVERT_TEMPERATURE
+00010c dfd6      rcall ow_write_byte
+                 ;
+                 init_18b20_exit:
+00010d 9508      ret
+                 
+                 process_18b20:
+00010e 9100 0068 lds r16, state18b20
+000110 3000      cpi r16, STATE18B20_WAIT_MEASURING
+000111 f0b1      breq process_18b20_readtemp
+000112 3001      cpi r16, STATE18B20_WAIT_TIMEOUT
+000113 f019      breq process_18b20_checktimeout
+000114 9220 0068 sts state18b20, r2
+000116 9508      ret
+                 
+                 process_18b20_checktimeout:
+000117 9100 0067 lds r16, Systick
+000119 9110 0069 lds r17, pt18b20
+00011b 1b10      sub r17, r16
+00011c ff17      sbrs r17, 7
+00011d 9508       ret
+                 ;start conversion
+00011e df80      rcall ow_reset
+00011f f03e      brts process_18b20_exit
+000120 ec0c      ldi r16, SKIP_ROM
+000121 dfc1      rcall ow_write_byte
+000122 e404      ldi r16, CONVERT_TEMPERATURE
+000123 dfbf      rcall ow_write_byte
+                 ;set state
+000124 e000      ldi r16, STATE18B20_WAIT_MEASURING
+000125 9300 0068 sts state18b20, r16
+                 ;
+                 process_18b20_exit:
+000127 9508      ret
+                 
+                 process_18b20_readtemp:
+000128 df8e      rcall ow_read_bit
+000129 f00e      brts p1
+00012a 9508       ret
+                 ; 
+                 ;read temperature
+                 p1:
+00012b df73      rcall ow_reset
+00012c f306      brts init_18b20_exit
+00012d ec0c      ldi r16, SKIP_ROM
+00012e dfb4      rcall ow_write_byte
+00012f eb0e      ldi r16, READ_SCRATCHPAD
+000130 dfb2      rcall ow_write_byte
+000131 dfa8      rcall ow_read_byte
+000132 9300 0065 sts TLow, r16
+000134 dfa5      rcall ow_read_byte
+000135 9300 0066 sts THigh, r16
+                 ;
+000137 9100 0067 lds r16, Systick
+000139 e010      ldi r17, MEAS_TIME
+00013a 0f01      add r16, r17
+00013b 9300 0069 sts pt18b20, r16
+                 ;
+00013d e001      ldi r16, STATE18B20_WAIT_TIMEOUT
+00013e 9300 0068 sts state18b20, r16
+                 #include "Display.asm"
+000140 9508      
+000141 d001      rcall writeTemperature
+000142 9508      ret
+                 
+                 writeTemperature:
+000143 9110 0066 lds r17, THigh
+000145 701f      andi r17, 0b00001111
+000146 9100 0065 lds r16, TLow
+000148 7f00      andi r16, 0b11110000
+000149 2b01      or r16, r17
+00014a 9502      swap r16
+                 ;
+00014b fd07      sbrc r16, 7
+00014c c03d      rjmp wt_minus
+                 ;+
+00014d 3604      cpi r16, 100
+00014e f520      brsh wt_over100
+                 ;-----normal-----
+00014f 2711      clr r17
+                 wt2:
+000150 300a      cpi r16, 10
+000151 f018      brlo wt3
+000152 9513       inc r17
+000153 500a       subi r16, 10
+000154 cffb       rjmp wt2
+                 wt3:
+000155 2311      tst r17
+000156 f021      breq wt10
+000157 d063       rcall convertnumberto7segment1
+000158 9310 0060  sts SEG1, r17
+00015a c002       rjmp wt11
+                 wt10:
+00015b 9220 0060  sts SEG1, r2	
+                 wt11:
+                 ;
+00015d 2f10      mov r17, r16
+00015e d05c      rcall convertnumberto7segment1
+00015f 6014      ori r17, 0b00000100 ;DP
+000160 9310 0061 sts SEG2, r17
+                 ;
+000162 9100 0065 lds r16, TLow
+000164 700f      andi r16, 0b00001111
+000165 2711      clr r17
+                 wt1:
+000166 2300      tst r16
+000167 f019      breq wt0
+000168 950a       dec r16
+000169 0d13       add r17, r3
+00016a cffb       rjmp wt1
+                 wt0:
+00016b 9516      lsr r17
+00016c 9516      lsr r17
+00016d 9516      lsr r17
+00016e 9516      lsr r17
+00016f d074      rcall convertnumberto7segment2
+000170 9310 0062 sts SEG3, r17
+000172 c02a      rjmp wt_exit
+                 ;----->100-----
+                 wt_over100:
+000173 2711      clr r17
+                 wt4:
+000174 3604      cpi r16, 100
+000175 f018      brlo wt5
+000176 9513       inc r17
+000177 5604       subi r16, 100
+000178 cffb       rjmp wt4
+                 wt5:
+000179 d041      rcall convertnumberto7segment1
+00017a 9310 0060 sts SEG1, r17
+                 ;
+00017c 2711      clr r17
+                 wt6:
+00017d 300a      cpi r16, 10
+00017e f018      brlo wt7
+00017f 9513       inc r17
+000180 500a       subi r16, 10
+000181 cffb       rjmp wt6
+                 wt7:
+000182 d038      rcall convertnumberto7segment1
+000183 9310 0061 sts SEG2, r17
+                 ;
+000185 2f10      mov r17, r16
+000186 d05d      rcall convertnumberto7segment2
+000187 9310 0062 sts SEG3, r17
+000189 c013      rjmp wt_exit
+                 ;-----<0-----
+                 wt_minus:
+                 ;
+00018a e410      ldi r17, 0b01000000
+00018b 9310 0060 sts SEG1, r17
+00018d 2711      clr r17
+00018e 1b10      sub r17, r16
+00018f 2f01      mov r16, r17
+                 ;
+000190 2711      clr r17
+                 wt8:
+000191 300a      cpi r16, 10
+000192 f018      brlo wt9
+000193 9513       inc r17
+000194 500a       subi r16, 10
+000195 cffb       rjmp wt8
+                 wt9:
+000196 d024      rcall convertnumberto7segment1
+000197 9310 0061 sts SEG2, r17
+                 ;
+000199 2f10      mov r17, r16
+00019a d049      rcall convertnumberto7segment2
+00019b 9310 0062 sts SEG3, r17
+                 ;
+                 wt_exit:
+00019d eb11      ldi r17, 0b10110001
+00019e 9310 0063 sts SEG4, r17
+0001a0 9508      ret
+                 
+                 ;IN r16 - errorcode
+                 writeError:
+0001a1 e713      ldi r17, 0b01110011
+0001a2 9310 0060 sts SEG1, r17
+                 ;
+0001a4 2711      clr r17
+                 we0:
+0001a5 3604      cpi r16, 100
+0001a6 f018      brlo we1
+0001a7 9513       inc r17
+0001a8 5604       subi r16, 100
+0001a9 cffb       rjmp we0
+                 we1:
+0001aa d010      rcall convertnumberto7segment1
+0001ab 9310 0061 sts SEG2, r17
+                 ;
+0001ad 2711      clr r17
+                 we2:
+0001ae 300a      cpi r16, 10
+0001af f018      brlo we3
+0001b0 9513       inc r17
+0001b1 500a       subi r16, 10
+0001b2 cffb       rjmp we2
+                 we3:
+0001b3 d030      rcall convertnumberto7segment2
+0001b4 9310 0062 sts SEG3, r17
+                 ;
+0001b6 2f10      mov r17, r16
+0001b7 d02c      rcall convertnumberto7segment2
+0001b8 9310 0063 sts SEG4, r17
+                 ;
+                 we_exit:
+0001ba cfff      rjmp we_exit
+                 
+                 convertnumberto7segment1:
+0001bb 3010      cpi r17, 0
+0001bc f411      brne c1
+0001bd eb1b       ldi r17, 0b10111011
+0001be 9508       ret
+                 c1:
+0001bf 3011      cpi r17, 1
+0001c0 f411      brne c2
+0001c1 e818       ldi r17, 0b10001000
+0001c2 9508       ret
+                 c2:
+0001c3 3012      cpi r17, 2
+0001c4 f411      brne c3
+0001c5 ed13       ldi r17, 0b11010011
+0001c6 9508       ret
+                 c3:
+0001c7 3013      cpi r17, 3
+0001c8 f411      brne c4
+0001c9 ed19       ldi r17, 0b11011001
+0001ca 9508       ret
+                 c4:
+0001cb 3014      cpi r17, 4
+0001cc f411      brne c5
+0001cd ee18       ldi r17, 0b11101000
+0001ce 9508       ret
+                 c5:
+0001cf 3015      cpi r17, 5
+0001d0 f411      brne c6
+0001d1 e719       ldi r17, 0b01111001
+0001d2 9508       ret
+                 c6:
+0001d3 3016      cpi r17, 6
+0001d4 f411      brne c7
+0001d5 e71b       ldi r17, 0b01111011
+0001d6 9508       ret
+                 c7:
+0001d7 3017      cpi r17, 7
+0001d8 f411      brne c8
+0001d9 e918       ldi r17, 0b10011000
+0001da 9508       ret
+                 c8:
+0001db 3018      cpi r17, 8
+0001dc f411      brne c9
+0001dd ef1b       ldi r17, 0b11111011
+0001de 9508       ret
+                 c9:
+0001df 3019      cpi r17, 9
+0001e0 f411      brne c10
+0001e1 ef19       ldi r17, 0b11111001
+0001e2 9508       ret
+                 c10:
+0001e3 9508      ret
+                 
+                 convertnumberto7segment2:
+0001e4 3010      cpi r17, 0
+0001e5 f411      brne cc1
+0001e6 e31f       ldi r17, 0b00111111
+0001e7 9508       ret
+                 cc1:
+0001e8 3011      cpi r17, 1
+0001e9 f411      brne cc2
+0001ea e218       ldi r17, 0b00101000
+0001eb 9508       ret
+                 cc2:
+0001ec 3012      cpi r17, 2
+0001ed f411      brne cc3
+0001ee eb16       ldi r17, 0b10110110
+0001ef 9508       ret
+                 cc3:
+0001f0 3013      cpi r17, 3
+0001f1 f411      brne cc4
+0001f2 eb1a       ldi r17, 0b10111010
+0001f3 9508       ret
+                 cc4:
+0001f4 3014      cpi r17, 4
+0001f5 f411      brne cc5
+0001f6 ea19       ldi r17, 0b10101001
+0001f7 9508       ret
+                 cc5:
+0001f8 3015      cpi r17, 5
+0001f9 f411      brne cc6
+0001fa e91b       ldi r17, 0b10011011
+0001fb 9508       ret
+                 cc6:
+0001fc 3016      cpi r17, 6
+0001fd f411      brne cc7
+0001fe e91f       ldi r17, 0b10011111
+0001ff 9508       ret
+                 cc7:
+000200 3017      cpi r17, 7
+000201 f411      brne cc8
+000202 e318       ldi r17, 0b00111000
+000203 9508       ret
+                 cc8:
+000204 3018      cpi r17, 8
+000205 f411      brne cc9
+000206 eb1f       ldi r17, 0b10111111
+000207 9508       ret
+                 cc9:
+000208 3019      cpi r17, 9
+000209 f411      brne cc10
+00020a eb1b       ldi r17, 0b10111011
+00020b 9508       ret
+                 cc10:
 
 
 RESOURCE USE INFORMATION
@@ -931,39 +1456,39 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 ATmega8 register use summary:
-r0 :   0 r1 :   0 r2 :   2 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
+r0 :   0 r1 :   0 r2 :   7 r3 :   1 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
-r16:  76 r17:  15 r18:   0 r19:   0 r20:   0 r21:   0 r22:   0 r23:   0 
+r16: 162 r17: 129 r18:   0 r19:   0 r20:   0 r21:   0 r22:   0 r23:   0 
 r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 r29:   0 r30:   0 r31:   0 
 x  :   0 y  :   0 z  :   0 
-Registers used: 3 out of 35 (8.6%)
+Registers used: 4 out of 35 (11.4%)
 
 ATmega8 instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
-andi  :  12 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 breq  :   0 brge  :   0 brhc  :   0 brhs  :   0 
-brid  :   0 brie  :   0 brlo  :   1 brlt  :   0 brmi  :   0 brne  :   3 
-brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 brvs  :   0 
-bset  :   0 bst   :   0 cbi   :   4 cbr   :   0 clc   :   0 clh   :   0 
-cli   :   0 cln   :   0 clr   :   2 cls   :   0 clt   :   0 clv   :   0 
-clz   :   0 com   :   0 cp    :   0 cpc   :   0 cpi   :   4 cpse  :   0 
-dec   :   0 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 
-ijmp  :   0 in    :   5 inc   :   1 ld    :   0 ldd   :   0 ldi   :  14 
-lds   :   9 lpm   :   0 lsl   :   4 lsr   :   0 mov   :   0 movw  :   1 
-mul   :   0 muls  :   0 mulsu :   0 neg   :   0 nop   :   0 or    :   4 
-ori   :   0 out   :  19 pop   :   3 push  :   3 rcall :   0 ret   :   0 
-reti  :   1 rjmp  :   7 rol   :   0 ror   :   0 sbc   :   0 sbci  :   0 
-sbi   :   4 sbic  :   0 sbis  :   0 sbiw  :   0 sbr   :   0 sbrc  :   0 
-sbrs  :   0 sec   :   0 seh   :   0 sei   :   1 sen   :   0 ser   :   1 
-ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 spm   :   0 
-st    :   0 std   :   0 sts   :   6 sub   :   0 subi  :   0 swap  :   0 
-tst   :   0 wdr   :   0 
-Instructions used: 22 out of 110 (20.0%)
+.lds  :   0 .sts  :   0 adc   :   0 add   :   2 adiw  :   0 and   :   0 
+andi  :  15 asr   :   0 bclr  :   0 bld   :   1 brbc  :   0 brbs  :   0 
+brcc  :   1 brcs  :   0 breq  :   4 brge  :   0 brhc  :   0 brhs  :   0 
+brid  :   0 brie  :   0 brlo  :   7 brlt  :   0 brmi  :   0 brne  :  25 
+brpl  :   0 brsh  :   1 brtc  :   4 brts  :   5 brvc  :   0 brvs  :   0 
+bset  :   0 bst   :   1 cbi   :  11 cbr   :   0 clc   :   0 clh   :   0 
+cli   :   0 cln   :   0 clr   :  17 cls   :   0 clt   :   2 clv   :   0 
+clz   :   0 com   :   0 cp    :   0 cpc   :   0 cpi   :  33 cpse  :   0 
+dec   :   3 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 
+ijmp  :   0 in    :   6 inc   :   8 ld    :   0 ldd   :   0 ldi   :  63 
+lds   :  17 lpm   :   0 lsl   :   4 lsr   :   4 mov   :   5 movw  :   1 
+mul   :   0 muls  :   0 mulsu :   0 neg   :   0 nop   :   5 or    :   5 
+ori   :   1 out   :  24 pop   :  13 push  :  13 rcall :  44 ret   :  37 
+reti  :   2 rjmp  :  24 rol   :   0 ror   :   2 sbc   :   1 sbci  :   0 
+sbi   :  11 sbic  :   2 sbis  :   1 sbiw  :   0 sbr   :   0 sbrc  :   1 
+sbrs  :   1 sec   :   0 seh   :   0 sei   :   1 sen   :   0 ser   :   1 
+ses   :   0 set   :   2 sev   :   0 sez   :   0 sleep :   0 spm   :   0 
+st    :   0 std   :   0 sts   :  29 sub   :   2 subi  :   7 swap  :   1 
+tst   :   2 wdr   :   0 
+Instructions used: 49 out of 110 (44.5%)
 
 ATmega8 memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000108    248      0    248    8192   3.0%
+[.cseg] 0x000000 0x00041a   1036      0   1036    8192  12.6%
 [.dseg] 0x000060 0x000060      0      0      0    1024   0.0%
 [.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 
