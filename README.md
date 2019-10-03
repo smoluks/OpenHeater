@@ -12,7 +12,9 @@
 
 #### Toolchain:
 PCB - Diptrace
+
 Firmware - Proteus VSM Studio (you can compile it with AVRASM)
+
 Heater -
 
 #### Building:
