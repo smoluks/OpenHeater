@@ -1,7 +1,7 @@
 # OpenHeater
 2,3-channel controller for oil-filled heater based on ATMEGA8 & 18B20
 
-###### Roadmap:
+#### Roadmap:
 - [x] PCB
 - [ ] Main firmware
 - [ ] PID regulation
@@ -9,7 +9,7 @@
 - [ ] Remote control over ESP8266 connected to J3
 #### WARNING: You need galvanic-isolation version of power pcb, another external sensor will be shocked
 
-###### Building:
+#### Building:
 - Made PCB
 - Flash Atmega8
 - Connect
