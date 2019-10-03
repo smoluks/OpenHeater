@@ -11,10 +11,8 @@
 #### WARNING: You need galvanic-isolation version of power pcb, another external sensor will be shocked
 
 #### Toolchain:
-PCB - Diptrace
-
-Firmware - Proteus VSM Studio (you can compile it with AVRASM)
-
+PCB - Diptrace  
+Firmware - Proteus VSM Studio (you can compile it with AVRASM)  
 Heater -
 
 #### Building:
