@@ -1,5 +1,16 @@
+#define DISPLAY_MODE_DEFAULT 0
+
 process_display:
-rcall writeTemperature
+;
+cp DISPLAY_MODE_REG DISPLAY_MODE_DEFAULT
+brne pd1
+ ;show temp
+ test ERROR_REG
+ breq pd2
+  rcall writeError
+ pd2:
+  rcall writeTemperature
+ ret
 ret
 
 writeTemperature:

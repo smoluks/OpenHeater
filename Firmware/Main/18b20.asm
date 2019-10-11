@@ -42,7 +42,7 @@ rcall ow_write_byte
 init_18b20_exit:
 ret
 
-process_18b20:
+read_18b20:
 lds r16, state18b20
 cpi r16, STATE18B20_WAIT_MEASURING
 breq process_18b20_readtemp

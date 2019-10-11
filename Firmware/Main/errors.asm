@@ -1,0 +1,1 @@
+#define ERROR_NO18B20 0

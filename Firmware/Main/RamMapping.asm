@@ -1,3 +1,7 @@
+#define ERROR_REG r24
+#define BUTTONS_REG r25
+#define DISPLAY_MODE_REG r26
+
 ;Display
 #define SEG1 0x60
 #define SEG2 0x61 

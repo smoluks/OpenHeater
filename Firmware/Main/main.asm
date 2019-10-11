@@ -1,4 +1,5 @@
 #include "RamMapping.asm"
+#include "errors.asm"
 
 .ORG 0x00 rjmp RESET ; Reset Handler
 ;.ORG 0x01 rjmp EXT_INT0 ; IRQ0 Handler
@@ -24,6 +25,7 @@
 #include "TIM1.asm"
 
 RESET:
+;----init----
 ;stack
 ldi r16, high(RAMEND)
 out SPH, r16
@@ -46,6 +48,8 @@ ldi r16, 0b11111011
 out PORTD, r16
 ldi r16, 0b11110110
 out DDRD, r16
+;regs
+clr ERROR_REG
 ;ram
 ser r16
 sts SEG1, r16
@@ -69,23 +73,31 @@ out TIMSK, r16
 ;
 rcall init_18b20
 brtc l0
- ldi r16, 1
- rjmp writeError
+ sbr ERROR_REG, 1 << ERROR_NO18B20
 l0:
 sei
-l_cycle:
+main_cycle:
 ;
-rcall process_18b20
-brtc l2
- ldi r16, 1
- rjmp writeError
+sbrs ERROR_REG, ERROR_NO18B20
+rjmp l1
+ ;18b20 not found
+ rcall init_18b20
+ brts l2
+  cbr ERROR_REG, 1 << ERROR_NO18B20
+l1:
+ ;read 18b20
+ rcall read_18b20
+ brtc l2
+  sbr ERROR_REG, 1 << ERROR_NO18B20
 l2:
 ;
+rcall process_buttons
+;
 rcall process_display
-brtc l_cycle
- ldi r16, 2
- rjmp writeError
+;
+rjmp main_cycle
 
 #include "1Wire.asm"
 #include "18b20.asm"
-#include "Display.asm"
+#include "display.asm"
+#include "buttons.asm"
