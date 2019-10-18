@@ -1,16 +1,36 @@
 #define DISPLAY_MODE_DEFAULT 0
+#define DISPLAY_MODE_SETTEMP 1
+#define DISPLAY_MODE_SETMODE 2
 
 process_display:
 ;
-cp DISPLAY_MODE_REG DISPLAY_MODE_DEFAULT
-brne pd1
- ;show temp
- test ERROR_REG
- breq pd2
+cpi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
+brne pdi1
+ ;-----show temp-----
+ ;buttons
+ sbrs BUTTONS_REG, BUTTON_PLUS_FLAG
+ rjmp pdi3
+  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
+ pdi3:
+ sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
+ rjmp pdi4
+  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
+ pdi4:
+ sbrs BUTTONS_REG, BUTTON_MODE_FLAG
+ rjmp pdi5
+  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
+ pdi5:
+ clr BUTTONS_REG
+ ;display
+ tst ERROR_REG
+ breq pdi2
   rcall writeError
- pd2:
+  ret
+ pdi2:
   rcall writeTemperature
- ret
+  ret
+pdi1: 
+
 ret
 
 writeTemperature:

@@ -1,5 +1,11 @@
 #define ERROR_REG r24
+
 #define BUTTONS_REG r25
+#define BUTTON_PLUS_FLAG 0
+#define BUTTON_MINUS_FLAG 1
+#define BUTTON_MODE_FLAG 2
+#define BUTTON_MENU_FLAG 3
+
 #define DISPLAY_MODE_REG r26
 
 ;Display
