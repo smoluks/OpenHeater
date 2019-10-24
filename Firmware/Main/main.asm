@@ -15,7 +15,7 @@
 ;.ORG 0x0b rjmp USART_RXC ; USART RX Complete Handler
 ;.ORG 0x0c rjmp USART_UDRE ; UDR Empty Handler
 ;.ORG 0x0d rjmp USART_TXC ; USART TX Complete Handler
-;.ORG 0x0e rjmp ADC ; ADC Conversion Complete Handler
+.ORG 0x0e rjmp ADCi ; ADC Conversion Complete Handler
 ;.ORG 0x0f rjmp EE_RDY ; EEPROM Ready Handler
 ;.ORG 0x10 rjmp ANA_COMP ; Analog Comparator Handler
 ;.ORG 0x11 rjmp TWSI ; Two-wire Serial Interface Handler
@@ -70,14 +70,20 @@ ldi r16, 0x12
 out OCR1AL, r16
 ldi r16, 0b00010001
 out TIMSK, r16
+;ADC
+ldi r16, 0b01100110
+out ADMUX, r16
+ldi r16, 0b11101111
+out ADCSRA, r16
 ;
 rcall init_18b20
 brtc l0
  sbr ERROR_REG, 1 << ERROR_NO18B20
 l0:
 sei
+;----------main-cycle----------
 main_cycle:
-;
+;18b20
 sbrs ERROR_REG, ERROR_NO18B20
 rjmp l1
  ;18b20 not found
@@ -90,9 +96,9 @@ l1:
  brtc l2
   sbr ERROR_REG, 1 << ERROR_NO18B20
 l2:
-;
-rcall process_buttons
-;
+;logic
+rcall logic
+;display
 rcall process_display
 ;
 rjmp main_cycle
@@ -101,3 +107,4 @@ rjmp main_cycle
 #include "18b20.asm"
 #include "display.asm"
 #include "buttons.asm"
+#include "logic.asm"

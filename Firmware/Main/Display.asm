@@ -68,21 +68,16 @@ mov r17, r16
 rcall convertnumberto7segment1
 ori r17, 0b00000100 ;DP
 sts SEG2, r17
-;
+;-fractional part - TLow / 16 * 10 -
 lds r16, TLow
 andi r16, 0b00001111
-clr r17
-wt1:
-tst r16
-breq wt0
- dec r16
- add r17, r3
- rjmp wt1
-wt0:
-lsr r17
-lsr r17
-lsr r17
-lsr r17
+;*10
+mul r16, CONST_10
+mov r17, r0
+;/16
+swap r17
+andi r17, 0b00001111
+;
 rcall convertnumberto7segment2
 sts SEG3, r17
 rjmp wt_exit
