@@ -85,9 +85,9 @@ rcall ow_write_byte
 ldi r16, READ_SCRATCHPAD
 rcall ow_write_byte
 rcall ow_read_byte
-sts TLow, r16
+mov TLow_REG, r16
 rcall ow_read_byte
-sts THigh, r16
+mov THigh_REG, r16
 ;
 lds r16, Systick
 ldi r17, MEAS_TIME

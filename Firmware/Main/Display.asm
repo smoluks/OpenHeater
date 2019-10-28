@@ -34,9 +34,9 @@ pdi1:
 ret
 
 writeTemperature:
-lds r17, THigh
+mov r17, THigh_REG
 andi r17, 0b00001111
-lds r16, TLow
+mov r16, TLow_REG
 andi r16, 0b11110000
 or r16, r17
 swap r16
@@ -69,7 +69,7 @@ rcall convertnumberto7segment1
 ori r17, 0b00000100 ;DP
 sts SEG2, r17
 ;-fractional part - TLow / 16 * 10 -
-lds r16, TLow
+mov r16, TLow_REG
 andi r16, 0b00001111
 ;*10
 mul r16, CONST_10

@@ -1,5 +1,4 @@
 #include "RamMapping.asm"
-#include "errors.asm"
 
 .ORG 0x00 rjmp RESET ; Reset Handler
 ;.ORG 0x01 rjmp EXT_INT0 ; IRQ0 Handler
@@ -51,12 +50,23 @@ out DDRD, r16
 ;regs
 clr ERROR_REG
 ;ram
+ldi TTARGETLow_REG, 0xC0
+ldi TTARGETHigh_REG, 0x01 ;28
+ldi ERROR_REG, 0
+ldi BUTTONS_REG, 0
+ldi MODE_REG, MODE_OFF
+ldi DISPLAY_MODE_REG, 0
 ser r16
 sts SEG1, r16
 sts SEG2, r16
 sts SEG3, r16
 sts SEG4, r16
-sts SEGNUMBER, r2
+sts SEGNUMBER, CONST_0
+sts PREVBUTTONS, CONST_0
+sts BUTTON_PLUS_PRESS_COUNT, CONST_0
+sts BUTTON_MINUS_PRESS_COUNT, CONST_0
+sts BUTTON_MODE_PRESS_COUNT, CONST_0
+sts BUTTON_MENU_PRESS_COUNT, CONST_0
 ;T0 - indication
 ldi r16, 0b00000011
 out TCCR0, r16

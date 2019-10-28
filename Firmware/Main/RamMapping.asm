@@ -1,7 +1,14 @@
 #define CONST_0 r2
 #define CONST_10 r3
 
+;Temperature
+#define TLow_REG  r20
+#define THigh_REG  r21
+#define TTARGETLow_REG  r22
+#define TTARGETHigh_REG  r23
+
 #define ERROR_REG r24
+#define ERROR_NO18B20 0
 
 #define BUTTONS_REG r25
 #define BUTTON_PLUS_FLAG 0
@@ -13,7 +20,14 @@
 #define BUTTON_MODE_HOLD_FLAG 6
 #define BUTTON_MENU_HOLD_FLAG 7
 
-#define DISPLAY_MODE_REG r26
+#define MODE_REG r26
+#define MODE_OFF 0
+#define MODE_1 1
+#define MODE_2 2
+#define MODE_3 3
+#define MODE_FAN 4
+
+#define DISPLAY_MODE_REG r27
 
 ;Display
 #define SEG1 0x60
@@ -27,9 +41,6 @@
 #define BUTTON_MINUS_PRESS_COUNT 0x67
 #define BUTTON_MODE_PRESS_COUNT 0x68
 #define BUTTON_MENU_PRESS_COUNT 0x69
-;Temperature
-#define TLow 0x6A
-#define THigh 0x6D
 ;systick
 #define Systick 0x6C
 ;18b20
