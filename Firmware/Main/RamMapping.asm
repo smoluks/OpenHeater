@@ -4,11 +4,11 @@
 ;Temperature
 #define TLow_REG  r20
 #define THigh_REG  r21
-#define TTARGETLow_REG  r22
-#define TTARGETHigh_REG  r23
+#define TTARGET_REG r22
 
 #define ERROR_REG r24
 #define ERROR_NO18B20 0
+#define ERROR_SOFTWARE 1
 
 #define BUTTONS_REG r25
 #define BUTTON_PLUS_FLAG 0
@@ -21,6 +21,7 @@
 #define BUTTON_MENU_HOLD_FLAG 7
 
 #define MODE_REG r26
+#define MODE_COUNT 5
 #define MODE_OFF 0
 #define MODE_1 1
 #define MODE_2 2
@@ -28,6 +29,9 @@
 #define MODE_FAN 4
 
 #define DISPLAY_MODE_REG r27
+#define DISPLAY_MODE_DEFAULT 0
+#define DISPLAY_MODE_SETTEMP 1
+#define DISPLAY_MODE_SETMODE 2
 
 ;Display
 #define SEG1 0x60

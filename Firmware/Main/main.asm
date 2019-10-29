@@ -50,8 +50,7 @@ out DDRD, r16
 ;regs
 clr ERROR_REG
 ;ram
-ldi TTARGETLow_REG, 0xC0
-ldi TTARGETHigh_REG, 0x01 ;28
+ldi TTARGET_REG, 28
 ldi ERROR_REG, 0
 ldi BUTTONS_REG, 0
 ldi MODE_REG, MODE_OFF
