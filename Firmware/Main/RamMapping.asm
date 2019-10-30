@@ -5,12 +5,12 @@
 #define TLow_REG  r20
 #define THigh_REG  r21
 #define TTARGET_REG r22
-
-#define ERROR_REG r24
+;
+#define ERROR_REG r23
 #define ERROR_NO18B20 0
 #define ERROR_SOFTWARE 1
-
-#define BUTTONS_REG r25
+;
+#define BUTTONS_REG r24
 #define BUTTON_PLUS_FLAG 0
 #define BUTTON_MINUS_FLAG 1
 #define BUTTON_MODE_FLAG 2
@@ -19,16 +19,16 @@
 #define BUTTON_MINUS_HOLD_FLAG 5
 #define BUTTON_MODE_HOLD_FLAG 6
 #define BUTTON_MENU_HOLD_FLAG 7
-
-#define MODE_REG r26
+;
+#define MODE_REG r25
 #define MODE_COUNT 5
 #define MODE_OFF 0
 #define MODE_1 1
 #define MODE_2 2
 #define MODE_3 3
 #define MODE_FAN 4
-
-#define DISPLAY_MODE_REG r27
+;
+#define DISPLAY_MODE_REG r26
 #define DISPLAY_MODE_DEFAULT 0
 #define DISPLAY_MODE_SETTEMP 1
 #define DISPLAY_MODE_SETMODE 2

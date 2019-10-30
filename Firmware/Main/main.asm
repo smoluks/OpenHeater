@@ -77,6 +77,7 @@ ldi r16, 0x7A
 out OCR1AH, r16
 ldi r16, 0x12
 out OCR1AL, r16
+;
 ldi r16, 0b00010001
 out TIMSK, r16
 ;ADC
@@ -92,7 +93,7 @@ l0:
 sei
 ;----------main-cycle----------
 main_cycle:
-;18b20
+;--18b20--
 sbrs ERROR_REG, ERROR_NO18B20
 rjmp l1
  ;18b20 not found
@@ -105,9 +106,9 @@ l1:
  brtc l2
   sbr ERROR_REG, 1 << ERROR_NO18B20
 l2:
-;logic
+;--logic--
 rcall logic
-;display
+;--display--
 rcall process_display
 ;
 rjmp main_cycle

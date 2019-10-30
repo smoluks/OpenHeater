@@ -1,4 +1,4 @@
-;Systick
+;Systick 1ms
 TIM1_COMPA:
 push r16
 IN r16, SREG

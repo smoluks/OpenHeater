@@ -1,10 +1,17 @@
 #define MINUS_1SEG 0b01000000
 
 process_display:
-;
 cpi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
-brne pdi1
+breq display_default
+cpi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
+brne display_settemp
+cpi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
+brne display_mode
+sbr ERROR_REG, 1 << ERROR_SOFTWARE 
+ret
+
  ;-----------default-----------
+ display_default:
  ;buttons
  sbrs BUTTONS_REG, BUTTON_PLUS_FLAG
  rjmp pdi3
@@ -27,21 +34,20 @@ brne pdi1
  pdi2:
   rcall showTemperature
   ret
-pdi1: 
-cpi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
-brne pdt1
+
  ;-----------set temp-----------
+ display_settemp:
  ;buttons
  sbrs BUTTONS_REG, BUTTON_PLUS_FLAG
  rjmp pdt3
   cpi TTARGET_REG, 75
-  brsh pdt3
+  brge pdt3
    inc TTARGET_REG
  pdt3:
  sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
  rjmp pdt4
   cpi TTARGET_REG, -39
-  brlo pdt4
+  brlt pdt4
    dec TTARGET_REG
  pdt4:
  sbrs BUTTONS_REG, BUTTON_MODE_FLAG
@@ -52,12 +58,11 @@ brne pdt1
  ;display
  rcall showSetTemperature
  ret
-pdt1:
-cpi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
-brne pdm1
+
  ;-----------mode-----------
+ display_mode:
  ;buttons
- sbrs BUTTONS_REG, BUTTON_PLUS_FLAG
+ sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
  rjmp pdm3
   ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
  pdm3:
@@ -76,9 +81,6 @@ brne pdm1
  ;display
  rcall showMode
  ret
-pdm1:
-sbr ERROR_REG, 1 << ERROR_SOFTWARE 
-ret
 
 showMode:
 cpi MODE_REG, MODE_OFF

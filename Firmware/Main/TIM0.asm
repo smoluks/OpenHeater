@@ -7,20 +7,21 @@ push r16
 ;
 lds r16, SEGNUMBER
 inc r16
-cpi r16, 4
-brlo to0
- clr r16
-to0:
+andi r16, 0b00000011
 sts SEGNUMBER, r16
 ;
-cpi r16, 0
-brne to1
- ;SEG1
- cbi portb, 5
+cpi r16, 1
+breq to1
+cpi r16, 2
+brne to2
+cpi r16, 3
+brne to3
+;----------SEG1----------
+ ;cbi portb, 5
  ;
  lds r16, SEG1
  andi r16, 0b10001111
- out portb, r16
+ out portb, r16 ;cbi portb, 5 here
  ;
  lds r16, SEG1
  lsl r16
@@ -31,16 +32,19 @@ brne to1
  out portd, r16
  ;
  sbi portb, 6
- rjmp coexit
-to1:
-cpi r16, 1
-brne to2
- ;SEG2
- cbi portb, 6
+ ;
+ pop r16
+ out SREG, r16
+ pop r17
+ pop r16
+ reti
+ ;----------SEG2----------
+ to1:
+ ;cbi portb, 6
  ;
  lds r16, SEG2
  andi r16, 0b10001111
- out portb, r16
+ out portb, r16 ;cbi portb, 6 here
  ;
  lds r16, SEG2
  lsl r16
@@ -51,11 +55,14 @@ brne to2
  out portd, r16
  ;
  sbi portd, 4
- rjmp coexit
-to2:
-cpi r16, 2
-brne to3
- ;SEG3
+;
+ pop r16
+ out SREG, r16
+ pop r17
+ pop r16
+ reti
+ ;----------SEG3----------
+ to2:
  cbi portd, 4
  ;
  lds r16, SEG3
@@ -71,14 +78,19 @@ brne to3
  out portd, r16
  ;
  sbi portb, 4 
- rjmp coexit
-to3:
- ;SEG4 
- cbi portb, 4
+;
+ pop r16
+ out SREG, r16
+ pop r17
+ pop r16
+ reti
+ ;----------SEG4----------
+ to3:
+ ;cbi portb, 4
  ;
  lds r16, SEG4
  andi r16, 0b10001111
- out portb, r16
+ out portb, r16 ;cbi portb, 4 here
  ;
  lds r16, SEG4
  lsl r16
@@ -89,11 +101,9 @@ to3:
  out portd, r16
  ;
  sbi portb, 5
- rjmp coexit
-; 
-coexit:
-pop r16
-out SREG, r16
-pop r17
-pop r16
-reti
+ ;
+ pop r16
+ out SREG, r16
+ pop r17
+ pop r16
+ reti
