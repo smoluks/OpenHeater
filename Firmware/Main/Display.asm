@@ -11,41 +11,46 @@ sbr ERROR_REG, 1 << ERROR_SOFTWARE
 ret
 
  ;-----------default-----------
- display_default:
- ;buttons
- sbrs BUTTONS_REG, BUTTON_PLUS_FLAG
- rjmp pdi3
-  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
- pdi3:
- sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
- rjmp pdi4
-  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
- pdi4:
- sbrs BUTTONS_REG, BUTTON_MODE_FLAG
- rjmp pdi5
-  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
- pdi5:
- clr BUTTONS_REG
- ;display
- tst ERROR_REG
- breq pdi2
-  rcall showError
-  ret
- pdi2:
-  rcall showTemperature
-  ret
+display_default:
+;buttons
+sbrc BUTTONS_REG, BUTTON_PLUS_FLAG
+rjmp pdi3
+sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
+rjmp pdi4
+pdi3:
+ ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
+pdi4:
+sbrs BUTTONS_REG, BUTTON_MODE_FLAG
+rjmp pdi5
+ ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
+pdi5:
+clr BUTTONS_REG
+;display
+tst ERROR_REG
+breq pdi2
+ rcall showError
+ ret
+pdi2:
+rcall showTemperature
+ret
 
- ;-----------set temp-----------
- display_settemp:
- ;buttons
- sbrs BUTTONS_REG, BUTTON_PLUS_FLAG
- rjmp pdt3
-  cpi TTARGET_REG, 75
-  brge pdt3
-   inc TTARGET_REG
+;-----------set temp-----------
+display_settemp:
+;buttons
+sbrc BUTTONS_REG, BUTTON_PLUS_FLAG
+rjmp pdt1
+sbrs BUTTONS_REG, BUTTON_PLUS_HOLD_FLAG
+rjmp pdt3
+ pdt1:
+ cpi TTARGET_REG, 75
+ brge pdt3
+  inc TTARGET_REG
  pdt3:
- sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
+ sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
+ rjmp pdt2
+ sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
  rjmp pdt4
+  pdt2:
   cpi TTARGET_REG, -39
   brlt pdt4
    dec TTARGET_REG

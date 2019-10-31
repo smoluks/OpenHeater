@@ -46,7 +46,7 @@
 #define BUTTON_MODE_PRESS_COUNT 0x68
 #define BUTTON_MENU_PRESS_COUNT 0x69
 ;systick
-#define Systick 0x6C
+#define SYSTICK 0x6C
 ;18b20
-#define state18b20 0x6D
-#define pt18b20 0x6E
+#define D18B20_STATE 0x6D
+#define D18B20_TIMESTAMP 0x6E

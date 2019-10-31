@@ -14,14 +14,13 @@
 ;.ORG 0x0b rjmp USART_RXC ; USART RX Complete Handler
 ;.ORG 0x0c rjmp USART_UDRE ; UDR Empty Handler
 ;.ORG 0x0d rjmp USART_TXC ; USART TX Complete Handler
-.ORG 0x0e rjmp ADCi ; ADC Conversion Complete Handler
+;.ORG 0x0e rjmp ADCi ; ADC Conversion Complete Handler
 ;.ORG 0x0f rjmp EE_RDY ; EEPROM Ready Handler
 ;.ORG 0x10 rjmp ANA_COMP ; Analog Comparator Handler
 ;.ORG 0x11 rjmp TWSI ; Two-wire Serial Interface Handler
 ;.ORG 0x12 rjmp SPM_RDY ; Store Program Memory Ready Handler
 
 #include "TIM0.asm"
-#include "TIM1.asm"
 
 RESET:
 ;----init----
@@ -66,16 +65,17 @@ sts BUTTON_PLUS_PRESS_COUNT, CONST_0
 sts BUTTON_MINUS_PRESS_COUNT, CONST_0
 sts BUTTON_MODE_PRESS_COUNT, CONST_0
 sts BUTTON_MENU_PRESS_COUNT, CONST_0
+sts D18B20_STATE, CONST_0
 ;T0 - indication
 ldi r16, 0b00000011
 out TCCR0, r16
-;T1 - systick
+;T1 - button read 100 ms
 out TCCR1A, r2
-ldi r16, 0b00001100
+ldi r16, 0b00001011
 out TCCR1B, r16
-ldi r16, 0x7A
+ldi r16, 0x30
 out OCR1AH, r16
-ldi r16, 0x12
+ldi r16, 0xD4
 out OCR1AL, r16
 ;
 ldi r16, 0b00010001
@@ -83,7 +83,7 @@ out TIMSK, r16
 ;ADC
 ldi r16, 0b01100110
 out ADMUX, r16
-ldi r16, 0b11101111
+ldi r16, 0b11100111
 out ADCSRA, r16
 ;
 rcall init_18b20
