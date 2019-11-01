@@ -3,7 +3,7 @@
 .ORG 0x00 rjmp RESET ; Reset Handler
 ;.ORG 0x01 rjmp EXT_INT0 ; IRQ0 Handler
 ;.ORG 0x02 rjmp EXT_INT1 ; IRQ1 Handler
-;.ORG 0x03 rjmp TIM2_COMP ; Timer2 Compare Handler
+.ORG 0x03 rjmp TIM2_COMP ; Timer2 Compare Handler
 ;.ORG 0x04 rjmp TIM2_OVF ; Timer2 Overflow Handler
 ;.ORG 0x05 rjmp TIM1_CAPT ; Timer1 Capture Handler
 .ORG 0x06 rjmp TIM1_COMPA ; Timer1 CompareA Handler
@@ -11,9 +11,9 @@
 ;.ORG 0x08 rjmp TIM1_OVF ; Timer1 Overflow Handler
 .ORG 0x09 rjmp TIM0_OVF ; Timer0 Overflow Handler
 ;.ORG 0x0a rjmp SPI_STC ; SPI Transfer Complete Handler
-;.ORG 0x0b rjmp USART_RXC ; USART RX Complete Handler
+.ORG 0x0b rjmp USART_RXC ; USART RX Complete Handler
 ;.ORG 0x0c rjmp USART_UDRE ; UDR Empty Handler
-;.ORG 0x0d rjmp USART_TXC ; USART TX Complete Handler
+.ORG 0x0d rjmp USART_TXC ; USART TX Complete Handler
 ;.ORG 0x0e rjmp ADCi ; ADC Conversion Complete Handler
 ;.ORG 0x0f rjmp EE_RDY ; EEPROM Ready Handler
 ;.ORG 0x10 rjmp ANA_COMP ; Analog Comparator Handler
@@ -77,9 +77,20 @@ ldi r16, 0x30
 out OCR1AH, r16
 ldi r16, 0xD4
 out OCR1AL, r16
+;T2 - modbus timeout
+
 ;
 ldi r16, 0b00010001
 out TIMSK, r16
+;UART 9600 ODD
+out UCSRA, CONST_0
+ldi r16, 0b11011000
+out UCSRB, r16
+ldi r16, 0b10110110
+out UCSRC, r16
+out UBRRH, CONST_0
+ldi r16, 51
+out UBRRL, r16
 ;ADC
 ldi r16, 0b01100110
 out ADMUX, r16

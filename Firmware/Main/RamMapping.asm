@@ -1,3 +1,4 @@
+;-----------Regs-----------
 #define CONST_0 r2
 #define CONST_10 r3
 
@@ -33,6 +34,7 @@
 #define DISPLAY_MODE_SETTEMP 1
 #define DISPLAY_MODE_SETMODE 2
 
+;-----------RAM-----------
 ;Display
 #define SEG1 0x60
 #define SEG2 0x61 
@@ -46,7 +48,13 @@
 #define BUTTON_MODE_PRESS_COUNT 0x68
 #define BUTTON_MENU_PRESS_COUNT 0x69
 ;systick
-#define SYSTICK 0x6C
+#define SYSTICK 0x6A
 ;18b20
-#define D18B20_STATE 0x6D
-#define D18B20_TIMESTAMP 0x6E
+#define D18B20_STATE 0x6B
+#define D18B20_TIMESTAMP 0x6C
+;modbus
+#define RECV_HANDLE_L 0x6D
+#define RECV_HANDLE_H 0x6E 
+#define TRANS_HANDLE_L 0x6F
+#define TRANS_HANDLE_H 0x70
+#define TRANS_COUNT 0x71
