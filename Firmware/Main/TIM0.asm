@@ -13,9 +13,9 @@ sts SEGNUMBER, r16
 cpi r16, 1
 breq to1
 cpi r16, 2
-brne to2
+breq to2
 cpi r16, 3
-brne to3
+breq to3
 ;----------SEG1----------
  ;cbi portb, 5
  ;

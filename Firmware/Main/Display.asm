@@ -1,12 +1,10 @@
-#define MINUS_1SEG 0b01000000
-
 process_display:
 cpi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 breq display_default
 cpi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
-brne display_settemp
-cpi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
-brne display_mode
+breq display_settemp
+cpi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
+breq display_mode
 sbr ERROR_REG, 1 << ERROR_SOFTWARE 
 ret
 
@@ -31,8 +29,8 @@ breq pdi2
  rcall showError
  ret
 pdi2:
-rcall showTemperature
-ret
+ rcall showTemperature
+ ret
 
 ;-----------set temp-----------
 display_settemp:
@@ -45,24 +43,28 @@ rjmp pdt3
  cpi TTARGET_REG, 75
  brge pdt3
   inc TTARGET_REG
- pdt3:
- sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
- rjmp pdt2
- sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
- rjmp pdt4
-  pdt2:
-  cpi TTARGET_REG, -39
-  brlt pdt4
-   dec TTARGET_REG
- pdt4:
- sbrs BUTTONS_REG, BUTTON_MODE_FLAG
- rjmp pdt5
-  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
- pdt5:
- clr BUTTONS_REG
- ;display
- rcall showSetTemperature
- ret
+pdt3:
+sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
+rjmp pdt2
+sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
+rjmp pdt4
+ pdt2:
+ cpi TTARGET_REG, -39
+ brlt pdt4
+  dec TTARGET_REG
+pdt4:
+sbrs BUTTONS_REG, BUTTON_MODE_FLAG
+rjmp pdt5
+ ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
+pdt5:
+sbrs BUTTONS_REG, BUTTON_MENU_FLAG
+rjmp pdt6
+ ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
+pdt6:
+clr BUTTONS_REG
+;display
+rcall showSetTemperature
+ret
 
  ;-----------mode-----------
  display_mode:
@@ -81,7 +83,11 @@ rjmp pdt3
   cpi MODE_REG, MODE_COUNT
   brlo pdm5
    clr MODE_REG
- pdm5:
+pdm5:
+sbrs BUTTONS_REG, BUTTON_MENU_FLAG
+rjmp pdm6
+ ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
+pdm6:
  clr BUTTONS_REG
  ;display
  rcall showMode
@@ -104,8 +110,8 @@ cpi MODE_REG, MODE_1
 brne ccm2
  ;--1--
  sts SEG1, CONST_0
- sts SEG1, CONST_0
- sts SEG1, CONST_0
+ sts SEG2, CONST_0
+ sts SEG3, CONST_0
  ldi r16, 0b00000101
  sts SEG4, r16
  ret 
@@ -114,8 +120,8 @@ cpi MODE_REG, MODE_2
 brne ccm3
  ;--2--
  sts SEG1, CONST_0
- sts SEG1, CONST_0
- sts SEG1, CONST_0
+ sts SEG2, CONST_0
+ sts SEG3, CONST_0
  ldi r16, 0b01110110
  sts SEG4, r16
  ret 
@@ -124,8 +130,8 @@ cpi MODE_REG, MODE_3
 brne ccm4
  ;--3--
  sts SEG1, CONST_0
- sts SEG1, CONST_0
- sts SEG1, CONST_0
+ sts SEG2, CONST_0
+ sts SEG3, CONST_0
  ldi r16, 0b00101111
  sts SEG4, r16
  ret 
@@ -149,14 +155,19 @@ showSetTemperature:
 ;-1-
 sts SEG1, CONST_0
 ;-2-
-mov r16, TTARGET_REG
-sts SEG2, CONST_0
-sbrs r16, 7
+sbrs TTARGET_REG, 7
 rjmp sst1
- ldi r17, MINUS_1SEG
- sts SEG2, r17
-;-3-
+ ;<0
+ sts SEG2, CONST_MINUS_1SEG
+ clr r16
+ sub r16, TTARGET_REG 
+ rjmp sst0
 sst1:
+ ;>=0
+ sts SEG2, CONST_0
+ mov r16, TTARGET_REG
+sst0:
+;-3-
 clr r17
 sst2:
 cpi r16, 10
@@ -252,8 +263,7 @@ rjmp wt_exit
 ;-----<0-----
 wt_minus:
 ;1
-ldi r17, MINUS_1SEG
-sts SEG1, r17
+sts SEG1, CONST_MINUS_1SEG
 ;2
 clr r17
 sub r17, r16
@@ -279,11 +289,12 @@ ldi r17, 0b10110001
 sts SEG4, r17
 ret
 
-;IN r16 - errorcode
 showError:
-ldi r17, 0b01110011
-sts SEG1, r17
-;
+;1
+ldi r16, 0b01110011
+sts SEG1, r16
+;2
+mov r16, ERROR_REG
 clr r17
 we0:
 cpi r16, 100
@@ -294,7 +305,7 @@ brlo we1
 we1:
 rcall convertnumberto7segment1
 sts SEG2, r17
-;
+;3
 clr r17
 we2:
 cpi r16, 10
@@ -305,13 +316,12 @@ brlo we3
 we3:
 rcall convertnumberto7segment2
 sts SEG3, r17
-;
+;4
 mov r17, r16
 rcall convertnumberto7segment2
 sts SEG4, r17
 ;
-we_exit:
-rjmp we_exit
+ret
 
 convertnumberto7segment1:
 cpi r17, 0

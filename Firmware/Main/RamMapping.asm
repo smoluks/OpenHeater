@@ -1,6 +1,7 @@
 ;-----------Regs-----------
 #define CONST_0 r2
 #define CONST_10 r3
+#define CONST_MINUS_1SEG r4 
 
 ;Temperature
 #define TLow_REG  r20
@@ -58,3 +59,8 @@
 #define TRANS_HANDLE_L 0x6F
 #define TRANS_HANDLE_H 0x70
 #define TRANS_COUNT 0x71
+#define CRCHI 0x72
+#define CRCLO 0x73
+#define MODBUS_INPUT_REGS_COUNT 1
+#define MODBUS_INPUT_REGS 0x74
+#define UART_BUFFER 0x80

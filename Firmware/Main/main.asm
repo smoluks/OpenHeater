@@ -33,6 +33,8 @@ out SPL, r16
 clr r16
 ldi r17, 10
 movw r2, r16
+ldi r16, 0b01000000
+movw r4, r16
 ;gpio
 ldi r16, 0b11111111
 out PORTB, r16
@@ -66,10 +68,14 @@ sts BUTTON_MINUS_PRESS_COUNT, CONST_0
 sts BUTTON_MODE_PRESS_COUNT, CONST_0
 sts BUTTON_MENU_PRESS_COUNT, CONST_0
 sts D18B20_STATE, CONST_0
+ldi r16, low(UART_BUFFER)
+sts RECV_HANDLE_L, r16
+ldi r16, high(UART_BUFFER)
+sts RECV_HANDLE_H, r16
 ;T0 - indication
 ldi r16, 0b00000011
 out TCCR0, r16
-;T1 - button read 100 ms
+;T1 - button read  + systick 100 ms
 out TCCR1A, r2
 ldi r16, 0b00001011
 out TCCR1B, r16
@@ -124,8 +130,11 @@ rcall process_display
 ;
 rjmp main_cycle
 
+#include "Uart.asm"
+#include "Modbus.asm"
+#include "Crc.asm"
 #include "1Wire.asm"
 #include "18b20.asm"
-#include "display.asm"
-#include "buttons.asm"
-#include "logic.asm"
+#include "Display.asm"
+#include "Buttons.asm"
+#include "Logic.asm"

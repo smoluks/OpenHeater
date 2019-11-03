@@ -26,18 +26,18 @@ brlo adc0
 ;
 adc0:
 cpi r16, 159
-brlo menu_btn
+brsh menu_btn
 cpi r16, 95
-brlo mode_btn
+brsh mode_btn
 cpi r16, 31
-brlo plus_btn
-rjmp minus_btn
+brsh minus_btn
+rjmp plus_btn
 
 ;---------- Menu ----------
 menu_btn:
 lds r16, PREVBUTTONS
 sbrc r16, BUTTON_MENU_FLAG
-breq adc11
+rjmp adc11
   ;first press
   sbr r16, 1 << BUTTON_MENU_FLAG
   sts PREVBUTTONS, r16
@@ -55,14 +55,14 @@ adc11:
    sbr BUTTONS_REG, 1 << BUTTON_MENU_HOLD_FLAG
    rjmp adc_exit
 
-
  ;---------- Mode ----------
  mode_btn:
- sbrc r17, BUTTON_MODE_FLAG
- breq adc21
+ lds r16, PREVBUTTONS
+ sbrc r16, BUTTON_MODE_FLAG
+ rjmp adc21
   ;first press
-  sbr r17, 1 << BUTTON_MODE_FLAG
-  sts PREVBUTTONS, r17
+  sbr r16, 1 << BUTTON_MODE_FLAG
+  sts PREVBUTTONS, r16
   sbr BUTTONS_REG, 1 << BUTTON_MODE_FLAG
   rjmp adc_exit
  adc21:
@@ -76,52 +76,51 @@ adc11:
   adc22: 
    sbr BUTTONS_REG, 1 << BUTTON_MODE_HOLD_FLAG
    rjmp adc_exit
-adc2:
 
- ;---------- + ----------
+;---------- + ----------
 plus_btn: 
- sbrc r17, BUTTON_PLUS_FLAG
- breq adc31
-  ;first press
-  sbr r17, 1 << BUTTON_PLUS_FLAG
-  sts PREVBUTTONS, r17
-  sbr BUTTONS_REG, 1 << BUTTON_PLUS_FLAG
-  rjmp adc_exit
- adc31:
-  ;long press detect
-  lds r16, BUTTON_PLUS_PRESS_COUNT
-  cpi r16, CONST_LONG_PRESS
-  brsh adc32
+lds r16, PREVBUTTONS
+sbrc r16, BUTTON_PLUS_FLAG
+rjmp adc31
+ ;first press
+ sbr r16, 1 << BUTTON_PLUS_FLAG
+ sts PREVBUTTONS, r16
+ sbr BUTTONS_REG, 1 << BUTTON_PLUS_FLAG
+ rjmp adc_exit
+adc31:
+ ;long press detect
+ lds r16, BUTTON_PLUS_PRESS_COUNT
+ cpi r16, CONST_LONG_PRESS
+ brsh adc32
    inc r16
    sts BUTTON_PLUS_PRESS_COUNT, r16
    rjmp adc_exit
   adc32: 
    sbr BUTTONS_REG, 1 << BUTTON_PLUS_HOLD_FLAG
    rjmp adc_exit
-adc3:
 
- ;---------- - ----------
- minus_btn:
- sbrc r17, BUTTON_MINUS_FLAG
- breq adc41
-  ;first press
-  sbr r17, 1 << BUTTON_MINUS_FLAG
-  sts PREVBUTTONS, r17
-  sbr BUTTONS_REG, 1 << BUTTON_MINUS_FLAG
+;---------- - ----------
+minus_btn:
+lds r16, PREVBUTTONS
+sbrc r16, BUTTON_MINUS_FLAG
+rjmp adc41
+ ;first press
+ sbr r16, 1 << BUTTON_MINUS_FLAG
+ sts PREVBUTTONS, r16
+ sbr BUTTONS_REG, 1 << BUTTON_MINUS_FLAG
+ rjmp adc_exit
+adc41:
+ ;long press detect
+ lds r16, BUTTON_MINUS_PRESS_COUNT
+ cpi r16, CONST_LONG_PRESS
+ brsh adc42
+  inc r16
+  sts BUTTON_MINUS_PRESS_COUNT, r16
   rjmp adc_exit
- adc41:
-  ;long press detect
-  lds r16, BUTTON_MINUS_PRESS_COUNT
-  cpi r16, CONST_LONG_PRESS
-  brsh adc42
-   inc r16
-   sts BUTTON_MINUS_PRESS_COUNT, r16
-   rjmp adc_exit
-  adc42: 
-   sbr BUTTONS_REG, 1 << BUTTON_MINUS_HOLD_FLAG
-   ;rjmp adc_exit
-;   
-
+ adc42: 
+  sbr BUTTONS_REG, 1 << BUTTON_MINUS_HOLD_FLAG
+  ;rjmp adc_exit
+;
 adc_exit:
 pop r16
 out SREG, r16
