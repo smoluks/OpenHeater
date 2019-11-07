@@ -34,6 +34,7 @@ clr r16
 ldi r17, 10
 movw r2, r16
 ldi r16, 0b01000000
+ldi r17, 0b00001101
 movw r4, r16
 ;gpio
 ldi r16, 0b11111111
@@ -83,10 +84,12 @@ ldi r16, 0x30
 out OCR1AH, r16
 ldi r16, 0xD4
 out OCR1AL, r16
-;T2 - modbus timeout
-
+;T2 - modbus timeout 4ms
+out TCNT2, r2
+ldi r16, 249
+out OCR2, r16
 ;
-ldi r16, 0b00010001
+ldi r16, 0b10010001
 out TIMSK, r16
 ;UART 9600 ODD
 out UCSRA, CONST_0

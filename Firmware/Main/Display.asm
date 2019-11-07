@@ -89,10 +89,7 @@ rjmp pdm6
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 pdm6:
  clr BUTTONS_REG
- ;display
- rcall showMode
- ret
-
+;display
 showMode:
 cpi MODE_REG, MODE_OFF
 brne ccm1
@@ -100,9 +97,9 @@ brne ccm1
  sts SEG1, CONST_0
  ldi r16, 0b10111011
  sts SEG2, r16
- ldi r16, 0b01110010
+ ldi r16, 0b01010101
  sts SEG3, r16
- ldi r16, 0b10101010
+ ldi r16, 0b10010101
  sts SEG4, r16
  ret 
 ccm1:
@@ -112,7 +109,7 @@ brne ccm2
  sts SEG1, CONST_0
  sts SEG2, CONST_0
  sts SEG3, CONST_0
- ldi r16, 0b00000101
+ ldi r16, 0b00101000
  sts SEG4, r16
  ret 
 ccm2:
@@ -122,7 +119,7 @@ brne ccm3
  sts SEG1, CONST_0
  sts SEG2, CONST_0
  sts SEG3, CONST_0
- ldi r16, 0b01110110
+ ldi r16, 0b10110110
  sts SEG4, r16
  ret 
 ccm3:
@@ -132,7 +129,7 @@ brne ccm4
  sts SEG1, CONST_0
  sts SEG2, CONST_0
  sts SEG3, CONST_0
- ldi r16, 0b00101111
+ ldi r16, 0b10111010
  sts SEG4, r16
  ret 
 ccm4:
@@ -142,9 +139,9 @@ brne ccm5
  sts SEG1, CONST_0
  ldi r16, 0b01110010
  sts SEG2, r16
- ldi r16, 0b01011111
+ ldi r16, 0b10111101
  sts SEG3, r16
- ldi r16, 0b00101111
+ ldi r16, 0b00111101
  sts SEG4, r16
  ret 
 ccm5:

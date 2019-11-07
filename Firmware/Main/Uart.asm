@@ -14,8 +14,7 @@ sts RECV_HANDLE_L, r26
 sts RECV_HANDLE_H, r27
 ;restart T2
 out tcnt2, r2
-ldi r16, 0b00001101
-out tccr2, r16
+out tccr2, CONST_T2_START
 ;
 pop r16
 out SREG, r16
