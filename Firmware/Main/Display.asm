@@ -97,7 +97,7 @@ brne ccm1
  sts SEG1, CONST_0
  ldi r16, 0b10111011
  sts SEG2, r16
- ldi r16, 0b01010101
+ ldi r16, 0b10010101
  sts SEG3, r16
  ldi r16, 0b10010101
  sts SEG4, r16
