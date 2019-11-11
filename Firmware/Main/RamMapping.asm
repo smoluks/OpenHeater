@@ -1,8 +1,10 @@
 ;-----------Regs-----------
+#ifdef DEBUG
 #define CONST_0 r2
 #define CONST_10 r3
 #define CONST_MINUS_1SEG r4 
 #define CONST_T2_START r5
+#endif
 
 ;Temperature
 #define TLow_REG  r20

@@ -71,11 +71,6 @@ pop r16
 reti
 
 readAnalogInput:
-push r18
-push r28
-push r29
-push r30
-push r31
 ;check address
 lds r16, UART_BUFFER + 2 ;RegAddrHi
 tst r16
@@ -91,17 +86,14 @@ lds r17, UART_BUFFER + 5 ;CountLo
 cpi r17, MODBUS_INPUT_REGS_COUNT+1
 brsh rai1
 ;check all
-mov r18, r16
-add r18, r17
-cpi r18, MODBUS_INPUT_REGS_COUNT+1
+add r16, r17
+cpi r16, MODBUS_INPUT_REGS_COUNT+1
 brlo rai2
  rai1:	
  ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
- rcall makeerr
- rjmp rai_exit
+ rjmp makeerr 
 ;
 rai2:
-;---rcall readtemp---
 ;---build packet---
 ;clean CRC
 sts CRCLO, r3
@@ -121,7 +113,7 @@ mov r16, THigh_REG
 sts UART_BUFFER+3, r16
 rcall acrc
 ;
-ldi r16, TLow_REG
+mov r16, TLow_REG
 sts UART_BUFFER+4, r16
 rcall acrc
 ;crc
@@ -131,13 +123,7 @@ lds r16, CRCLO
 sts UART_BUFFER+6, r16
 ;
 ldi r16, 7
-sts TRANS_COUNT, r4
-rai_exit:
-pop r31
-pop r30
-pop r29
-pop r28
-pop r18
+sts TRANS_COUNT, r16
 ret
 
 ;in: error - r17
@@ -145,15 +131,15 @@ makeerr:
 ;clear crc
 sts CRCLO, r3
 sts CRCHI, r3
-;
+;address
 ldi r16, DEV_ADDR
 rcall acrc
-;
+;command
 lds r16, UART_BUFFER+1
 sbr r16, 0b10000000
 sts UART_BUFFER+1, r16
 rcall acrc
-;������
+;error
 sts UART_BUFFER+2, r17
 mov r16, r17
 rcall acrc
@@ -162,8 +148,9 @@ lds r16, CRCHI
 sts UART_BUFFER+3, r16
 lds r16, CRCLO
 sts UART_BUFFER+4, r16
-;���������� ���� � ������
-sts TRANS_COUNT, r4
+;start
+ldi r16, 5
+sts TRANS_COUNT, r16
 ;
 ret
 
