@@ -12,9 +12,9 @@
 init_18b20:
 ;set resolution
 rcall ow_reset
-brtc i181
+brtc i180
  ret
-i181:
+i180:
 ldi r16, SKIP_ROM
 rcall ow_write_byte
 ldi r16, WRITE_SCRATCHPAD
@@ -23,9 +23,27 @@ clr r16
 rcall ow_write_byte
 clr r16
 rcall ow_write_byte
-ldi r16, 0b00011111
+ldi r16, 0b01111111
 rcall ow_write_byte
 ;read scrathpad
+rcall ow_reset
+brtc i181
+ ret
+i181:
+ldi r16, SKIP_ROM
+rcall ow_write_byte
+ldi r16, READ_SCRATCHPAD
+rcall ow_write_byte
+rcall ow_read_byte
+cpi r16, 0x50
+breq i20
+ sbr ERROR_REG, 1 << FAKE_18B20
+i20:
+rcall ow_read_byte
+cpi r16, 0x05
+breq i21
+ sbr ERROR_REG, 1 << FAKE_18B20
+i21:
 ;start conversion
 rcall ow_reset
 brtc i182

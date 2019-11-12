@@ -15,6 +15,7 @@
 #define ERROR_NO18B20 0
 #define ERROR_SOFTWARE 1
 #define ERROR_I2C 2
+#define FAKE_18B20 3
 ;
 #define BUTTONS_REG r24
 #define BUTTON_PLUS_FLAG 0
@@ -65,5 +66,8 @@
 #define TRANS_COUNT 0x71
 #define CRCHI 0x72
 #define CRCLO 0x73
+;i2c
+#define TEMP1 0x74
+
 ;uart
 #define UART_BUFFER 0x80

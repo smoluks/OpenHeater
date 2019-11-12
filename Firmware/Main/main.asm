@@ -93,10 +93,10 @@ ldi r16, 0b10010001
 out TIMSK, r16
 ;I2C
 ldi r16, 32
-sts TWBR, r16
-sts TWSR, CONST_0
+out TWBR, r16
+out TWSR, CONST_0
 ldi r16, 0b10000100
-sts TWCR, r16
+out TWCR, r16
 ;UART 9600 ODD
 out UCSRA, CONST_0
 ldi r16, 0b11011000
