@@ -14,6 +14,7 @@
 #define ERROR_REG r23
 #define ERROR_NO18B20 0
 #define ERROR_SOFTWARE 1
+#define ERROR_I2C 2
 ;
 #define BUTTONS_REG r24
 #define BUTTON_PLUS_FLAG 0

@@ -91,6 +91,12 @@ out OCR2, r16
 ;
 ldi r16, 0b10010001
 out TIMSK, r16
+;I2C
+ldi r16, 32
+sts TWBR, r16
+sts TWSR, CONST_0
+ldi r16, 0b10000100
+sts TWCR, r16
 ;UART 9600 ODD
 out UCSRA, CONST_0
 ldi r16, 0b11011000
@@ -110,9 +116,13 @@ rcall init_18b20
 brtc l0
  sbr ERROR_REG, 1 << ERROR_NO18B20
 l0:
+;
+rcall ds1307_init
+;
 sei
 ;----------main-cycle----------
 main_cycle:
+wdr
 ;--18b20--
 sbrs ERROR_REG, ERROR_NO18B20
 rjmp l1
@@ -141,3 +151,5 @@ rjmp main_cycle
 #include "Display.asm"
 #include "Buttons.asm"
 #include "Logic.asm"
+#include "I2C.asm"
+#include "DS1307.asm"
