@@ -26,6 +26,7 @@ rcall ow_write_byte
 ldi r16, 0b01111111
 rcall ow_write_byte
 ;read scrathpad
+.IFDEF CHECK_18B20_GENUINE
 rcall ow_reset
 brtc i181
  ret
@@ -44,6 +45,7 @@ cpi r16, 0x05
 breq i21
  sbr ERROR_REG, 1 << FAKE_18B20
 i21:
+.ENDIF
 ;start conversion
 rcall ow_reset
 brtc i182

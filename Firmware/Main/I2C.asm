@@ -80,6 +80,7 @@ cpi r16, START
 brne i2
 ret
 i2:
+out UDR, r16
 set
 ret
 
@@ -184,16 +185,23 @@ rjmp i8
 ;
 in r16,TWSR
 andi r16, 0xF8
-cpi r16, RECEIVE_BYTE
+cpi r16, RECEIVE_BYTE_NACK
 brne i10
 ;
 in r17, TWDR
 ret
 i10:
+out UDR, r16
 set
 ret
 
 i2c_send_stop:
 ldi r16, (1<<TWINT)|(1<<TWEN)|(1<<TWSTO)
 out TWCR, r16
+;
+i12:
+in r16, TWCR
+sbrc r16,TWSTO
+rjmp i12
+;
 ret
