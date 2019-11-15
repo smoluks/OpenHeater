@@ -5,7 +5,7 @@ cpi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
 breq display_settemp
 cpi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
 breq display_mode
-sbr ERROR_REG, 1 << ERROR_SOFTWARE 
+sbr ERRORL_REG, 1 << ERRORL_SOFTWARE 
 ret
 
  ;-----------default-----------
@@ -24,13 +24,13 @@ rjmp pdi5
 pdi5:
 clr BUTTONS_REG
 ;display
-tst ERROR_REG
-breq pdi2
- rcall showError
- ret
+tst ERRORL_REG
+brne pdi2
+tst ERRORH_REG
+brne pdi2
+rjmp showTemperature
 pdi2:
- rcall showTemperature
- ret
+ rjmp showError
 
 ;-----------set temp-----------
 display_settemp:
@@ -147,7 +147,7 @@ brne ccm5
  sts SEG4, r16
  ret 
 ccm5:
-sbr ERROR_REG, 1 << ERROR_SOFTWARE 
+sbr ERRORL_REG, 1 << ERRORL_SOFTWARE 
 ret
 
 showSetTemperature:
@@ -292,8 +292,27 @@ showError:
 ;1
 ldi r16, 0b01110011
 sts SEG1, r16
+;
+ldi r16, 1
+mov r17, ERRORL_REG
+we5:
+sbrc r17, 0
+rjmp we4
+ inc r16
+ lsr r17
+ cpi r16, 8
+ brne we5
+mov r17, ERRORH_REG
+we6:
+sbrc r17, 0
+rjmp we4
+ inc r16
+ lsr r17
+ cpi r16, 16
+ brne we6
+clr r16 
 ;2
-mov r16, ERROR_REG
+we4:
 clr r17
 we0:
 cpi r16, 100

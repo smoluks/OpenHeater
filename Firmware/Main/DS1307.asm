@@ -35,5 +35,5 @@ brts ds1307_err
 ret
 
 ds1307_err:
-sbr ERROR_REG, 1 << ERROR_I2C
+sbr ERRORL_REG, 1 << ERRORL_I2C
 ret

@@ -1,23 +1,31 @@
 ;-----------Regs-----------
-#ifdef DEBUG
 #define CONST_0 r2
 #define CONST_10 r3
 #define CONST_MINUS_1SEG r4 
 #define CONST_T2_START r5
-#endif
+#define CONST_ADMUX_BUTTONS r6 
+#define CONST_ADMUX_FEEDBACK1 r7
 
 ;Temperature
 #define TLow_REG  r20
 #define THigh_REG  r21
 #define TTARGET_REG r22
 ;
-#define ERROR_REG r23
-#define ERROR_NO18B20 0
-#define ERROR_SOFTWARE 1
-#define ERROR_I2C 2
-#define FAKE_18B20 3
+#define ERRORL_REG r23
+#define ERRORL_NO18B20 0
+#define ERRORL_SOFTWARE 1
+#define ERRORL_I2C 2
+#define ERRORL_FAKE_18B20 3
+
+#define ERRORH_REG r24
+#define ERRORH_CHANNEL1_BREAK 0
+#define ERRORH_CHANNEL1_ENABLEFAIL 1
+#define ERRORH_CHANNEL2_BREAK 2
+#define ERRORH_CHANNEL2_ENABLEFAIL 3
+#define ERRORH_CHANNEL3_BREAK 4
+#define ERRORH_CHANNEL3_ENABLEFAIL 5
 ;
-#define BUTTONS_REG r24
+#define BUTTONS_REG r25
 #define BUTTON_PLUS_FLAG 0
 #define BUTTON_MINUS_FLAG 1
 #define BUTTON_MODE_FLAG 2
@@ -27,7 +35,7 @@
 #define BUTTON_MODE_HOLD_FLAG 6
 #define BUTTON_MENU_HOLD_FLAG 7
 ;
-#define MODE_REG r25
+#define MODE_REG r26
 #define MODE_COUNT 5
 #define MODE_OFF 0
 #define MODE_1 1
@@ -35,39 +43,41 @@
 #define MODE_3 3
 #define MODE_FAN 4
 ;
-#define DISPLAY_MODE_REG r26
+#define DISPLAY_MODE_REG r27
 #define DISPLAY_MODE_DEFAULT 0
 #define DISPLAY_MODE_SETTEMP 1
 #define DISPLAY_MODE_SETMODE 2
 
 ;-----------RAM-----------
+#define FEEDBACK1_ADC 0x60
 ;Display
-#define SEG1 0x60
-#define SEG2 0x61 
-#define SEG3 0x62
-#define SEG4 0x63
-#define SEGNUMBER 0x64
+#define SEG1 0x61
+#define SEG2 0x62 
+#define SEG3 0x63
+#define SEG4 0x64
+#define SEGNUMBER 0x65
 ;Buttons
-#define PREVBUTTONS 0x65
-#define BUTTON_PLUS_PRESS_COUNT 0x66
-#define BUTTON_MINUS_PRESS_COUNT 0x67
-#define BUTTON_MODE_PRESS_COUNT 0x68
-#define BUTTON_MENU_PRESS_COUNT 0x69
+#define BUTTONS_ADC 0x66
+#define PREVBUTTONS 0x67
+#define BUTTON_PLUS_PRESS_COUNT 0x68
+#define BUTTON_MINUS_PRESS_COUNT 0x69
+#define BUTTON_MODE_PRESS_COUNT 0x6A
+#define BUTTON_MENU_PRESS_COUNT 0x6B
 ;systick
-#define SYSTICK 0x6A
+#define SYSTICK 0x6C
 ;18b20
-#define D18B20_STATE 0x6B
-#define D18B20_TIMESTAMP 0x6C
+#define D18B20_STATE 0x6D
+#define D18B20_TIMESTAMP 0x6E
 ;modbus
-#define RECV_HANDLE_L 0x6D
-#define RECV_HANDLE_H 0x6E 
-#define TRANS_HANDLE_L 0x6F
-#define TRANS_HANDLE_H 0x70
-#define TRANS_COUNT 0x71
-#define CRCHI 0x72
-#define CRCLO 0x73
+#define RECV_HANDLE_L 0x6F
+#define RECV_HANDLE_H 0x70
+#define TRANS_HANDLE_L 0x71
+#define TRANS_HANDLE_H 0x72
+#define TRANS_COUNT 0x73
+#define CRCHI 0x74
+#define CRCLO 0x75
 ;i2c
-#define TEMP1 0x74
+#define TEMP1 0x76
 
 ;uart
 #define UART_BUFFER 0x80

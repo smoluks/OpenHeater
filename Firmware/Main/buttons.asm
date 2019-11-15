@@ -1,15 +1,8 @@
 #define CONST_LONG_PRESS 30
 
-TIM1_COMPA:
-push r16
-in r16, SREG
-push r16
+process_buttons:
 ;
-lds r16, SYSTICK
-inc r16
-sts SYSTICK, r16
-;
-in r16, ADCH
+lds r16, BUTTONS_ADC
 cpi r16, 223
 brlo adc0
  ;buttons released
@@ -18,11 +11,7 @@ brlo adc0
  sts BUTTON_MINUS_PRESS_COUNT, CONST_0
  sts BUTTON_MODE_PRESS_COUNT, CONST_0
  sts BUTTON_MENU_PRESS_COUNT, CONST_0
- ;
- pop r16
- out SREG, r16
- pop r16
- reti
+ ret
 ;
 adc0:
 cpi r16, 159
@@ -42,7 +31,7 @@ rjmp adc11
   sbr r16, 1 << BUTTON_MENU_FLAG
   sts PREVBUTTONS, r16
   sbr BUTTONS_REG, 1 << BUTTON_MENU_FLAG
-  rjmp adc_exit
+  ret
 adc11:
   ;long press detect
   lds r16, BUTTON_MENU_PRESS_COUNT
@@ -50,10 +39,10 @@ adc11:
   brsh adc12
    inc r16
    sts BUTTON_MENU_PRESS_COUNT, r16
-   rjmp adc_exit
+   ret
   adc12: 
    sbr BUTTONS_REG, 1 << BUTTON_MENU_HOLD_FLAG
-   rjmp adc_exit
+   ret
 
  ;---------- Mode ----------
  mode_btn:
@@ -64,7 +53,7 @@ adc11:
   sbr r16, 1 << BUTTON_MODE_FLAG
   sts PREVBUTTONS, r16
   sbr BUTTONS_REG, 1 << BUTTON_MODE_FLAG
-  rjmp adc_exit
+  ret
  adc21:
   ;long press detect
   lds r16, BUTTON_MODE_PRESS_COUNT
@@ -72,10 +61,10 @@ adc11:
   brsh adc22
    inc r16
    sts BUTTON_MODE_PRESS_COUNT, r16
-   rjmp adc_exit
+   ret
   adc22: 
    sbr BUTTONS_REG, 1 << BUTTON_MODE_HOLD_FLAG
-   rjmp adc_exit
+   ret
 
 ;---------- + ----------
 plus_btn: 
@@ -86,7 +75,7 @@ rjmp adc31
  sbr r16, 1 << BUTTON_PLUS_FLAG
  sts PREVBUTTONS, r16
  sbr BUTTONS_REG, 1 << BUTTON_PLUS_FLAG
- rjmp adc_exit
+ ret
 adc31:
  ;long press detect
  lds r16, BUTTON_PLUS_PRESS_COUNT
@@ -94,10 +83,10 @@ adc31:
  brsh adc32
    inc r16
    sts BUTTON_PLUS_PRESS_COUNT, r16
-   rjmp adc_exit
+   ret
   adc32: 
    sbr BUTTONS_REG, 1 << BUTTON_PLUS_HOLD_FLAG
-   rjmp adc_exit
+   ret
 
 ;---------- - ----------
 minus_btn:
@@ -108,7 +97,7 @@ rjmp adc41
  sbr r16, 1 << BUTTON_MINUS_FLAG
  sts PREVBUTTONS, r16
  sbr BUTTONS_REG, 1 << BUTTON_MINUS_FLAG
- rjmp adc_exit
+ ret
 adc41:
  ;long press detect
  lds r16, BUTTON_MINUS_PRESS_COUNT
@@ -116,13 +105,7 @@ adc41:
  brsh adc42
   inc r16
   sts BUTTON_MINUS_PRESS_COUNT, r16
-  rjmp adc_exit
+  ret
  adc42: 
   sbr BUTTONS_REG, 1 << BUTTON_MINUS_HOLD_FLAG
-  ;rjmp adc_exit
-;
-adc_exit:
-pop r16
-out SREG, r16
-pop r16
-reti
+  ret

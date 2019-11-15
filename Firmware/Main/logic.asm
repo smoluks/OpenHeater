@@ -1,10 +1,12 @@
 logic:
-;
-tst ERROR_REG
+;checks
+tst ERRORL_REG
+breq logic_off
+tst ERRORH_REG
 breq logic_off
 cpi MODE_REG, MODE_OFF
 breq logic_off
-;
+;temperature
 movw r16, TLow_REG
 andi r16, 0b11110000
 andi r17, 0b00001111
@@ -14,7 +16,7 @@ cp r16, TTARGET_REG
 brsh logic_off
 ;
 cpi MODE_REG, MODE_1
-breq lo1
+brne lo1
  ;1
  sbi portc, 0
  cbi portc, 2
@@ -22,7 +24,7 @@ breq lo1
  ret
 lo1: 
 cpi MODE_REG, MODE_2
-breq lo2
+brne lo2
  ;2
  cbi portc, 0
  sbi portc, 2
@@ -30,7 +32,7 @@ breq lo2
  ret
 lo2:
 cpi MODE_REG, MODE_3
-breq lo3
+brne lo3
  ;3
  sbi portc, 0
  sbi portc, 2
@@ -38,14 +40,14 @@ breq lo3
  ret
 lo3:
 cpi MODE_REG, MODE_FAN
-breq lo4
+brne lo4
  ;FAN
  cbi portc, 0
  cbi portc, 2
  sbi portd, 2
  ret
 lo4: 
-sbr ERROR_REG, 1 << ERROR_SOFTWARE
+sbr ERRORL_REG, 1 << ERRORL_SOFTWARE
 logic_off:
  cbi portc, 0
  cbi portc, 2

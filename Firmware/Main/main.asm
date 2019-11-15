@@ -14,16 +14,19 @@
 .ORG 0x0b rjmp USART_RXC ; USART RX Complete Handler
 ;.ORG 0x0c rjmp USART_UDRE ; UDR Empty Handler
 .ORG 0x0d rjmp USART_TXC ; USART TX Complete Handler
-;.ORG 0x0e rjmp ADCi ; ADC Conversion Complete Handler
+.ORG 0x0e rjmp ADCi ; ADC Conversion Complete Handler
 ;.ORG 0x0f rjmp EE_RDY ; EEPROM Ready Handler
 ;.ORG 0x10 rjmp ANA_COMP ; Analog Comparator Handler
 ;.ORG 0x11 rjmp TWSI ; Two-wire Serial Interface Handler
 ;.ORG 0x12 rjmp SPM_RDY ; Store Program Memory Ready Handler
 
 #include "TIM0.asm"
-
+#include "ADC.asm"
+#include "SYSTICK.asm"
 RESET:
 ;----init----
+clr ERRORL_REG
+clr ERRORH_REG
 ;stack
 ldi r16, high(RAMEND)
 out SPH, r16
@@ -36,6 +39,9 @@ movw r2, r16
 ldi r16, 0b01000000
 ldi r17, 0b00001101
 movw r4, r16
+ldi r16, ADMUX_BUTTONS
+ldi r17, ADMUX_FEEDBACK1
+movw r6, r16
 ;gpio
 ldi r16, 0b11111111
 out PORTB, r16
@@ -50,10 +56,8 @@ out PORTD, r16
 ldi r16, 0b11110110
 out DDRD, r16
 ;regs
-clr ERROR_REG
 ;ram
 ldi TTARGET_REG, 28
-ldi ERROR_REG, 0
 ldi BUTTONS_REG, 0
 ldi MODE_REG, MODE_OFF
 ldi DISPLAY_MODE_REG, 0
@@ -107,14 +111,15 @@ out UBRRH, CONST_0
 ldi r16, 51
 out UBRRL, r16
 ;ADC
-ldi r16, 0b01100110
+ldi r16, ADMUX_FEEDBACK1
 out ADMUX, r16
-ldi r16, 0b11100111
+ldi r16, 0b11011111
 out ADCSRA, r16
 ;
+rcall selfdignostics
 rcall init_18b20
 brtc l0
- sbr ERROR_REG, 1 << ERROR_NO18B20
+ sbr ERRORL_REG, 1 << ERRORL_NO18B20
 l0:
 ;
 rcall ds1307_init
@@ -124,17 +129,17 @@ sei
 main_cycle:
 wdr
 ;--18b20--
-sbrs ERROR_REG, ERROR_NO18B20
+sbrs ERRORL_REG, ERRORL_NO18B20
 rjmp l1
  ;18b20 not found
  rcall init_18b20
  brts l2
-  cbr ERROR_REG, 1 << ERROR_NO18B20
+  cbr ERRORL_REG, 1 << ERRORL_NO18B20
 l1:
  ;read 18b20
  rcall read_18b20
  brtc l2
-  sbr ERROR_REG, 1 << ERROR_NO18B20
+  sbr ERRORL_REG, 1 << ERRORL_NO18B20
 l2:
 ;--logic--
 rcall logic
@@ -143,6 +148,7 @@ rcall process_display
 ;
 rjmp main_cycle
 
+#include "SelfDiagnostics.asm"
 #include "Uart.asm"
 #include "Modbus.asm"
 #include "Crc.asm"
