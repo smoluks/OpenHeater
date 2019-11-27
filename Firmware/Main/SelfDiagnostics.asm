@@ -1,22 +1,24 @@
 selfdignostics:
+;-----check heaters-----
 lds r16, SYSTICK
 inc r16
 inc r16
 s1:
+;timeout
 lds r17, SYSTICK
 cp r17, r16
 breq s1_timeout
- ;1
- lds r17, FEEDBACK1_ADC
- cpi r17, 0x80
- brlo s1
- ;2
- sbis pinc, 1
- rjmp s1
- ;3
- sbis pinc, 3
- rjmp s1
-;
+;1
+lds r17, FEEDBACK1_ADC
+cpi r17, 0x80
+brlo s1
+;2
+sbis pinc, 1
+rjmp s1
+;3
+sbis pinc, 3
+rjmp s1
+;-----check triaks-----
 lds r16, SYSTICK
 inc r16
 inc r16
@@ -37,7 +39,7 @@ breq s2_timeout
  ;3
  sbic pinc, 3
  rjmp s2
-;
+;-----check triaks off-----
 lds r16, SYSTICK
 inc r16
 inc r16
@@ -88,4 +90,8 @@ sbr ERRORH_REG, ERRORH_CHANNEL2_ENABLEFAIL
 ;3
 sbic pinc, 3
 sbr ERRORH_REG, ERRORH_CHANNEL3_ENABLEFAIL
+;
+cbi portc, 0
+cbi portc, 2
+cbi portd, 2
 ret

@@ -15,7 +15,7 @@
 #define ADDRESS_WRITE 0xD0
 
 ;in: r17 - addr
-;out: r17 - data
+;out: r16 - data
 i2c_read:
 ;
 rcall i2c_send_start
@@ -157,45 +157,46 @@ ret
 
 i2c_receive_byte_ack:
 clt
-ldi r16, (1<<TWEA) | (1<<TWINT) | (1<<TWEN)
-out TWCR, r16
+ldi r17, (1<<TWEA) | (1<<TWINT) | (1<<TWEN)
+out TWCR, r17
 ;
 i7:
-in r16,TWCR
-sbrs r16,TWINT
+in r17,TWCR
+sbrs r17,TWINT
 rjmp i7
 ;
-in r16,TWSR
-andi r16, 0xF8
-cpi r16, RECEIVE_BYTE
+in r17,TWSR
+andi r17, 0xF8
+cpi r17, RECEIVE_BYTE
 brne i2
 ;
-in r17, TWDR
+in r16, TWDR
 ret
 
 i2c_receive_byte_nack:
 clt
-ldi r16, (1<<TWINT) | (1<<TWEN)
-out TWCR, r16
+ldi r17, (1<<TWINT) | (1<<TWEN)
+out TWCR, r17
 ;
 i8:
-in r16,TWCR
-sbrs r16,TWINT
+in r17,TWCR
+sbrs r17,TWINT
 rjmp i8
 ;
-in r16,TWSR
-andi r16, 0xF8
-cpi r16, RECEIVE_BYTE_NACK
+in r17,TWSR
+andi r17, 0xF8
+cpi r17, RECEIVE_BYTE_NACK
 brne i10
 ;
-in r17, TWDR
+in r16, TWDR
 ret
 i10:
-out UDR, r16
 set
 ret
 
 i2c_send_stop:
+push r16
+;
 ldi r16, (1<<TWINT)|(1<<TWEN)|(1<<TWSTO)
 out TWCR, r16
 ;
@@ -204,4 +205,5 @@ in r16, TWCR
 sbrc r16,TWSTO
 rjmp i12
 ;
+pop r16
 ret
