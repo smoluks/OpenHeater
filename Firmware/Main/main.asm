@@ -116,7 +116,6 @@ out ADMUX, r16
 ldi r16, 0b11011111
 out ADCSRA, r16
 ;
-rcall selfdignostics
 rcall init_18b20
 brtc l0
  sbr ERRORL_REG, 1 << ERRORL_NO18B20
@@ -125,6 +124,7 @@ l0:
 rcall ds1307_init
 ;
 sei
+;rcall selfdignostics
 ;----------main-cycle----------
 main_cycle:
 wdr

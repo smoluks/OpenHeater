@@ -1,9 +1,9 @@
 logic:
 ;checks
 tst ERRORL_REG
-breq logic_off
+brne logic_off
 tst ERRORH_REG
-breq logic_off
+brne logic_off
 cpi MODE_REG, MODE_OFF
 breq logic_off
 ;temperature

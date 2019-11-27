@@ -293,7 +293,7 @@ showError:
 ldi r16, 0b01110011
 sts SEG1, r16
 ;
-ldi r16, 1
+clr r16
 mov r17, ERRORL_REG
 we5:
 sbrc r17, 0

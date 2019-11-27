@@ -11,18 +11,17 @@
 #define TTARGET_TKREG 0x08
 
 ds1307_init:
-;--start oscillator--
+;--stop oscillator--
 ldi r17, SECONDS_TKREG
 rcall i2c_read
 brts ds1307_err
-sbrs r16, 7
+sbrc r16, 7
 rjmp d1
-cbr r16, 0b10000000
-ldi r17, CONTROL_TKREG
+sbr r16, 0b10000000
+ldi r17, SECONDS_TKREG
 rcall i2c_write
 d1:
-;--test 1 HZ output--
-ldi r16, 0b00010000
+ldi r16, 0b00000000
 ldi r17, CONTROL_TKREG
 rcall i2c_write
 brts ds1307_err
