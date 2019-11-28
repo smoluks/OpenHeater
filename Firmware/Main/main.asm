@@ -42,6 +42,9 @@ movw r4, r16
 ldi r16, ADMUX_BUTTONS
 ldi r17, ADMUX_FEEDBACK1
 movw r6, r16
+ldi r16, ADMUX_FEEDBACK2
+ldi r17, ADMUX_FEEDBACK3
+movw r8, r16
 ;gpio
 ldi r16, 0b11111111
 out PORTB, r16
@@ -55,7 +58,6 @@ ldi r16, 0b11111011
 out PORTD, r16
 ldi r16, 0b11110110
 out DDRD, r16
-;regs
 ;ram
 ldi TTARGET_REG, 28
 ldi BUTTONS_REG, 0
@@ -111,7 +113,7 @@ out UBRRH, CONST_0
 ldi r16, 51
 out UBRRL, r16
 ;ADC
-ldi r16, ADMUX_FEEDBACK1
+ldi r16, ADMUX_BUTTONS
 out ADMUX, r16
 ldi r16, 0b11011111
 out ADCSRA, r16

@@ -5,6 +5,8 @@
 #define CONST_T2_START r5
 #define CONST_ADMUX_BUTTONS r6 
 #define CONST_ADMUX_FEEDBACK1 r7
+#define CONST_ADMUX_FEEDBACK2 r8
+#define CONST_ADMUX_FEEDBACK3 r9
 
 ;Temperature
 #define TLow_REG  r20
@@ -48,8 +50,12 @@
 #define DISPLAY_MODE_SETTEMP 1
 #define DISPLAY_MODE_SETMODE 2
 
+#define FEEDBACK_REG r28
+#define FEEDBACK1 0
+#define FEEDBACK2 1
+#define FEEDBACK3 2
+
 ;-----------RAM-----------
-#define FEEDBACK1_ADC 0x60
 ;Display
 #define SEG1 0x61
 #define SEG2 0x62 
