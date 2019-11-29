@@ -71,9 +71,6 @@
 #define BUTTON_MENU_PRESS_COUNT 0x6B
 ;systick
 #define SYSTICK 0x6C
-;18b20
-#define D18B20_STATE 0x6D
-#define D18B20_TIMESTAMP 0x6E
 ;modbus
 #define RECV_HANDLE_L 0x6F
 #define RECV_HANDLE_H 0x70
@@ -84,6 +81,10 @@
 #define CRCLO 0x75
 ;i2c
 #define TEMP1 0x76
-
+;18b20
+#define D18B20_STATE 0x80
+#define D18B20_TIMESTAMP 0x81
+#define D18B20_COUNT 0x82
+#define D18B20_ADDRESSES 0x83
 ;uart
-#define UART_BUFFER 0x80
+#define UART_BUFFER 0x100

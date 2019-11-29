@@ -111,6 +111,25 @@ rcall ipause
 pop r17
 ret
 
+ow_write_byte_with_check:
+push r17
+;
+ldi r17, 8
+rw1c:
+rcall ow_read_bit
+rcall ow_read_bit
+bst r16, 0
+ror r16
+rcall ow_write_bit;
+dec r17
+brne rw1c;
+;
+ldi r16, 5
+clr r17
+rcall ipause
+pop r17
+ret
+
 ipause:
 nop
 nop
