@@ -1,5 +1,5 @@
 ;Dynamic indication
-TIM0_OVF:
+TIM2_OVF:
 push r16
 push r17
 in r16, SREG
@@ -107,3 +107,10 @@ breq to3
  pop r17
  pop r16
  reti
+
+TIM2_COMP:
+cbi portb, 4
+cbi portb, 5
+cbi portb, 6
+cbi portd, 4
+reti

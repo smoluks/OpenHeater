@@ -14,6 +14,11 @@
 #define MEAS_TIME 70
 
 init_18b20:
+rcall search_18b20
+ret
+
+
+
 search_18b20:
 push r16
 push r17
@@ -124,22 +129,14 @@ rcall ow_write_bit
 ;
 dec r18
 brne search_bit_cycle
+;save
+rcall save_18b20
 ;
 tst r20
 breq search_exit;no more branch
 mov r19, r20
 ;save
 search_exit:
-ldi r16, 0x28
-st z+, r16
-st z+, r24
-st z+, r25
-st z+, r26
-st z+, r27
-st z+, r28
-st z+, r29
-clr r16
-st x+, r16
 ;
 pop r31
 pop r30
@@ -155,6 +152,20 @@ pop r18
 pop r17
 pop r16
 ret
+
+save_18b20:
+ldi r16, 0x28
+st z+, r16
+st z+, r24
+st z+, r25
+st z+, r26
+st z+, r27
+st z+, r28
+st z+, r29
+clr r16
+st x+, r16
+ret
+
 
 ;set resolution
 rcall ow_reset

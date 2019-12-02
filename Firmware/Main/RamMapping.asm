@@ -1,12 +1,21 @@
 ;-----------Regs-----------
 #define CONST_0 r2
 #define CONST_10 r3
-#define CONST_MINUS_1SEG r4 
-#define CONST_T2_START r5
+
+#define TCNT0_START 131
+#define CONST_TCNT0_START r4
+#define TССR0_START 0b00000100
+#define CONST_TССR0_START r5
+
 #define CONST_ADMUX_BUTTONS r6 
 #define CONST_ADMUX_FEEDBACK1 r7
+
 #define CONST_ADMUX_FEEDBACK2 r8
 #define CONST_ADMUX_FEEDBACK3 r9
+
+#define MINUS_1SEG 0b01000000
+#define CONST_MINUS_1SEG r10
+#define CONST_BUTTON_IDLE r11
 
 ;Temperature
 #define TLow_REG  r20
@@ -57,28 +66,29 @@
 
 ;-----------RAM-----------
 ;Display
-#define SEG1 0x61
-#define SEG2 0x62 
-#define SEG3 0x63
-#define SEG4 0x64
-#define SEGNUMBER 0x65
+#define SEG1 0x60
+#define SEG2 0x61 
+#define SEG3 0x62
+#define SEG4 0x63
+#define SEGNUMBER 0x64
 ;Buttons
-#define BUTTONS_ADC 0x66
-#define PREVBUTTONS 0x67
-#define BUTTON_PLUS_PRESS_COUNT 0x68
-#define BUTTON_MINUS_PRESS_COUNT 0x69
-#define BUTTON_MODE_PRESS_COUNT 0x6A
-#define BUTTON_MENU_PRESS_COUNT 0x6B
+#define BUTTONS_ADC 0x65
+#define PREVBUTTONS 0x66
+#define BUTTON_PLUS_PRESS_COUNT 0x67
+#define BUTTON_MINUS_PRESS_COUNT 0x68
+#define BUTTON_MODE_PRESS_COUNT 0x69
+#define BUTTON_MENU_PRESS_COUNT 0x6A
+#define BUTTONS_IDLETIMEOUT 0x6B
 ;systick
 #define SYSTICK 0x6C
 ;modbus
-#define RECV_HANDLE_L 0x6F
-#define RECV_HANDLE_H 0x70
-#define TRANS_HANDLE_L 0x71
-#define TRANS_HANDLE_H 0x72
-#define TRANS_COUNT 0x73
-#define CRCHI 0x74
-#define CRCLO 0x75
+#define RECV_HANDLE_L 0x6D
+#define RECV_HANDLE_H 0x6E
+#define TRANS_HANDLE_L 0x6F
+#define TRANS_HANDLE_H 0x70
+#define TRANS_COUNT 0x71
+#define CRCHI 0x72
+#define CRCLO 0x73
 ;i2c
 #define TEMP1 0x76
 ;18b20

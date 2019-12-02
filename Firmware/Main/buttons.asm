@@ -1,4 +1,5 @@
 #define CONST_LONG_PRESS 30
+#define BUTTON_IDLE 100
 
 process_buttons:
 ;
@@ -6,6 +7,16 @@ lds r16, BUTTONS_ADC
 cpi r16, 223
 brlo adc0
  ;buttons released
+ lds r17, BUTTONS_IDLETIMEOUT
+ cpi r17, 1
+ brlo pb1
+ brne pb2
+  ;idle handlers
+  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
+ pb2:
+ dec r17
+ sts BUTTONS_IDLETIMEOUT,  
+ pb1:
  sts PREVBUTTONS, CONST_0
  sts BUTTON_PLUS_PRESS_COUNT, CONST_0
  sts BUTTON_MINUS_PRESS_COUNT, CONST_0
@@ -14,6 +25,7 @@ brlo adc0
  ret
 ;
 adc0:
+sts BUTTONS_IDLETIMEOUT, CONST_BUTTON_IDLE
 cpi r16, 159
 brsh menu_btn
 cpi r16, 95
