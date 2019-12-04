@@ -22,7 +22,10 @@
 
 #include "Indication.asm"
 #include "ADC.asm"
-#include "SYSTICK.asm"
+#include "Systick.asm"
+#include "Display.asm"
+#include "Buttons.asm"
+
 RESET:
 ;----init----
 clr ERRORL_REG
@@ -66,6 +69,7 @@ ldi TTARGET_REG, 28
 ldi BUTTONS_REG, 0
 ldi MODE_REG, MODE_OFF
 ldi DISPLAY_MODE_REG, 0
+ldi DISPLAY_MENU_REG, 0
 ser r16
 sts SEG1, r16
 sts SEG2, r16
@@ -160,8 +164,6 @@ rjmp main_cycle
 #include "ModbusCrc.asm"
 #include "1Wire.asm"
 #include "18b20.asm"
-#include "Display.asm"
-#include "Buttons.asm"
 #include "Logic.asm"
 #include "I2C.asm"
 #include "DS1307.asm"

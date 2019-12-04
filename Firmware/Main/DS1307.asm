@@ -9,6 +9,7 @@
 #define CONTROL_TKREG 0x07
 ;CUSTOM
 #define TTARGET_TKREG 0x08
+#define BRIGHTNESS_TKREG 0x09
 
 ds1307_init:
 ;--stop oscillator--
@@ -26,12 +27,21 @@ ldi r17, CONTROL_TKREG
 rcall i2c_write
 brts ds1307_err
 ;--read params--
+;
 ldi r17, TTARGET_TKREG
 rcall i2c_read
 brts ds1307_err
 tst r16
-breq ds1307_init_exit
+breq readBg
 mov TTARGET_REG, r16
+;
+readBg:
+ldi r17, BRIGHTNESS_TKREG
+rcall i2c_read
+brts ds1307_err
+cpi r16, MIN_BRIGHTNESS
+brlo ds1307_init_exit
+out OCR2, r16
 ;
 ds1307_init_exit:
 ret
@@ -39,6 +49,12 @@ ret
 ds1307_savetargettemp:
 mov r16, TTARGET_REG
 ldi r17, TTARGET_TKREG
+rcall i2c_write
+brts ds1307_err
+ret
+
+ds1307_savebrightness:
+ldi r17, BRIGHTNESS_TKREG
 rcall i2c_write
 brts ds1307_err
 ret

@@ -43,6 +43,9 @@ ret
 
 ;in: r16 - data, r17 - addr
 i2c_write:
+push r16
+push r17
+;
 sts TEMP1, r16
 ;
 rcall i2c_send_start
@@ -61,6 +64,8 @@ brts i2c_write_exit
 rcall i2c_send_stop
 ;
 i2c_write_exit:
+pop r17
+pop r16
 ret
 
 i2c_send_start:

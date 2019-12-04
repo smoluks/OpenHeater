@@ -9,14 +9,14 @@ brlo adc0
  ;buttons released
  lds r17, BUTTONS_IDLETIMEOUT
  cpi r17, 1
- brlo pb1
- brne pb2
+ brlo prb1
+ brne prb2
   ;idle handlers
   ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
- pb2:
+ prb2:
  dec r17
- sts BUTTONS_IDLETIMEOUT,  
- pb1:
+ sts BUTTONS_IDLETIMEOUT, CONST_BUTTON_IDLE  
+ prb1:
  sts PREVBUTTONS, CONST_0
  sts BUTTON_PLUS_PRESS_COUNT, CONST_0
  sts BUTTON_MINUS_PRESS_COUNT, CONST_0
