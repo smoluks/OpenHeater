@@ -14,10 +14,50 @@
 #define MEAS_TIME 70
 
 init_18b20:
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
+;
 rcall search_18b20
+;
+lds r18, D18B20_COUNT
+tst r18
+brne init_18b20_f
+ sbr ERRORL_REG, 1 << ERRORL_NO18B20
+ rjmp init_18b20_exit
+init_18b20_f:
+ldi r30, low(D18B20_ADDRESSES)
+ldi r31, high(D18B20_ADDRESSES)
+;
+init_18b20_cycle:
+ld r8, z+
+ld r9, z+
+ld r10, z+
+ld r11, z+
+ld r12, z+
+ld r13, z+
+ld r14, z+
+ld r15, z+
+rcall set_resolution
+;
+dec r18
+brne init_18b20_cycle
+;
+init_18b20_exit:
+pop r15
+pop r14
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
 ret
-
-
 
 search_18b20:
 push r16
@@ -36,8 +76,8 @@ push r31
 ;---search all 18b20---
 ldi r19, 0xFF ;last cycle last zero-wented branch
 ;handle to store
-ldi r30, low(D18B20_ADDRESSES * 2)
-ldi r31, high(D18B20_ADDRESSES * 2)
+ldi r30, low(D18B20_ADDRESSES)
+ldi r31, high(D18B20_ADDRESSES)
 ;address
 clr r24
 clr r25
@@ -60,6 +100,7 @@ rcall ow_write_byte
 ;
 ldi r16, 0x28
 rcall ow_write_byte_with_check
+brts search_exit
 ;-----bit cycle------
 search_bit_cycle:
 clr r17
@@ -129,9 +170,44 @@ rcall ow_write_bit
 ;
 dec r18
 brne search_bit_cycle
-;save
-rcall save_18b20
+;-----save-----
+clr r17
+ldi r16, 0x28
+rcall calculate_dallas_crc
+mov r16, r24
+rcall calculate_dallas_crc
+mov r16, r25
+rcall calculate_dallas_crc
+mov r16, r26
+rcall calculate_dallas_crc
+mov r16, r27
+rcall calculate_dallas_crc
+mov r16, r28
+rcall calculate_dallas_crc
+mov r16, r29
+rcall calculate_dallas_crc
+;check crc
+;mov r16, r17
+;rcall ow_write_byte_with_check
+;brts 
+;---save---
+;device id
+ldi r16, 0x28
+st z+, r16
+;addr
+st z+, r24
+st z+, r25
+st z+, r26
+st z+, r27
+st z+, r28
+st z+, r29
+;crc
+st x+, r17
 ;
+lds r16, D18B20_COUNT
+inc r16
+sts D18B20_COUNT, r16
+;---
 tst r20
 breq search_exit;no more branch
 mov r19, r20
@@ -153,27 +229,30 @@ pop r17
 pop r16
 ret
 
-save_18b20:
-ldi r16, 0x28
-st z+, r16
-st z+, r24
-st z+, r25
-st z+, r26
-st z+, r27
-st z+, r28
-st z+, r29
-clr r16
-st x+, r16
-ret
-
-
-;set resolution
+set_resolution:
 rcall ow_reset
 brtc i180
  ret
 i180:
-ldi r16, SKIP_ROM
+ldi r16, MATCH_ROM
 rcall ow_write_byte
+mov r16, r8
+rcall ow_write_byte
+mov r16, r9
+rcall ow_write_byte
+mov r16, r10
+rcall ow_write_byte
+mov r16, r11
+rcall ow_write_byte
+mov r16, r12
+rcall ow_write_byte
+mov r16, r13
+rcall ow_write_byte
+mov r16, r14
+rcall ow_write_byte
+mov r16, r15
+rcall ow_write_byte
+;
 ldi r16, WRITE_SCRATCHPAD
 rcall ow_write_byte
 clr r16
@@ -182,16 +261,34 @@ clr r16
 rcall ow_write_byte
 ldi r16, 0b01111111
 rcall ow_write_byte
-;read scrathpad
+;---read scrathpad---
 .IFDEF CHECK_18B20_GENUINE
 rcall ow_reset
 brtc i181
  ret
 i181:
-ldi r16, SKIP_ROM
+ldi r16, MATCH_ROM
 rcall ow_write_byte
+mov r16, r8
+rcall ow_write_byte
+mov r16, r9
+rcall ow_write_byte
+mov r16, r10
+rcall ow_write_byte
+mov r16, r11
+rcall ow_write_byte
+mov r16, r12
+rcall ow_write_byte
+mov r16, r13
+rcall ow_write_byte
+mov r16, r14
+rcall ow_write_byte
+mov r16, r15
+rcall ow_write_byte
+;
 ldi r16, READ_SCRATCHPAD
 rcall ow_write_byte
+;
 rcall ow_read_byte
 cpi r16, 0x50
 breq i20
@@ -208,13 +305,28 @@ rcall ow_reset
 brtc i182
  ret
 i182:
-ldi r16, SKIP_ROM
+ldi r16, MATCH_ROM
+rcall ow_write_byte
+mov r16, r8
+rcall ow_write_byte
+mov r16, r9
+rcall ow_write_byte
+mov r16, r10
+rcall ow_write_byte
+mov r16, r11
+rcall ow_write_byte
+mov r16, r12
+rcall ow_write_byte
+mov r16, r13
+rcall ow_write_byte
+mov r16, r14
+rcall ow_write_byte
+mov r16, r15
 rcall ow_write_byte
 ldi r16, CONVERT_TEMPERATURE
 rcall ow_write_byte
 ;
 ret
-
 
 read_18b20:
 lds r16, D18B20_STATE

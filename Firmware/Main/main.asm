@@ -51,6 +51,8 @@ movw r8, r16
 ldi r16, MINUS_1SEG
 ldi r17, BUTTON_IDLE
 movw r10, r16
+ldi r16, 5
+movw r12, r16
 ;gpio
 ldi r16, 0b11111111
 out PORTB, r16
@@ -83,6 +85,7 @@ sts BUTTON_MINUS_PRESS_COUNT, CONST_0
 sts BUTTON_MODE_PRESS_COUNT, CONST_0
 sts BUTTON_MENU_PRESS_COUNT, CONST_0
 sts D18B20_STATE, CONST_0
+sts D18B20_COUNT, CONST_0
 ldi r16, low(UART_BUFFER)
 sts RECV_HANDLE_L, r16
 ldi r16, high(UART_BUFFER)
@@ -127,9 +130,6 @@ ldi r16, 0b11011111
 out ADCSRA, r16
 ;
 rcall init_18b20
-brtc l0
- sbr ERRORL_REG, 1 << ERRORL_NO18B20
-l0:
 ;
 rcall ds1307_init
 ;
@@ -143,13 +143,10 @@ sbrs ERRORL_REG, ERRORL_NO18B20
 rjmp l1
  ;18b20 not found
  rcall init_18b20
- brts l2
-  cbr ERRORL_REG, 1 << ERRORL_NO18B20
+ rjmp l2
 l1:
  ;read 18b20
  rcall read_18b20
- brtc l2
-  sbr ERRORL_REG, 1 << ERRORL_NO18B20
 l2:
 ;--logic--
 rcall logic

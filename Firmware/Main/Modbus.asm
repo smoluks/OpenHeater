@@ -1,5 +1,6 @@
 #define DEV_ADDR 01
-#define MODBUS_INPUT_REGS_COUNT 1
+#define MODBUS_INPUT_REGS_COUNT 11
+#define MODBUS_HOLDING_REGS_COUNT 8
 
 #define READ_COILS 0x01
 #define READ_DISCRETE_INPUTS 0x02
@@ -101,6 +102,10 @@ brlo rai2
  rjmp makeerr 
 ;
 rai2:
+push r18
+push r19
+push r30
+push r31
 ;---build packet---
 ;clean CRC
 sts CRCLO, r3
@@ -112,28 +117,119 @@ rcall acrc
 lds r16, UART_BUFFER+1
 rcall acrc
 ;size
-ldi r16, 2
+mov r16, r17
+lsl r16
+mov r18, r16
 sts UART_BUFFER+2, r16
 rcall acrc
 ;data
-mov r16, THigh_REG
-sts UART_BUFFER+3, r16
-rcall acrc
-;
-mov r16, TLow_REG
-sts UART_BUFFER+4, r16
-rcall acrc
+lds r19, UART_BUFFER + 3 ;RegAddrLo
+ldi r30, low(UART_BUFFER + 3)
+ldi r31, high(UART_BUFFER + 3)
+rai_data_cycle:
+ tst r17
+ breq rai_data_cycle_exit
+ ;
+ rcall read_input_reg
+ st z+, r16
+ rcall acrc
+ mov r16, r17
+ st z+, r16
+ rcall acrc
+ ;
+ inc r19
+ dec r17
+ rjmp rai_data_cycle
+rai_data_cycle_exit:
 ;crc
 lds r16, CRCHI
-sts UART_BUFFER+5, r16
+st z+, r16
 lds r16, CRCLO
-sts UART_BUFFER+6, r16
+st z+, r16
 ;
-ldi r16, 7
-sts TRANS_COUNT, r16
+add r18, CONST_5
+st z+, r18
+;
+pop r31
+pop r30
+pop r19
+pop r18
 ret
 
 readHoldingRegisters:
+;check address
+lds r16, UART_BUFFER + 2 ;RegAddrHi
+tst r16
+brne rhr1
+lds r16, UART_BUFFER + 3 ;RegAddrLo
+cpi r16, MODBUS_HOLDING_REGS_COUNT+1
+brsh rhr1
+;check count
+lds r17, UART_BUFFER + 4 ;CountHi
+tst r17
+brne rhr1
+lds r17, UART_BUFFER + 5 ;CountLo
+cpi r17, MODBUS_HOLDING_REGS_COUNT+1
+brsh rhr1
+;check all
+add r16, r17
+cpi r16, MODBUS_HOLDING_REGS_COUNT+1
+brlo rhr2
+ rhr1:	
+ ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
+ rjmp makeerr 
+;
+rhr2:
+push r18
+push r30
+push r31
+;---build packet---
+;clean CRC
+sts CRCLO, r3
+sts CRCHI, r3
+;address
+ldi r16, DEV_ADDR
+rcall acrc
+;command
+lds r16, UART_BUFFER+1
+rcall acrc
+;size
+mov r16, r17
+lsl r16
+mov r18, r16
+sts UART_BUFFER+2, r16
+rcall acrc
+;data
+lds r16, UART_BUFFER + 3 ;RegAddrLo
+ldi r30, low(UART_BUFFER + 3)
+ldi r31, high(UART_BUFFER + 3)
+rhr_data_cycle:
+ tst r17
+ breq rhr_data_cycle_exit
+ ;
+ rcall read_holding_reg
+ st z+, r16
+ rcall acrc
+ mov r16, r17
+ st z+, r16
+ rcall acrc
+ ;
+ inc r16
+ dec r17
+ rjmp rhr_data_cycle
+rhr_data_cycle_exit:
+;crc
+lds r16, CRCHI
+st z+, r16
+lds r16, CRCLO
+st z+, r16
+;
+add r18, CONST_5
+st z+, r18
+;
+pop r31
+pop r30
+pop r18
 ret
 
 ;in: error - r17
@@ -164,3 +260,4 @@ sts TRANS_COUNT, r16
 ;
 ret
 
+read_input_reg:

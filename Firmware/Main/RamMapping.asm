@@ -17,6 +17,8 @@
 #define CONST_MINUS_1SEG r10
 #define CONST_BUTTON_IDLE r11
 
+#define CONST_5 r12
+
 ;Temperature
 #define TLow_REG  r20
 #define THigh_REG  r21
@@ -93,6 +95,8 @@
 #define D18B20_STATE 0x80
 #define D18B20_TIMESTAMP 0x81
 #define D18B20_COUNT 0x82
-#define D18B20_ADDRESSES 0x83
+#define D18B20_TEMPERATURES 0x83
+#define D18B20_ADDRESSES D18B20_TEMPERATURES + 20
+
 ;uart
 #define UART_BUFFER 0x100
