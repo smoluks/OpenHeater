@@ -66,12 +66,13 @@ ldi r16, 0b11111011
 out PORTD, r16
 ldi r16, 0b11110110
 out DDRD, r16
-;ram
+;regs
 ldi TTARGET_REG, 28
 ldi BUTTONS_REG, 0
 ldi MODE_REG, MODE_OFF
 ldi DISPLAY_MODE_REG, 0
 ldi DISPLAY_MENU_REG, 0
+;----ram----
 ser r16
 sts SEG1, r16
 sts SEG2, r16
@@ -90,6 +91,8 @@ ldi r16, low(UART_BUFFER)
 sts RECV_HANDLE_L, r16
 ldi r16, high(UART_BUFFER)
 sts RECV_HANDLE_H, r16
+ldi r16, 1
+sts MODBUS_ADDRESS, r16
 ;T0 - modbus timeout 4ms
 ;T1 - button read  + systick 100 ms
 out TCCR1A, r2

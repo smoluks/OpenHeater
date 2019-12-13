@@ -1,3 +1,5 @@
+#define D18B20_MAX_COUNT 10
+
 ;-----------Regs-----------
 #define CONST_0 r2
 #define CONST_10 r3
@@ -65,38 +67,45 @@
 #define FEEDBACK3 2
 
 ;-----------RAM-----------
+#define ACTION 0x60
+#define ACTION_MODBUS 0
 ;Display
-#define SEG1 0x60
-#define SEG2 0x61 
-#define SEG3 0x62
-#define SEG4 0x63
-#define SEGNUMBER 0x64
+#define SEG1 0x61
+#define SEG2 0x62 
+#define SEG3 0x63
+#define SEG4 0x64
+#define SEGNUMBER 0x65
 ;Buttons
-#define BUTTONS_ADC 0x65
-#define PREVBUTTONS 0x66
-#define BUTTON_PLUS_PRESS_COUNT 0x67
-#define BUTTON_MINUS_PRESS_COUNT 0x68
-#define BUTTON_MODE_PRESS_COUNT 0x69
-#define BUTTON_MENU_PRESS_COUNT 0x6A
-#define BUTTONS_IDLETIMEOUT 0x6B
+#define BUTTONS_ADC 0x66
+#define PREVBUTTONS 0x67
+#define BUTTON_PLUS_PRESS_COUNT 0x68
+#define BUTTON_MINUS_PRESS_COUNT 0x69
+#define BUTTON_MODE_PRESS_COUNT 0x6A
+#define BUTTON_MENU_PRESS_COUNT 0x6B
+#define BUTTONS_IDLETIMEOUT 0x6C
 ;systick
-#define SYSTICK 0x6C
+#define SYSTICK 0x6D
 ;modbus
-#define RECV_HANDLE_L 0x6D
-#define RECV_HANDLE_H 0x6E
-#define TRANS_HANDLE_L 0x6F
-#define TRANS_HANDLE_H 0x70
-#define TRANS_COUNT 0x71
-#define CRCHI 0x72
-#define CRCLO 0x73
+#define MODBUS_ADDRESS 0x6E
+#define RECV_HANDLE_L 0x6F
+#define RECV_HANDLE_H 0x70
+#define TRANS_HANDLE_L 0x71
+#define TRANS_HANDLE_H 0x72
+#define TRANS_COUNT 0x73
+#define CRCHI 0x74
+#define CRCLO 0x75
 ;i2c
 #define TEMP1 0x76
 ;18b20
-#define D18B20_STATE 0x80
-#define D18B20_TIMESTAMP 0x81
-#define D18B20_COUNT 0x82
-#define D18B20_TEMPERATURES 0x83
-#define D18B20_ADDRESSES D18B20_TEMPERATURES + 20
-
+#define D18B20_STATE 0x77
+#define D18B20_TIMESTAMP 0x78
+#define D18B20_COUNT 0x79
+#define D18B20_TEMPERATURES 0x7A
+#define D18B20_ADDRESSES D18B20_TEMPERATURES + D18B20_MAX_COUNT * 2
+;events
+#define EVENTS_CACHE D18B20_ADDRESSES + D18B20_MAX_COUNT * 8
 ;uart
-#define UART_BUFFER 0x100
+#define UART_BUFFER EVENTS_CACHE + 64
+
+#define ram_size UART_BUFFER+100
+#message "Ram used:" ram_size

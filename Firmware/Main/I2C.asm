@@ -41,6 +41,33 @@ rcall i2c_send_stop
 i2c_read_exit:
 ret
 
+;in: r17 - addr
+;out: r16:17 - data
+i2c_read_pair:
+;
+rcall i2c_send_start
+brts i2c_read_exit
+;
+rcall i2c_send_address_w
+brts i2c_read_exit
+;
+rcall i2c_send_byte
+brts i2c_read_exit
+;
+rcall i2c_send_repeat_start
+brts i2c_read_exit
+
+rcall i2c_send_address_r
+brts i2c_read_exit
+
+rcall i2c_receive_byte_nack
+brts i2c_read_exit
+;
+rcall i2c_send_stop
+;
+i2c_read_exit:
+ret
+
 ;in: r16 - data, r17 - addr
 i2c_write:
 push r16

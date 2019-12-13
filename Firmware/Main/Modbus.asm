@@ -1,4 +1,3 @@
-#define DEV_ADDR 01
 #define MODBUS_INPUT_REGS_COUNT 11
 #define MODBUS_HOLDING_REGS_COUNT 8
 
@@ -20,12 +19,11 @@
 #define ERROR_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND 0x0B
 
 TIM0_OVF:
-push r16
-push r17
-in r16, SREG
-push r16
-;stop t2
 out tccr2, CONST_0
+reti
+
+
+process_modbus:
 ;check crc
 lds r16, CRCHI
 tst r16
@@ -35,7 +33,8 @@ tst r16
 brne t2exit
 ;check addr
 lds r16, UART_BUFFER + 0
-cpi r16, DEV_ADDR
+lds r17, MODBUS_ADDRESS
+cp r16, r17
 brne t2exit
 ;------select command------
 lds r16, UART_BUFFER + 1
@@ -72,11 +71,7 @@ sts RECV_HANDLE_L, r16
 ldi r16, high(UART_BUFFER)
 sts RECV_HANDLE_H, r16
 ;
-pop r16
-out SREG, r16
-pop r17
-pop r16
-reti
+ret
 
 readAnalogInput:
 ;check address
@@ -111,7 +106,7 @@ push r31
 sts CRCLO, r3
 sts CRCHI, r3
 ;address
-ldi r16, DEV_ADDR
+lds r16, MODBUS_ADDRESS
 rcall acrc
 ;command
 lds r16, UART_BUFFER+1
@@ -188,7 +183,7 @@ push r31
 sts CRCLO, r3
 sts CRCHI, r3
 ;address
-ldi r16, DEV_ADDR
+lds r16, MODBUS_ADDRESS
 rcall acrc
 ;command
 lds r16, UART_BUFFER+1
@@ -238,7 +233,7 @@ makeerr:
 sts CRCLO, r3
 sts CRCHI, r3
 ;address
-ldi r16, DEV_ADDR
+lds r16, MODBUS_ADDRESS
 rcall acrc
 ;command
 lds r16, UART_BUFFER+1
@@ -260,4 +255,80 @@ sts TRANS_COUNT, r16
 ;
 ret
 
+;in - r19 addr
+;out - r16-17 data
 read_input_reg:
+cpi r19, 0
+brne ri1
+ ;18b20 count
+ lds r16, D18B20_COUNT
+ clr r17
+ ret
+ri1:
+cpi r19, 12
+brsh ri2
+ ;temperatures
+ push r19
+ push r30
+ push r31
+ ;
+ lsl r19
+ ldi r30, low(D18B20_TEMPERATURES - 2)
+ ldi r31, high(D18B20_TEMPERATURES - 2)
+ add r30, r19
+ adc r31, CONST_0
+ ld r16, z+
+ ld r17, z
+ ;
+ pop r31
+ pop r30
+ pop r19
+ ret
+ri2:
+ clr r16
+ clr r17 
+ret
+
+;in - r19 addr
+;out - r16-17 data
+read_holding_reg:
+cpi r19, 0
+brne h1
+ ;modbus address
+ lds r16, MODBUS_ADDRESS
+ clr r17
+ ret
+h1:
+cpi r19, 1
+brne h2
+ ;target temperature
+ mov r16, TTARGET_REG
+ clr r17
+ ret
+h2:
+cpi r19, 2
+brne h3
+ ;mode
+ mov r16, MODE_REG
+ clr r17
+ ret
+h3: 
+cpi r19, 3
+brne h4
+ ;brightness
+ in r16, OCR2
+ clr r17
+ ret
+h4:
+cpi r19, 8
+brsh h5
+ ;1307 regs
+ mov r17, r19
+ subi r17, 4
+ lsl r17
+ rcall i2c_read_pair
+ ret
+h5:
+ clr r16
+ clr r17 
+ ret

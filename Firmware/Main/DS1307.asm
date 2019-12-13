@@ -27,14 +27,15 @@ ldi r17, CONTROL_TKREG
 rcall i2c_write
 brts ds1307_err
 ;--read params--
-;
+;modbus address
+;target temperatute
 ldi r17, TTARGET_TKREG
 rcall i2c_read
 brts ds1307_err
 tst r16
 breq readBg
 mov TTARGET_REG, r16
-;
+;brightness
 readBg:
 ldi r17, BRIGHTNESS_TKREG
 rcall i2c_read

@@ -22,11 +22,13 @@ push r12
 push r13
 push r14
 push r15
+push r30
+push r31
 ;
 rcall search_18b20
 ;
-lds r18, D18B20_COUNT
-tst r18
+lds r17, D18B20_COUNT
+tst r17
 brne init_18b20_f
  sbr ERRORL_REG, 1 << ERRORL_NO18B20
  rjmp init_18b20_exit
@@ -45,10 +47,12 @@ ld r14, z+
 ld r15, z+
 rcall set_resolution
 ;
-dec r18
+dec r17
 brne init_18b20_cycle
 ;
 init_18b20_exit:
+pop r31
+pop r30
 pop r15
 pop r14
 pop r13
@@ -57,6 +61,89 @@ pop r11
 pop r10
 pop r9
 pop r8
+ret
+
+read_18b20:
+lds r16, D18B20_STATE
+tst r16
+breq r18b20_read
+ ;check delay
+ lds r16, SYSTICK
+ lds r17, D18B20_TIMESTAMP
+ sub r17, r16
+ sbrs r17, 7
+ ret
+ ;start conversion (all)
+ rcall ow_reset
+ brtc r183
+  sbr ERRORL_REG, 1 << ERRORL_NO18B20
+  ret
+ r183:
+ ldi r16, SKIP_ROM
+ rcall ow_write_byte
+ ldi r16, CONVERT_TEMPERATURE
+ rcall ow_write_byte
+ ;set state
+ sts D18B20_STATE, CONST_0
+ ret
+; 
+r18b20_read:
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
+push r28
+push r29
+push r30
+push r31
+;
+lds r17, D18B20_COUNT
+ldi r28, low(D18B20_TEMPERATURES)
+ldi r29, high(D18B20_TEMPERATURES)
+ldi r30, low(D18B20_ADDRESSES)
+ldi r31, high(D18B20_ADDRESSES)
+;
+read_18b20_cycle:
+ld r8, z+
+ld r9, z+
+ld r10, z+
+ld r11, z+
+ld r12, z+
+ld r13, z+
+ld r14, z+
+ld r15, z+
+rcall read_single_18b20
+brts read_18b20_fail
+
+read_18b20_fail:
+;
+dec r17
+brne read_18b20_cycle
+;
+read_18b20_exit:
+pop r31
+pop r30
+pop r29
+pop r28
+pop r15
+pop r14
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
+;
+lds r16, SYSTICK
+ldi r17, MEAS_TIME
+add r16, r17
+sts D18B20_TIMESTAMP, r16
+;
+sts D18B20_STATE, CONST_10
 ret
 
 search_18b20:
@@ -100,7 +187,9 @@ rcall ow_write_byte
 ;
 ldi r16, 0x28
 rcall ow_write_byte_with_check
-brts search_exit
+brtc search0
+ rjmp search_exit
+search0: 
 ;-----bit cycle------
 search_bit_cycle:
 clr r17
@@ -207,6 +296,8 @@ st x+, r17
 lds r16, D18B20_COUNT
 inc r16
 sts D18B20_COUNT, r16
+cpi r16, D18B20_MAX_COUNT
+breq search_exit
 ;---
 tst r20
 breq search_exit;no more branch
@@ -328,52 +419,45 @@ rcall ow_write_byte
 ;
 ret
 
-read_18b20:
-lds r16, D18B20_STATE
-tst r16
-brne r18b20_timeout
- ;read temperature
- rcall ow_read_bit
- brts r181
-  ;conversation in progress
-  ret
- r181:
- rcall ow_reset
- brtc r182
-  ret
- r182:
- ldi r16, SKIP_ROM
- rcall ow_write_byte
- ldi r16, READ_SCRATCHPAD
- rcall ow_write_byte
- rcall ow_read_byte
- mov TLow_REG, r16
- rcall ow_read_byte
- mov THigh_REG, r16
- ;
- lds r16, SYSTICK
- ldi r17, MEAS_TIME
- add r16, r17
- sts D18B20_TIMESTAMP, r16
- ;
- sts D18B20_STATE, CONST_10
+;in r8-r15 - addr
+;out Y
+read_single_18b20:
+rcall ow_read_bit
+brts r181
+ ;conversation in progress
  ret
-r18b20_timeout:
- lds r16, SYSTICK
- lds r17, D18B20_TIMESTAMP
- sub r17, r16
- sbrs r17, 7
+r181:
+rcall ow_reset
+brtc r182
  ret
- ;start conversion
- rcall ow_reset
- brtc r183
-  ret
- r183:
- ldi r16, SKIP_ROM
- rcall ow_write_byte
- ldi r16, CONVERT_TEMPERATURE
- rcall ow_write_byte
- ;set state
- sts D18B20_STATE, CONST_0
- ;
- ret
+r182:
+ldi r16, MATCH_ROM
+rcall ow_write_byte
+mov r16, r8
+rcall ow_write_byte
+mov r16, r9
+rcall ow_write_byte
+mov r16, r10
+rcall ow_write_byte
+mov r16, r11
+rcall ow_write_byte
+mov r16, r12
+rcall ow_write_byte
+mov r16, r13
+rcall ow_write_byte
+mov r16, r14
+rcall ow_write_byte
+mov r16, r15
+rcall ow_write_byte
+;
+ldi r16, READ_SCRATCHPAD
+rcall ow_write_byte
+;
+rcall ow_read_byte
+st y+, r16
+rcall ow_read_byte
+st y+, r16
+;
+ret
+
+#include "dallasCrc.asm"
