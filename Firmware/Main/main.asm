@@ -155,8 +155,16 @@ l2:
 rcall logic
 ;--display--
 rcall process_display
-;
+;--modbus--
+lds r16, ACTION
+sbrs r16, ACTION_MODBUS
+ rjmp main_cycle
+cbr r16, 1 << ACTION_MODBUS
+sts ACTION, r16 
+rcall process_modbus
+sbi UCSRB, RXEN
 rjmp main_cycle
+
 
 #include "SelfDiagnostics.asm"
 #include "Uart.asm"

@@ -19,9 +19,21 @@
 #define ERROR_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND 0x0B
 
 TIM0_OVF:
+push r16
+in r16, SREG
+push r16
+;
+cbi UCSRB, RXEN
 out tccr2, CONST_0
+;
+lds r16, ACTION
+sbr r16, 1 << ACTION_MODBUS
+sts ACTION, r16
+;
+pop r16
+out SREG, r16
+pop r16
 reti
-
 
 process_modbus:
 ;check crc
@@ -33,9 +45,12 @@ tst r16
 brne t2exit
 ;check addr
 lds r16, UART_BUFFER + 0
+tst r16
+breq t2c0
 lds r17, MODBUS_ADDRESS
 cp r16, r17
 brne t2exit
+t2c0:
 ;------select command------
 lds r16, UART_BUFFER + 1
 cpi r16, READ_INPUT_REGISTERS
