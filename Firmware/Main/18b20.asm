@@ -33,22 +33,7 @@ brne init_18b20_f
  sbr ERRORL_REG, 1 << ERRORL_NO18B20
  rjmp init_18b20_exit
 init_18b20_f:
-ldi r30, low(D18B20_ADDRESSES)
-ldi r31, high(D18B20_ADDRESSES)
-;
-init_18b20_cycle:
-ld r8, z+
-ld r9, z+
-ld r10, z+
-ld r11, z+
-ld r12, z+
-ld r13, z+
-ld r14, z+
-ld r15, z+
 rcall set_resolution
-;
-dec r17
-brne init_18b20_cycle
 ;
 init_18b20_exit:
 pop r31
@@ -88,6 +73,11 @@ breq r18b20_read
  ret
 ; 
 r18b20_read:
+rcall ow_read_bit
+brts r181
+ ;conversation in progress
+ ret
+r181:
 push r8
 push r9
 push r10
@@ -191,7 +181,6 @@ search_cycle:
   ;-----bit cycle------
   search_bit_cycle:
     clr r17
-    clr r20
     ;old value bit
     ror r13
     ror r12
@@ -206,18 +195,18 @@ search_cycle:
   rcall ow_read_bit
   brtc search2
     rcall ow_read_bit
-    brts search3
+    brtc search3
     ;none present
      rjmp search_exit
     search3:
-     ;zero present
-     clc
+     ;one present
+     sec
      rjmp search_savebit 
   search2:
     rcall ow_read_bit
     brtc search4
-    ;one present
-     sec
+    ;zero present
+     clc
      rjmp search_savebit
     search4:
      ;both present
@@ -286,7 +275,7 @@ st z+, r27
 st z+, r28
 st z+, r29
 ;crc
-st x+, r17
+st z+, r17
 ;
 lds r16, D18B20_COUNT
 inc r16
@@ -321,23 +310,7 @@ rcall ow_reset
 brtc i180
  ret
 i180:
-ldi r16, MATCH_ROM
-rcall ow_write_byte
-mov r16, r8
-rcall ow_write_byte
-mov r16, r9
-rcall ow_write_byte
-mov r16, r10
-rcall ow_write_byte
-mov r16, r11
-rcall ow_write_byte
-mov r16, r12
-rcall ow_write_byte
-mov r16, r13
-rcall ow_write_byte
-mov r16, r14
-rcall ow_write_byte
-mov r16, r15
+ldi r16, SKIP_ROM
 rcall ow_write_byte
 ;
 ldi r16, WRITE_SCRATCHPAD
@@ -354,23 +327,7 @@ rcall ow_reset
 brtc i181
  ret
 i181:
-ldi r16, MATCH_ROM
-rcall ow_write_byte
-mov r16, r8
-rcall ow_write_byte
-mov r16, r9
-rcall ow_write_byte
-mov r16, r10
-rcall ow_write_byte
-mov r16, r11
-rcall ow_write_byte
-mov r16, r12
-rcall ow_write_byte
-mov r16, r13
-rcall ow_write_byte
-mov r16, r14
-rcall ow_write_byte
-mov r16, r15
+ldi r16, SKIP_ROM
 rcall ow_write_byte
 ;
 ldi r16, READ_SCRATCHPAD
@@ -379,12 +336,12 @@ rcall ow_write_byte
 rcall ow_read_byte
 cpi r16, 0x50
 breq i20
- ;sbr ERROR_REG, 1 << FAKE_18B20
+ sbr ERROR_REG, 1 << FAKE_18B20
 i20:
 rcall ow_read_byte
 cpi r16, 0x05
 breq i21
- ;sbr ERROR_REG, 1 << FAKE_18B20
+ sbr ERROR_REG, 1 << FAKE_18B20
 i21:
 .ENDIF
 ;start conversion
@@ -392,23 +349,7 @@ rcall ow_reset
 brtc i182
  ret
 i182:
-ldi r16, MATCH_ROM
-rcall ow_write_byte
-mov r16, r8
-rcall ow_write_byte
-mov r16, r9
-rcall ow_write_byte
-mov r16, r10
-rcall ow_write_byte
-mov r16, r11
-rcall ow_write_byte
-mov r16, r12
-rcall ow_write_byte
-mov r16, r13
-rcall ow_write_byte
-mov r16, r14
-rcall ow_write_byte
-mov r16, r15
+ldi r16, SKIP_ROM
 rcall ow_write_byte
 ldi r16, CONVERT_TEMPERATURE
 rcall ow_write_byte
@@ -418,11 +359,6 @@ ret
 ;in r8-r15 - addr
 ;out Y
 read_single_18b20:
-rcall ow_read_bit
-brts r181
- ;conversation in progress
- ret
-r181:
 rcall ow_reset
 brtc r182
  ret
