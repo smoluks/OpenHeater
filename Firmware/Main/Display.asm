@@ -122,7 +122,7 @@ rjmp pdt1
 sbrs BUTTONS_REG, BUTTON_PLUS_HOLD_FLAG
 rjmp pdt3
  pdt1:
- cpi TTARGET_REG, 75
+ cpi TTARGET_REG, MAX_TARGET_TEMP
  brge pdt3
   inc TTARGET_REG
   rcall ds1307_savetargettemp
@@ -132,7 +132,7 @@ rjmp pdt2
 sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
 rjmp pdt4
  pdt2:
- cpi TTARGET_REG, -39
+ cpi TTARGET_REG, MIN_TARGET_TEMP
  brlt pdt4
   dec TTARGET_REG
   rcall ds1307_savetargettemp

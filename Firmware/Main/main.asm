@@ -175,3 +175,4 @@ rjmp main_cycle
 #include "Logic.asm"
 #include "I2C.asm"
 #include "DS1307.asm"
+#include "EEPROM.asm"

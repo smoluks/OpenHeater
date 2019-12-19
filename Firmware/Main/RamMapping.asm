@@ -1,4 +1,6 @@
 #define D18B20_MAX_COUNT 10
+#define MIN_TARGET_TEMP -39
+#define MAX_TARGET_TEMP 75
 
 ;-----------Regs-----------
 #define CONST_0 r2

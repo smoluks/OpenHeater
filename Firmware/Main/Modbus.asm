@@ -20,72 +20,79 @@
 
 TIM0_OVF:
 push r16
+push r17
 in r16, SREG
 push r16
+;stop t2
+out TCCR2, CONST_0
+;check crc
+lds r16, CRCHI
+tst r16
+brne t0_ovf_exit
+lds r16, CRCLO
+tst r16
+brne t0_ovf_exit
+;check addr
+lds r16, UART_BUFFER + 0
+tst r16
+breq t0_ovf_p
+lds r17, MODBUS_ADDRESS
+cp r16, r17
+brne t0_ovf_exit
 ;
-cbi UCSRB, RXEN
-out tccr2, CONST_0
-;
-lds r16, ACTION
-sbr r16, 1 << ACTION_MODBUS
-sts ACTION, r16
+t0_ovf_p:
+ cbi UCSRB, RXEN
+ ;set modbus process flag
+ lds r16, ACTION
+ sbr r16, 1 << ACTION_MODBUS
+ sts ACTION, r16
+t0_ovf_exit:
+;repair all for new packet
+sts CRCLO, CONST_0
+sts CRCHI, CONST_0
+ldi r16, low(UART_BUFFER)
+sts RECV_HANDLE_L, r16
+ldi r16, high(UART_BUFFER)
+sts RECV_HANDLE_H, r16
 ;
 pop r16
 out SREG, r16
+pop r17
 pop r16
 reti
 
 process_modbus:
-;check crc
-lds r16, CRCHI
-tst r16
-brne t2exit
-lds r16, CRCLO
-tst r16
-brne t2exit
-;check addr
-lds r16, UART_BUFFER + 0
-tst r16
-breq t2c0
-lds r17, MODBUS_ADDRESS
-cp r16, r17
-brne t2exit
-t2c0:
 ;------select command------
 lds r16, UART_BUFFER + 1
 cpi r16, READ_INPUT_REGISTERS
 brne t2c1
- ;---Read analog input---
  rcall readAnalogInput
  rjmp t2end
-;
 t2c1:
 cpi r16, READ_HOLDING_REGISTERS
 brne t2c2
- ;---Read analog input---
  rcall readHoldingRegisters
- rjmp t2end
-;
+ rjmp t2end 
 t2c2:
+cpi r16, WRITE_SINGLE_REGISTER
+brne t2c3
+ rcall writeSingleRegister
+ tst r16
+ breq t2end
+  mov r17, r16
+  rcall makeerr
+  rjmp t2end 
+t2c3: 
 ldi r17, ERROR_ILLEGAL_FUNCTION ;not supported error
 rcall makeerr
-;set answer handle
 t2end:
+;set answer handle
 ldi r16, low(UART_BUFFER)
 sts TRANS_HANDLE_L, r16
 ldi r16, high(UART_BUFFER)
 sts TRANS_HANDLE_H, r16
 ;start transmit
 rcall USART_TXC
-;recover receive buffer handle
-t2exit:
-sts CRCLO, r3
-sts CRCHI, r3
-ldi r16, low(UART_BUFFER)
-sts RECV_HANDLE_L, r16
-ldi r16, high(UART_BUFFER)
-sts RECV_HANDLE_H, r16
-;
 ret
 
 readAnalogInput:
@@ -158,7 +165,7 @@ lds r16, CRCLO
 st z+, r16
 ;
 add r18, CONST_5
-st z+, r18
+sts TRANS_COUNT, r18
 ;
 pop r31
 pop r30
@@ -235,10 +242,42 @@ lds r16, CRCLO
 st z+, r16
 ;
 add r18, CONST_5
-st z+, r18
+sts TRANS_COUNT, r18
 ;
 pop r31
 pop r30
+pop r18
+ret
+
+writeSingleRegister:
+push r18
+;check address
+lds r16, UART_BUFFER + 2 ;RegAddrHi
+tst r16
+brne wsr1
+lds r16, UART_BUFFER + 3 ;RegAddrLo
+cpi r16, MODBUS_HOLDING_REGS_COUNT+1
+brsh wsr2
+wsr1:	
+ ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
+ rcall makeerr
+ rjmp wsr_exit
+;
+wsr2:
+lds r18, UART_BUFFER + 3 ;RegAddrLo
+lds r17, UART_BUFFER + 4 ;Data High
+lds r16, UART_BUFFER + 5 ;Data Low
+rcall write_single_reg
+brtc wsr3
+ ldi r17, ERROR_SLAVE_DEVICE_FAILURE
+ rcall makeerr
+ rjmp wsr_exit
+;
+wsr3:
+add r18, CONST_5
+sts TRANS_COUNT, r18
+;
+wsr_exit:
 pop r18
 ret
 
@@ -347,3 +386,74 @@ h5:
  clr r16
  clr r17 
  ret
+
+;in r18 - addr, r16:17 - data
+;out r16 - error 
+write_single_reg:
+clt
+cpi r18, 0
+brne ws1
+ ;---modbus address---
+ tst r17
+ brne data_error
+ sts MODBUS_ADDRESS, r16
+ rcall save_modbus_address
+ clr r16
+ ret
+ws1:
+cpi r19, 1
+brne ws2
+ ;---target temperature---
+ tst r17
+ brne data_error
+ cpi r16, MIN_TARGET_TEMP
+ brlt data_error
+ cpi r16, MAX_TARGET_TEMP+1
+ brge data_error
+ mov TTARGET_REG, r16
+ clr r16
+ ret
+ws2:
+cpi r19, 2
+brne ws3
+ ;---mode---
+ tst r17
+ brne data_error
+ cpi r16, MODE_COUNT
+ brsh data_error
+ mov MODE_REG, r16
+ clr r16
+ ret
+ws3: 
+cpi r19, 3
+brne ws4
+ ;---brightness---
+ tst r17
+ brne data_error
+ cpi r16, MODE_COUNT
+ brsh data_error
+ out OCR2, r16
+ rcall ds1307_savebrightness
+ clr r16
+ ret
+ws4:
+cpi r19, 8
+brsh ws5
+ ;1307 regs
+ tst r17
+ brne data_error
+ mov r17, r18
+ rcall i2c_write
+ brts not_ready
+ clr r16
+ ret
+ws5:
+ clr r16
+ clr r17 
+ ret
+data_error:
+ ldi r16, ERROR_ILLEGAL_DATA_VALUE
+ ret
+not_ready:
+ ldi r16, ERROR_SLAVE_DEVICE_BUSY
+ ret 

@@ -174,77 +174,72 @@ clr r28
 clr r29
 ;
 search_cycle:
-movw r8, r24
-movw r10, r26
-movw r12, r28
-ldi r18, 48
-clr r20 ;current cycle last zero-wented branch
-;
-rcall ow_reset
-;
-ldi r16, SEARCH_ROM
-rcall ow_write_byte
-;
-ldi r16, 0x28
-rcall ow_write_byte_with_check
-brtc search0
- rjmp search_exit
-search0: 
-;-----bit cycle------
-search_bit_cycle:
-clr r17
-clr r20
-;
-ror r13
-ror r12
-ror r11
-ror r10
-ror r9
-ror r8
-brcc search1
- sbr r17, 0b00000001
-search1:
-;----- read -----
-rcall ow_read_bit
-brts search2
- ;
- rcall ow_read_bit
- brts search3
-  ;none present
-  rjmp search_exit
- search3:
-  ;zero present
-  clc
-  rjmp search_savebit 
-search2:
-rcall ow_read_bit
-brts search4
- ;one present
- sec
- rjmp search_savebit
-search4:
- ;both present
- cp r19, r18
- brne search6
-  ;-current bit - branch-
-  sec ;go to one
-  rjmp search_savebit
- search6:
- brlo search7
-  ;i's branch inside current - use default
-  mov r20, r18
-  clc ;go to one
-  rjmp search_savebit
- search7:
-  ;it's brach outside current - use stored
-  sec
-  sbrc r17, 0
-  rjmp search8
-   mov r20, r18
-   clc
-  search8:  
-  ;rjmp search_savebit 
-;save bit
+  movw r8, r24
+  movw r10, r26
+  movw r12, r28
+  ldi r18, 48
+  clr r20 ;current cycle last zero-wented branch
+  ;
+  rcall ow_reset
+  ldi r16, SEARCH_ROM
+  rcall ow_write_byte
+  ldi r16, 0x28
+  rcall ow_write_byte_with_check
+  brtc search0
+   rjmp search_exit
+  search0: 
+  ;-----bit cycle------
+  search_bit_cycle:
+    clr r17
+    clr r20
+    ;old value bit
+    ror r13
+    ror r12
+    ror r11
+    ror r10
+    ror r9
+    ror r8
+    brcc search1
+     sbr r17, 0b00000001
+    search1:
+  ;----- read -----
+  rcall ow_read_bit
+  brtc search2
+    rcall ow_read_bit
+    brts search3
+    ;none present
+     rjmp search_exit
+    search3:
+     ;zero present
+     clc
+     rjmp search_savebit 
+  search2:
+    rcall ow_read_bit
+    brtc search4
+    ;one present
+     sec
+     rjmp search_savebit
+    search4:
+     ;both present
+     cp r18, r19
+     breq search_curr
+     brsh search_out
+      ;it's branch inside current - use default
+      mov r20, r18
+      clc ;go to one
+      rjmp search_savebit
+     search_out:
+     ;it's brach outside current - use stored
+     sec
+     sbrc r17, 0
+     rjmp search_savebit
+      mov r20, r18
+      clc
+      rjmp search_savebit
+     search_curr:
+      ;-current bit - branch-
+      sec
+      ;rjmp search_savebit
 search_savebit:
 ror r29
 ror r28
@@ -279,7 +274,7 @@ rcall calculate_dallas_crc
 ;mov r16, r17
 ;rcall ow_write_byte_with_check
 ;brts 
-;---save---
+;-----save-----
 ;device id
 ldi r16, 0x28
 st z+, r16
@@ -299,9 +294,10 @@ sts D18B20_COUNT, r16
 cpi r16, D18B20_MAX_COUNT
 breq search_exit
 ;---
+mov r19, r20
 tst r20
 breq search_exit;no more branch
-mov r19, r20
+rjmp search_cycle
 ;save
 search_exit:
 ;

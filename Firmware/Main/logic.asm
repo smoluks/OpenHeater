@@ -13,7 +13,7 @@ andi r17, 0b00001111
 or r16, r17
 swap r16
 cp r16, TTARGET_REG
-brsh logic_off
+brge logic_off
 ;
 cpi MODE_REG, MODE_1
 brne lo1
