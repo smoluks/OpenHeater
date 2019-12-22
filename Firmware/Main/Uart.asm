@@ -12,9 +12,9 @@ lds r27, RECV_HANDLE_H
 st x+, r16
 sts RECV_HANDLE_L, r26
 sts RECV_HANDLE_H, r27
-;restart T2
-out tcnt2, CONST_TCNT0_START
-out tccr0, r5
+;restart T0
+out tcnt0, CONST_TCNT0_START
+out tccr0, CONST_TCCR0_START
 ;
 pop r16
 out SREG, r16

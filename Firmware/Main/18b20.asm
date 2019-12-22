@@ -86,12 +86,18 @@ push r12
 push r13
 push r14
 push r15
+push r22
 push r28
 push r29
 push r30
 push r31
+;clear current min, max temperature
+ldi TLowH_REG, 0x7F
+ldi TLowL_REG, 0xFF
+ldi THighH_REG, 0x80
+ldi THighL_REG, 0x00
 ;
-lds r17, D18B20_COUNT
+lds r22, D18B20_COUNT
 ldi r28, low(D18B20_TEMPERATURES)
 ldi r29, high(D18B20_TEMPERATURES)
 ldi r30, low(D18B20_ADDRESSES)
@@ -108,17 +114,43 @@ ld r14, z+
 ld r15, z+
 rcall read_single_18b20
 brts read_18b20_fail
-
-read_18b20_fail:
+;store
+st y+, r17
+st y+, r16
 ;
-dec r17
-brne read_18b20_cycle
+cp r17, TLowL_REG
+cpc r16, TLowH_REG
+brge read_18b20_low
+ mov TLowL_REG, r17
+ mov TLowH_REG, r16
+;
+read_18b20_low:
+cp r17, THighL_REG
+cpc r16, THighH_REG
+brlt read_18b20_high
+ mov THighL_REG, r17
+ mov THighH_REG, r16 
+;
+read_18b20_high:
+dec r22
+breq read_18b20_exit
+;
+read_18b20_fail:
+sbr ERRORL_REG, 1 << ERRORL_NO18B20
 ;
 read_18b20_exit:
+lds r16, SYSTICK
+ldi r17, MEAS_TIME
+add r16, r17
+sts D18B20_TIMESTAMP, r16
+;
+sts D18B20_STATE, CONST_10
+;
 pop r31
 pop r30
 pop r29
 pop r28
+pop r22
 pop r15
 pop r14
 pop r13
@@ -128,12 +160,6 @@ pop r10
 pop r9
 pop r8
 ;
-lds r16, SYSTICK
-ldi r17, MEAS_TIME
-add r16, r17
-sts D18B20_TIMESTAMP, r16
-;
-sts D18B20_STATE, CONST_10
 ret
 
 search_18b20:
@@ -357,8 +383,9 @@ rcall ow_write_byte
 ret
 
 ;in r8-r15 - addr
-;out Y
+;out r17:16 - temp, T - error
 read_single_18b20:
+;
 rcall ow_reset
 brtc r182
  ret
@@ -386,10 +413,11 @@ ldi r16, READ_SCRATCHPAD
 rcall ow_write_byte
 ;
 rcall ow_read_byte
-st y+, r16
-rcall ow_read_byte
-st y+, r16
+mov r17, r16
 ;
+rcall ow_read_byte
+;
+clt
 ret
 
 #include "dallasCrc.asm"

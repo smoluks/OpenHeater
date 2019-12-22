@@ -35,8 +35,8 @@ ow_read_bit:
 push r16
 push r17
 ;
-sbi ddrd, 3
 cbi portd, 3
+sbi ddrd, 3
 rcall pause_1us
 ;
 cbi ddrd, 3
@@ -53,6 +53,10 @@ ldi r16, 38
 clr r17
 rcall ipause
 ;
+ow_read_bit_wait:
+sbis pind, 3
+rjmp ow_read_bit_wait
+;
 pop r17
 pop r16
 ret
@@ -61,20 +65,20 @@ ow_write_bit:
 push r16 
 push r17
 ;
-sbi ddrd, 3
 cbi portd, 3
+sbi ddrd, 3
 rcall pause_1us
 ;
 brtc w1
- sbi portd, 3
  cbi ddrd, 3
+ sbi portd, 3 
 w1:
 clr r17
 ldi r16, 54
 rcall ipause
 ;
-sbi portd, 3
 cbi ddrd, 3
+sbi portd, 3
 ;
 pop r17
 pop r16

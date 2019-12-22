@@ -11,8 +11,6 @@ sts SYSTICK, r16
 ;
 rcall process_buttons
 ;
-rcall logic
-;
 pop r16
 out SREG, r16
 pop r17

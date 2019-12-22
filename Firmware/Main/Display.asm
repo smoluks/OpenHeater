@@ -6,7 +6,7 @@
 
 #define DISPLAY_MENU_BRIGHTNESS 0
 
-#define MIN_BRIGHTNESS 0x20
+#define MIN_BRIGHTNESS 0
 
 process_display:
 cpi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
@@ -100,6 +100,7 @@ rjmp pdb4
  cpi r16, MIN_BRIGHTNESS
  brlo pdb4
   dec r16
+  out OCR2, r16
   rcall ds1307_savebrightness
 pdb4:
 sbrs BUTTONS_REG, BUTTON_MODE_FLAG
@@ -308,9 +309,8 @@ sts SEG4, r17
 ret
 
 showTemperature:
-mov r17, THigh_REG
+movw r16, TLowL_REG
 andi r17, 0b00001111
-mov r16, TLow_REG
 andi r16, 0b11110000
 or r16, r17
 swap r16
@@ -343,7 +343,7 @@ rcall convertnumberto7segment1
 ori r17, 0b00000100 ;DP
 sts SEG2, r17
 ;-fractional part - TLow / 16 * 10 -
-mov r16, TLow_REG
+mov r16, TLowL_REG
 andi r16, 0b00001111
 ;*10
 mul r16, CONST_10

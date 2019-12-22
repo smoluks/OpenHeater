@@ -8,8 +8,8 @@
 
 #define TCNT0_START 131
 #define CONST_TCNT0_START r4
-#define TССR0_START 0b00000100
-#define CONST_TССR0_START r5
+#define TCCR0_START 0b00000100
+#define CONST_TCCR0_START r5
 
 #define CONST_ADMUX_BUTTONS r6 
 #define CONST_ADMUX_FEEDBACK1 r7
@@ -24,8 +24,10 @@
 #define CONST_5 r12
 
 ;Temperature
-#define TLow_REG  r20
-#define THigh_REG  r21
+#define TLowL_REG  r18
+#define TLowH_REG  r19
+#define THighL_REG  r20
+#define THighH_REG  r21
 #define TTARGET_REG r22
 ;
 #define ERRORL_REG r23

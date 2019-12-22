@@ -23,15 +23,15 @@ push r16
 push r17
 in r16, SREG
 push r16
-;stop t2
-out TCCR2, CONST_0
+;stop t0
+out TCCR0, CONST_0
 ;check crc
-lds r16, CRCHI
-tst r16
-brne t0_ovf_exit
-lds r16, CRCLO
-tst r16
-brne t0_ovf_exit
+;lds r16, CRCHI
+;tst r16
+;brne t0_ovf_exit
+;lds r16, CRCLO
+;tst r16
+;brne t0_ovf_exit
 ;check addr
 lds r16, UART_BUFFER + 0
 tst r16
@@ -125,8 +125,9 @@ push r30
 push r31
 ;---build packet---
 ;clean CRC
-sts CRCLO, r3
-sts CRCHI, r3
+ser r16
+sts CRCLO, r16
+sts CRCHI, r16
 ;address
 lds r16, MODBUS_ADDRESS
 rcall acrc
@@ -198,30 +199,34 @@ brlo rhr2
 ;
 rhr2:
 push r18
+push r19
 push r30
 push r31
 ;---build packet---
 ;clean CRC
-sts CRCLO, r3
-sts CRCHI, r3
+ser r16
+sts CRCLO, r16
+sts CRCHI, r16
 ;address
-lds r16, MODBUS_ADDRESS
+lds r16, UART_BUFFER+0
 rcall acrc
 ;command
 lds r16, UART_BUFFER+1
 rcall acrc
 ;size
+mov r18, r17
 mov r16, r17
 lsl r16
-mov r18, r16
 sts UART_BUFFER+2, r16
 rcall acrc
+add r16, CONST_5
+sts TRANS_COUNT, r16
 ;data
-lds r16, UART_BUFFER + 3 ;RegAddrLo
+lds r19, UART_BUFFER + 3 ;RegAddrLo
 ldi r30, low(UART_BUFFER + 3)
 ldi r31, high(UART_BUFFER + 3)
 rhr_data_cycle:
- tst r17
+ tst r18
  breq rhr_data_cycle_exit
  ;
  rcall read_holding_reg
@@ -231,8 +236,8 @@ rhr_data_cycle:
  st z+, r16
  rcall acrc
  ;
- inc r16
- dec r17
+ inc r19
+ dec r18
  rjmp rhr_data_cycle
 rhr_data_cycle_exit:
 ;crc
@@ -241,11 +246,9 @@ st z+, r16
 lds r16, CRCLO
 st z+, r16
 ;
-add r18, CONST_5
-sts TRANS_COUNT, r18
-;
 pop r31
 pop r30
+pop r19
 pop r18
 ret
 
@@ -284,10 +287,11 @@ ret
 ;in: error - r17
 makeerr:
 ;clear crc
-sts CRCLO, r3
-sts CRCHI, r3
+ser r16
+sts CRCLO, r16
+sts CRCHI, r16
 ;address
-lds r16, MODBUS_ADDRESS
+lds r16, UART_BUFFER+0
 rcall acrc
 ;command
 lds r16, UART_BUFFER+1

@@ -40,7 +40,7 @@ clr r16
 ldi r17, 10
 movw r2, r16
 ldi r16, TCNT0_START
-ldi r17, TССR0_START
+ldi r17, TCCR0_START
 movw r4, r16
 ldi r16, ADMUX_BUTTONS
 ldi r17, ADMUX_FEEDBACK1
@@ -106,7 +106,7 @@ out OCR1AL, r16
 out TCNT2, r2
 ldi r16, 128 ;Brightness
 out OCR2, r16
-ldi r16, 0b00000110 ;F/256
+ldi r16, 0b00000100 ;F/64
 out TCCR2, r16
 ;
 ldi r16, 0b11010001
@@ -121,7 +121,7 @@ out TWCR, r16
 out UCSRA, CONST_0
 ldi r16, 0b11011000
 out UCSRB, r16
-ldi r16, 0b10110110
+ldi r16, 0b10000110
 out UCSRC, r16
 out UBRRH, CONST_0
 ldi r16, 51
