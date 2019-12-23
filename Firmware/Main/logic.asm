@@ -6,7 +6,15 @@ tst ERRORH_REG
 brne logic_off
 cpi MODE_REG, MODE_OFF
 breq logic_off
-;temperature
+;temperature high
+movw r16, THighL_REG
+andi r16, 0b11110000
+andi r17, 0b00001111
+or r16, r17
+swap r16
+cpi r16, 70
+brge logic_off
+;temperature low
 movw r16, TLowL_REG
 andi r16, 0b11110000
 andi r17, 0b00001111

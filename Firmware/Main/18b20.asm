@@ -134,6 +134,7 @@ brlt read_18b20_high
 read_18b20_high:
 dec r22
 breq read_18b20_exit
+rjmp read_18b20_cycle
 ;
 read_18b20_fail:
 sbr ERRORL_REG, 1 << ERRORL_NO18B20

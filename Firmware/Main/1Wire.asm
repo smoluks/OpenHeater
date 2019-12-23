@@ -53,9 +53,9 @@ ldi r16, 38
 clr r17
 rcall ipause
 ;
-ow_read_bit_wait:
-sbis pind, 3
-rjmp ow_read_bit_wait
+;ow_read_bit_wait:
+;sbis pind, 3
+;rjmp ow_read_bit_wait
 ;
 pop r17
 pop r16

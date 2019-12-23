@@ -18,6 +18,7 @@ sbi portd, 2
 lds r16, SYSTICK
 inc r16
 inc r16
+inc r16
 s2: 
 lds r17, SYSTICK
 cp r17, r16

@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.42  main.asm Mon Dec 23 23:18:15 2019
+AVRASM ver. 2.1.42  main.asm Tue Dec 24 00:42:44 2019
 
 [builtin](2): Including file 'C:\Program Files (x86)\Labcenter Electronics\Proteus 7 Professional\tools\AVRASM\appnotes\m8def.inc'
 main.asm(1): Including file 'RamMapping.asm'
@@ -9,17 +9,17 @@ main.asm(24): Including file 'ADC.asm'
 main.asm(25): Including file 'Systick.asm'
 main.asm(26): Including file 'Display.asm'
 main.asm(27): Including file 'Buttons.asm'
-main.asm(183): Including file 'SelfDiagnostics.asm'
-main.asm(184): Including file 'Uart.asm'
-main.asm(185): Including file 'Modbus.asm'
-main.asm(186): Including file 'ModbusCrc.asm'
-main.asm(187): Including file '1Wire.asm'
-main.asm(188): Including file '18b20.asm'
-18b20.asm(423): Including file 'dallasCrc.asm'
-main.asm(189): Including file 'Logic.asm'
-main.asm(190): Including file 'I2C.asm'
-main.asm(191): Including file 'DS1307.asm'
-main.asm(192): Including file 'EEPROM.asm'
+main.asm(170): Including file 'SelfDiagnostics.asm'
+main.asm(171): Including file 'Uart.asm'
+main.asm(172): Including file 'Modbus.asm'
+main.asm(173): Including file 'ModbusCrc.asm'
+main.asm(174): Including file '1Wire.asm'
+main.asm(175): Including file '18b20.asm'
+18b20.asm(424): Including file 'dallasCrc.asm'
+main.asm(176): Including file 'Logic.asm'
+main.asm(177): Including file 'I2C.asm'
+main.asm(178): Including file 'DS1307.asm'
+main.asm(179): Including file 'EEPROM.asm'
                  
                  #include "RamMapping.asm"
                  
@@ -886,11 +886,11 @@ main.asm(192): Including file 'EEPROM.asm'
 000006 c0a2      .ORG 0x06 rjmp TIM1_COMPA ; Timer1 CompareA Handler
                  ;.ORG 0x07 rjmp TIM1_COMPB ; Timer1 CompareB Handler
                  ;.ORG 0x08 rjmp TIM1_OVF ; Timer1 Overflow Handler
-000009 c407      .ORG 0x09 rjmp TIM0_OVF ; Timer0 Overflow Handler
+000009 c3f6      .ORG 0x09 rjmp TIM0_OVF ; Timer0 Overflow Handler
                  ;.ORG 0x0a rjmp SPI_STC ; SPI Transfer Complete Handler
-00000b c3d1      .ORG 0x0b rjmp USART_RXC ; USART RX Complete Handler
+00000b c3c0      .ORG 0x0b rjmp USART_RXC ; USART RX Complete Handler
                  ;.ORG 0x0c rjmp USART_UDRE ; UDR Empty Handler
-00000d c3e7      .ORG 0x0d rjmp USART_TXC ; USART TX Complete Handler
+00000d c3d6      .ORG 0x0d rjmp USART_TXC ; USART TX Complete Handler
 00000e c05e      .ORG 0x0e rjmp ADCi ; ADC Conversion Complete Handler
                  ;.ORG 0x0f rjmp EE_RDY ; EEPROM Ready Handler
                  ;.ORG 0x10 rjmp ANA_COMP ; Analog Comparator Handler
@@ -1265,7 +1265,7 @@ main.asm(192): Including file 'EEPROM.asm'
 000119 f019       breq pdb3
 00011a 9503        inc r16
 00011b bd03        out OCR2, r16
-00011c d885        rcall ds1307_savetargettemp
+00011c d87a        rcall ds1307_savetargettemp
                  pdb3:
 00011d fd91      sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
 00011e c002      rjmp pdb2
@@ -1276,7 +1276,7 @@ main.asm(192): Including file 'EEPROM.asm'
 000122 f018       brlo pdb4
 000123 950a        dec r16
 000124 bd03        out OCR2, r16
-000125 d881        rcall ds1307_savebrightness
+000125 d876        rcall ds1307_savebrightness
                  pdb4:
 000126 ff92      sbrs BUTTONS_REG, BUTTON_MODE_FLAG
 000127 c001      rjmp pdb5
@@ -1301,7 +1301,7 @@ main.asm(192): Including file 'EEPROM.asm'
 000132 346b       cpi TTARGET_REG, MAX_TARGET_TEMP
 000133 f414       brge pdt3
 000134 9563        inc TTARGET_REG
-000135 d86c        rcall ds1307_savetargettemp
+000135 d861        rcall ds1307_savetargettemp
                  pdt3:
 000136 fd91      sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
 000137 c002      rjmp pdt2
@@ -1311,7 +1311,7 @@ main.asm(192): Including file 'EEPROM.asm'
 00013a 3d69       cpi TTARGET_REG, MIN_TARGET_TEMP
 00013b f014       brlt pdt4
 00013c 956a        dec TTARGET_REG
-00013d d864        rcall ds1307_savetargettemp
+00013d d859        rcall ds1307_savetargettemp
                  pdt4:
 00013e ff92      sbrs BUTTONS_REG, BUTTON_MODE_FLAG
 00013f c001      rjmp pdt5
@@ -1979,178 +1979,166 @@ main.asm(192): Including file 'EEPROM.asm'
 00037d ed0f      ldi r16, 0b11011111
 00037e b906      out ADCSRA, r16
                  ;
-00037f d38f      rcall init_18b20
+00037f d37c      rcall init_18b20
                  ;
-000380 d608      rcall ds1307_init
+000380 d5fd      rcall ds1307_init
                  ;
 000381 9478      sei
                  ;
-000382 e000      ldi r16, 0x00
-000383 9300 011e sts UART_BUFFER + 0, r16
-000385 e003      ldi r16, 0x03
-000386 9300 011f sts UART_BUFFER + 1, r16
-000388 e000      ldi r16, 0x00
-000389 9300 0120 sts UART_BUFFER + 2, r16
-00038b e000      ldi r16, 0x00
-00038c 9300 0121 sts UART_BUFFER + 3, r16
-00038e e000      ldi r16, 0x00
-00038f 9300 0122 sts UART_BUFFER + 4, r16
-000391 e001      ldi r16, 0x01
-000392 9300 0123 sts UART_BUFFER + 5, r16
-000394 d09f      rcall process_modbus
-                 ;rcall selfdignostics
+000382 d012      rcall selfdignostics
                  ;----------main-cycle----------
                  main_cycle:
-000395 95a8      wdr
+000383 95a8      wdr
                  ;--18b20--
-000396 ff70      sbrs ERRORL_REG, ERRORL_NO18B20
-000397 c002      rjmp l1
+000384 ff70      sbrs ERRORL_REG, ERRORL_NO18B20
+000385 c002      rjmp l1
                   ;18b20 not found
-000398 d376       rcall init_18b20
-000399 c001       rjmp l2
+000386 d375       rcall init_18b20
+000387 c001       rjmp l2
                  l1:
                   ;read 18b20
-00039a d391       rcall read_18b20
+000388 d390       rcall read_18b20
                  l2:
                  ;--logic--
-00039b d52d      rcall logic
+000389 d52d      rcall logic
                  ;--display--
-00039c dd20      rcall process_display
+00038a dd32      rcall process_display
                  ;--modbus--
-00039d 9100 0060 lds r16, ACTION
-00039f ff00      sbrs r16, ACTION_MODBUS
-0003a0 cff4       rjmp main_cycle
-0003a1 7f0e      cbr r16, 1 << ACTION_MODBUS
-0003a2 9300 0060 sts ACTION, r16 
-0003a4 d08f      rcall process_modbus
-0003a5 9a54      sbi UCSRB, RXEN
-0003a6 cfee      rjmp main_cycle
+00038b 9100 0060 lds r16, ACTION
+00038d ff00      sbrs r16, ACTION_MODBUS
+00038e cff4       rjmp main_cycle
+00038f 7f0e      cbr r16, 1 << ACTION_MODBUS
+000390 9300 0060 sts ACTION, r16 
+000392 d090      rcall process_modbus
+000393 9a54      sbi UCSRB, RXEN
+000394 cfee      rjmp main_cycle
                  
                  
                  #include "SelfDiagnostics.asm"
                  
                  ;-----check heaters-----
-0003a7 9100 006d lds r16, SYSTICK
-0003a9 9503      inc r16
-0003aa 9503      inc r16
+000395 9100 006d lds r16, SYSTICK
+000397 9503      inc r16
+000398 9503      inc r16
                  s1:
                  ;timeout
-0003ab 9110 006d lds r17, SYSTICK
-0003ad 1710      cp r17, r16
-0003ae f0e9      breq s1_timeout
+000399 9110 006d lds r17, SYSTICK
+00039b 1710      cp r17, r16
+00039c f0f1      breq s1_timeout
                  ;
-0003af 30d7      cpi FEEDBACK_REG, 0b00000111
-0003b0 f7d1      brne s1
+00039d 30d7      cpi FEEDBACK_REG, 0b00000111
+00039e f7d1      brne s1
                  ;-----check triaks-----
-0003b1 9aa8      sbi portc, 0
-0003b2 9aaa      sbi portc, 2
-0003b3 9a92      sbi portd, 2
-0003b4 9100 006d lds r16, SYSTICK
-0003b6 9503      inc r16
-0003b7 9503      inc r16
+00039f 9aa8      sbi portc, 0
+0003a0 9aaa      sbi portc, 2
+0003a1 9a92      sbi portd, 2
+0003a2 9100 006d lds r16, SYSTICK
+0003a4 9503      inc r16
+0003a5 9503      inc r16
+0003a6 9503      inc r16
                  s2: 
-0003b8 9110 006d lds r17, SYSTICK
-0003ba 1710      cp r17, r16
-0003bb f0b9      breq s2_timeout
+0003a7 9110 006d lds r17, SYSTICK
+0003a9 1710      cp r17, r16
+0003aa f0b9      breq s2_timeout
                  ;
-0003bc 30d0      cpi FEEDBACK_REG, 0b00000000
-0003bd f7d1      brne s2
+0003ab 30d0      cpi FEEDBACK_REG, 0b00000000
+0003ac f7d1      brne s2
                  ;-----check triaks off-----
-0003be 98a8      cbi portc, 0
-0003bf 98aa      cbi portc, 2
-0003c0 9892      cbi portd, 2
-0003c1 9100 006d lds r16, SYSTICK
-0003c3 9503      inc r16
-0003c4 9503      inc r16
+0003ad 98a8      cbi portc, 0
+0003ae 98aa      cbi portc, 2
+0003af 9892      cbi portd, 2
+0003b0 9100 006d lds r16, SYSTICK
+0003b2 9503      inc r16
+0003b3 9503      inc r16
                  s3:
-0003c5 9110 006d lds r17, SYSTICK
-0003c7 1710      cp r17, r16
-0003c8 f019      breq s1_timeout
+0003b4 9110 006d lds r17, SYSTICK
+0003b6 1710      cp r17, r16
+0003b7 f019      breq s1_timeout
                  ;
-0003c9 30d7      cpi FEEDBACK_REG, 0b00000111
-0003ca f7d1      brne s3
-0003cb 9508      ret
+0003b8 30d7      cpi FEEDBACK_REG, 0b00000111
+0003b9 f7d1      brne s3
+0003ba 9508      ret
                  
                  s1_timeout:
                  ;1
-0003cc ffd1      sbrs FEEDBACK_REG, 1
-0003cd 6081       sbr ERRORH_REG, 1 << ERRORH_CHANNEL1_BREAK
+0003bb ffd1      sbrs FEEDBACK_REG, 1
+0003bc 6081       sbr ERRORH_REG, 1 << ERRORH_CHANNEL1_BREAK
                  ;2
-0003ce ffd2      sbrs FEEDBACK_REG, 2
-0003cf 6084       sbr ERRORH_REG, 1 << ERRORH_CHANNEL2_BREAK
+0003bd ffd2      sbrs FEEDBACK_REG, 2
+0003be 6084       sbr ERRORH_REG, 1 << ERRORH_CHANNEL2_BREAK
                  ;3
-0003d0 ffd3      sbrs FEEDBACK_REG, 3
-0003d1 6180       sbr ERRORH_REG, 1 << ERRORH_CHANNEL3_BREAK
-0003d2 9508      ret
+0003bf ffd3      sbrs FEEDBACK_REG, 3
+0003c0 6180       sbr ERRORH_REG, 1 << ERRORH_CHANNEL3_BREAK
+0003c1 9508      ret
                  
                  s2_timeout:
                  ;1
-0003d3 fdd1      sbrc FEEDBACK_REG, 1
-0003d4 6082       sbr ERRORH_REG, 1 << ERRORH_CHANNEL1_ENABLEFAIL
+0003c2 fdd1      sbrc FEEDBACK_REG, 1
+0003c3 6082       sbr ERRORH_REG, 1 << ERRORH_CHANNEL1_ENABLEFAIL
                  ;2
-0003d5 fdd2      sbrc FEEDBACK_REG, 2
-0003d6 6088       sbr ERRORH_REG, 1 << ERRORH_CHANNEL2_ENABLEFAIL
+0003c4 fdd2      sbrc FEEDBACK_REG, 2
+0003c5 6088       sbr ERRORH_REG, 1 << ERRORH_CHANNEL2_ENABLEFAIL
                  ;3
-0003d7 fdd3      sbrc FEEDBACK_REG, 3
-0003d8 6280       sbr ERRORH_REG, 1 << ERRORH_CHANNEL3_ENABLEFAIL
+0003c6 fdd3      sbrc FEEDBACK_REG, 3
+0003c7 6280       sbr ERRORH_REG, 1 << ERRORH_CHANNEL3_ENABLEFAIL
                  ;
-0003d9 98a8      cbi portc, 0
-0003da 98aa      cbi portc, 2
-0003db 9892      cbi portd, 2
+0003c8 98a8      cbi portc, 0
+0003c9 98aa      cbi portc, 2
+0003ca 9892      cbi portd, 2
                  #include "Uart.asm"
-0003dc 9508      
-0003dd 930f      push r16
-0003de 93af      push r26
-0003df 93bf      push r27
-0003e0 b70f      in r16, SREG
-0003e1 930f      push r16
+0003cb 9508      
+0003cc 930f      push r16
+0003cd 93af      push r26
+0003ce 93bf      push r27
+0003cf b70f      in r16, SREG
+0003d0 930f      push r16
                  ;
-0003e2 b10c      in r16, UDR
-0003e3 d1a4      rcall acrc
-0003e4 91a0 006f lds r26, RECV_HANDLE_L
-0003e6 91b0 0070 lds r27, RECV_HANDLE_H
-0003e8 930d      st x+, r16
-0003e9 93a0 006f sts RECV_HANDLE_L, r26
-0003eb 93b0 0070 sts RECV_HANDLE_H, r27
+0003d1 b10c      in r16, UDR
+0003d2 d1a4      rcall acrc
+0003d3 91a0 006f lds r26, RECV_HANDLE_L
+0003d5 91b0 0070 lds r27, RECV_HANDLE_H
+0003d7 930d      st x+, r16
+0003d8 93a0 006f sts RECV_HANDLE_L, r26
+0003da 93b0 0070 sts RECV_HANDLE_H, r27
                  ;restart T0
-0003ed be42      out tcnt0, CONST_TCNT0_START
-0003ee be53      out tccr0, CONST_TCCR0_START
+0003dc be42      out tcnt0, CONST_TCNT0_START
+0003dd be53      out tccr0, CONST_TCCR0_START
                  ;
-0003ef 910f      pop r16
-0003f0 bf0f      out SREG, r16
-0003f1 91bf      pop r27
-0003f2 91af      pop r26
-0003f3 910f      pop r16
-0003f4 9518      reti
+0003de 910f      pop r16
+0003df bf0f      out SREG, r16
+0003e0 91bf      pop r27
+0003e1 91af      pop r26
+0003e2 910f      pop r16
+0003e3 9518      reti
                  
                  USART_TXC:
-0003f5 930f      push r16
-0003f6 93af      push r26
-0003f7 93bf      push r27
-0003f8 b70f      in r16, SREG
-0003f9 930f      push r16
+0003e4 930f      push r16
+0003e5 93af      push r26
+0003e6 93bf      push r27
+0003e7 b70f      in r16, SREG
+0003e8 930f      push r16
                  ;
-0003fa 9100 0073 lds r16, TRANS_COUNT
-0003fc 2300      tst r16
-0003fd f069      breq utexit
+0003e9 9100 0073 lds r16, TRANS_COUNT
+0003eb 2300      tst r16
+0003ec f069      breq utexit
                  ;
-0003fe 950a      dec r16
-0003ff 9300 0073 sts TRANS_COUNT, r16
+0003ed 950a      dec r16
+0003ee 9300 0073 sts TRANS_COUNT, r16
                  ;
-000401 91a0 0071 lds r26, TRANS_HANDLE_L
-000403 91b0 0072 lds r27, TRANS_HANDLE_H
-000405 910d      ld r16, X+
-000406 93a0 0071 sts TRANS_HANDLE_L, r26
-000408 93b0 0072 sts TRANS_HANDLE_H, r27
-00040a b90c      out UDR, r16
+0003f0 91a0 0071 lds r26, TRANS_HANDLE_L
+0003f2 91b0 0072 lds r27, TRANS_HANDLE_H
+0003f4 910d      ld r16, X+
+0003f5 93a0 0071 sts TRANS_HANDLE_L, r26
+0003f7 93b0 0072 sts TRANS_HANDLE_H, r27
+0003f9 b90c      out UDR, r16
                  ;
                  utexit:
-00040b 910f      pop r16
-00040c bf0f      out SREG, r16
-00040d 91bf      pop r27
-00040e 91af      pop r26
-00040f 910f      pop r16
-000410 9518      reti
+0003fa 910f      pop r16
+0003fb bf0f      out SREG, r16
+0003fc 91bf      pop r27
+0003fd 91af      pop r26
+0003fe 910f      pop r16
+0003ff 9518      reti
                  #include "Modbus.asm"
                  
                  #define MODBUS_HOLDING_REGS_COUNT 8
@@ -2173,12 +2161,12 @@ main.asm(192): Including file 'EEPROM.asm'
                  #define ERROR_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND 0x0B
                  
                  TIM0_OVF:
-000411 930f      push r16
-000412 931f      push r17
-000413 b70f      in r16, SREG
-000414 930f      push r16
+000400 930f      push r16
+000401 931f      push r17
+000402 b70f      in r16, SREG
+000403 930f      push r16
                  ;stop t0
-000415 be23      out TCCR0, CONST_0
+000404 be23      out TCCR0, CONST_0
                  ;check crc
                  ;lds r16, CRCHI
                  ;tst r16
@@ -2187,878 +2175,878 @@ main.asm(192): Including file 'EEPROM.asm'
                  ;tst r16
                  ;brne t0_ovf_exit
                  ;check addr
-000416 9100 011e lds r16, UART_BUFFER + 0
-000418 2300      tst r16
-000419 f021      breq t0_ovf_p
-00041a 9110 006e lds r17, MODBUS_ADDRESS
-00041c 1701      cp r16, r17
-00041d f431      brne t0_ovf_exit
+000405 9100 011e lds r16, UART_BUFFER + 0
+000407 2300      tst r16
+000408 f021      breq t0_ovf_p
+000409 9110 006e lds r17, MODBUS_ADDRESS
+00040b 1701      cp r16, r17
+00040c f431      brne t0_ovf_exit
                  ;
                  t0_ovf_p:
-00041e 9854       cbi UCSRB, RXEN
+00040d 9854       cbi UCSRB, RXEN
                   ;set modbus process flag
-00041f 9100 0060  lds r16, ACTION
-000421 6001       sbr r16, 1 << ACTION_MODBUS
-000422 9300 0060  sts ACTION, r16
+00040e 9100 0060  lds r16, ACTION
+000410 6001       sbr r16, 1 << ACTION_MODBUS
+000411 9300 0060  sts ACTION, r16
                  t0_ovf_exit:
                  ;repair all for new packet
-000424 ef0f      ser r16
-000425 9300 0075 sts CRCLO, r16
-000427 9300 0074 sts CRCHI, r16
-000429 e10e      ldi r16, low(UART_BUFFER)
-00042a 9300 006f sts RECV_HANDLE_L, r16
-00042c e001      ldi r16, high(UART_BUFFER)
-00042d 9300 0070 sts RECV_HANDLE_H, r16
+000413 ef0f      ser r16
+000414 9300 0075 sts CRCLO, r16
+000416 9300 0074 sts CRCHI, r16
+000418 e10e      ldi r16, low(UART_BUFFER)
+000419 9300 006f sts RECV_HANDLE_L, r16
+00041b e001      ldi r16, high(UART_BUFFER)
+00041c 9300 0070 sts RECV_HANDLE_H, r16
                  ;
-00042f 910f      pop r16
-000430 bf0f      out SREG, r16
-000431 911f      pop r17
-000432 910f      pop r16
-000433 9518      reti
+00041e 910f      pop r16
+00041f bf0f      out SREG, r16
+000420 911f      pop r17
+000421 910f      pop r16
+000422 9518      reti
                  
                  process_modbus:
                  ;------select command------
-000434 9100 011f lds r16, UART_BUFFER + 1
-000436 3004      cpi r16, READ_INPUT_REGISTERS
-000437 f411      brne t2c1
-000438 d017       rcall readAnalogInput
-000439 c00e       rjmp t2end
+000423 9100 011f lds r16, UART_BUFFER + 1
+000425 3004      cpi r16, READ_INPUT_REGISTERS
+000426 f411      brne t2c1
+000427 d017       rcall readAnalogInput
+000428 c00e       rjmp t2end
                  t2c1:
-00043a 3003      cpi r16, READ_HOLDING_REGISTERS
-00043b f411      brne t2c2
-00043c d05a       rcall readHoldingRegisters
-00043d c00a       rjmp t2end 
+000429 3003      cpi r16, READ_HOLDING_REGISTERS
+00042a f411      brne t2c2
+00042b d05a       rcall readHoldingRegisters
+00042c c00a       rjmp t2end 
                  t2c2:
-00043e 3006      cpi r16, WRITE_SINGLE_REGISTER
-00043f f431      brne t2c3
-000440 d09d       rcall writeSingleRegister
-000441 2300       tst r16
-000442 f029       breq t2end
-000443 2f10        mov r17, r16
-000444 d0b5        rcall makeerr
-000445 c002        rjmp t2end 
+00042d 3006      cpi r16, WRITE_SINGLE_REGISTER
+00042e f431      brne t2c3
+00042f d09d       rcall writeSingleRegister
+000430 2300       tst r16
+000431 f029       breq t2end
+000432 2f10        mov r17, r16
+000433 d0b5        rcall makeerr
+000434 c002        rjmp t2end 
                  t2c3: 
-000446 e011      ldi r17, ERROR_ILLEGAL_FUNCTION ;not supported error
-000447 d0b2      rcall makeerr
+000435 e011      ldi r17, ERROR_ILLEGAL_FUNCTION ;not supported error
+000436 d0b2      rcall makeerr
                  t2end:
                  ;set answer handle
-000448 e10e      ldi r16, low(UART_BUFFER)
-000449 9300 0071 sts TRANS_HANDLE_L, r16
-00044b e001      ldi r16, high(UART_BUFFER)
-00044c 9300 0072 sts TRANS_HANDLE_H, r16
+000437 e10e      ldi r16, low(UART_BUFFER)
+000438 9300 0071 sts TRANS_HANDLE_L, r16
+00043a e001      ldi r16, high(UART_BUFFER)
+00043b 9300 0072 sts TRANS_HANDLE_H, r16
                  ;start transmit
-00044e dfa6      rcall USART_TXC
-00044f 9508      ret
+00043d dfa6      rcall USART_TXC
+00043e 9508      ret
                  
                  readAnalogInput:
                  ;check address
-000450 9100 0120 lds r16, UART_BUFFER + 2 ;RegAddrHi
-000452 2300      tst r16
-000453 f479      brne rai1
-000454 9100 0121 lds r16, UART_BUFFER + 3 ;RegAddrLo
-000456 300c      cpi r16, MODBUS_INPUT_REGS_COUNT+1
-000457 f458      brsh rai1
+00043f 9100 0120 lds r16, UART_BUFFER + 2 ;RegAddrHi
+000441 2300      tst r16
+000442 f479      brne rai1
+000443 9100 0121 lds r16, UART_BUFFER + 3 ;RegAddrLo
+000445 300c      cpi r16, MODBUS_INPUT_REGS_COUNT+1
+000446 f458      brsh rai1
                  ;check count
-000458 9110 0122 lds r17, UART_BUFFER + 4 ;CountHi
-00045a 2311      tst r17
-00045b f439      brne rai1
-00045c 9110 0123 lds r17, UART_BUFFER + 5 ;CountLo
-00045e 301c      cpi r17, MODBUS_INPUT_REGS_COUNT+1
-00045f f418      brsh rai1
+000447 9110 0122 lds r17, UART_BUFFER + 4 ;CountHi
+000449 2311      tst r17
+00044a f439      brne rai1
+00044b 9110 0123 lds r17, UART_BUFFER + 5 ;CountLo
+00044d 301c      cpi r17, MODBUS_INPUT_REGS_COUNT+1
+00044e f418      brsh rai1
                  ;check all
-000460 0f01      add r16, r17
-000461 300c      cpi r16, MODBUS_INPUT_REGS_COUNT+1
-000462 f010      brlo rai2
+00044f 0f01      add r16, r17
+000450 300c      cpi r16, MODBUS_INPUT_REGS_COUNT+1
+000451 f010      brlo rai2
                   rai1:	
-000463 e012       ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
-000464 c095       rjmp makeerr 
+000452 e012       ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
+000453 c095       rjmp makeerr 
                  ;
                  rai2:
-000465 932f      push r18
-000466 933f      push r19
-000467 93ef      push r30
-000468 93ff      push r31
+000454 932f      push r18
+000455 933f      push r19
+000456 93ef      push r30
+000457 93ff      push r31
                  ;---build packet---
                  ;clean CRC
-000469 ef0f      ser r16
-00046a 9300 0075 sts CRCLO, r16
-00046c 9300 0074 sts CRCHI, r16
+000458 ef0f      ser r16
+000459 9300 0075 sts CRCLO, r16
+00045b 9300 0074 sts CRCHI, r16
                  ;address
-00046e 9100 006e lds r16, MODBUS_ADDRESS
-000470 d117      rcall acrc
+00045d 9100 006e lds r16, MODBUS_ADDRESS
+00045f d117      rcall acrc
                  ;command
-000471 9100 011f lds r16, UART_BUFFER+1
-000473 d114      rcall acrc
+000460 9100 011f lds r16, UART_BUFFER+1
+000462 d114      rcall acrc
                  ;size
-000474 2f01      mov r16, r17
-000475 0f00      lsl r16
-000476 2f20      mov r18, r16
-000477 9300 0120 sts UART_BUFFER+2, r16
-000479 d10e      rcall acrc
+000463 2f01      mov r16, r17
+000464 0f00      lsl r16
+000465 2f20      mov r18, r16
+000466 9300 0120 sts UART_BUFFER+2, r16
+000468 d10e      rcall acrc
                  ;data
-00047a 9130 0121 lds r19, UART_BUFFER + 3 ;RegAddrLo
-00047c e2e1      ldi r30, low(UART_BUFFER + 3)
-00047d e0f1      ldi r31, high(UART_BUFFER + 3)
+000469 9130 0121 lds r19, UART_BUFFER + 3 ;RegAddrLo
+00046b e2e1      ldi r30, low(UART_BUFFER + 3)
+00046c e0f1      ldi r31, high(UART_BUFFER + 3)
                  rai_data_cycle:
-00047e 2311       tst r17
-00047f f049       breq rai_data_cycle_exit
+00046d 2311       tst r17
+00046e f049       breq rai_data_cycle_exit
                   ;
-000480 d097       rcall read_input_reg
-000481 9301       st z+, r16
-000482 d105       rcall acrc
-000483 2f01       mov r16, r17
-000484 9301       st z+, r16
-000485 d102       rcall acrc
+00046f d097       rcall read_input_reg
+000470 9301       st z+, r16
+000471 d105       rcall acrc
+000472 2f01       mov r16, r17
+000473 9301       st z+, r16
+000474 d102       rcall acrc
                   ;
-000486 9533       inc r19
-000487 951a       dec r17
-000488 cff5       rjmp rai_data_cycle
+000475 9533       inc r19
+000476 951a       dec r17
+000477 cff5       rjmp rai_data_cycle
                  rai_data_cycle_exit:
                  ;crc
-000489 9100 0074 lds r16, CRCHI
-00048b 9301      st z+, r16
-00048c 9100 0075 lds r16, CRCLO
-00048e 9301      st z+, r16
+000478 9100 0074 lds r16, CRCHI
+00047a 9301      st z+, r16
+00047b 9100 0075 lds r16, CRCLO
+00047d 9301      st z+, r16
                  ;
-00048f 0d2c      add r18, CONST_5
-000490 9320 0073 sts TRANS_COUNT, r18
+00047e 0d2c      add r18, CONST_5
+00047f 9320 0073 sts TRANS_COUNT, r18
                  ;
-000492 91ff      pop r31
-000493 91ef      pop r30
-000494 913f      pop r19
-000495 912f      pop r18
-000496 9508      ret
+000481 91ff      pop r31
+000482 91ef      pop r30
+000483 913f      pop r19
+000484 912f      pop r18
+000485 9508      ret
                  
                  readHoldingRegisters:
                  ;check address
-000497 9100 0120 lds r16, UART_BUFFER + 2 ;RegAddrHi
-000499 2300      tst r16
-00049a f479      brne rhr1
-00049b 9100 0121 lds r16, UART_BUFFER + 3 ;RegAddrLo
-00049d 3009      cpi r16, MODBUS_HOLDING_REGS_COUNT+1
-00049e f458      brsh rhr1
+000486 9100 0120 lds r16, UART_BUFFER + 2 ;RegAddrHi
+000488 2300      tst r16
+000489 f479      brne rhr1
+00048a 9100 0121 lds r16, UART_BUFFER + 3 ;RegAddrLo
+00048c 3009      cpi r16, MODBUS_HOLDING_REGS_COUNT+1
+00048d f458      brsh rhr1
                  ;check count
-00049f 9110 0122 lds r17, UART_BUFFER + 4 ;CountHi
-0004a1 2311      tst r17
-0004a2 f439      brne rhr1
-0004a3 9110 0123 lds r17, UART_BUFFER + 5 ;CountLo
-0004a5 3019      cpi r17, MODBUS_HOLDING_REGS_COUNT+1
-0004a6 f418      brsh rhr1
+00048e 9110 0122 lds r17, UART_BUFFER + 4 ;CountHi
+000490 2311      tst r17
+000491 f439      brne rhr1
+000492 9110 0123 lds r17, UART_BUFFER + 5 ;CountLo
+000494 3019      cpi r17, MODBUS_HOLDING_REGS_COUNT+1
+000495 f418      brsh rhr1
                  ;check all
-0004a7 0f01      add r16, r17
-0004a8 3009      cpi r16, MODBUS_HOLDING_REGS_COUNT+1
-0004a9 f010      brlo rhr2
+000496 0f01      add r16, r17
+000497 3009      cpi r16, MODBUS_HOLDING_REGS_COUNT+1
+000498 f010      brlo rhr2
                   rhr1:	
-0004aa e012       ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
-0004ab c04e       rjmp makeerr 
+000499 e012       ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
+00049a c04e       rjmp makeerr 
                  ;
                  rhr2:
-0004ac 932f      push r18
-0004ad 933f      push r19
-0004ae 93ef      push r30
-0004af 93ff      push r31
+00049b 932f      push r18
+00049c 933f      push r19
+00049d 93ef      push r30
+00049e 93ff      push r31
                  ;---build packet---
                  ;clean CRC
-0004b0 ef0f      ser r16
-0004b1 9300 0075 sts CRCLO, r16
-0004b3 9300 0074 sts CRCHI, r16
+00049f ef0f      ser r16
+0004a0 9300 0075 sts CRCLO, r16
+0004a2 9300 0074 sts CRCHI, r16
                  ;address
-0004b5 9100 011e lds r16, UART_BUFFER+0
-0004b7 d0d0      rcall acrc
+0004a4 9100 011e lds r16, UART_BUFFER+0
+0004a6 d0d0      rcall acrc
                  ;command
-0004b8 9100 011f lds r16, UART_BUFFER+1
-0004ba d0cd      rcall acrc
+0004a7 9100 011f lds r16, UART_BUFFER+1
+0004a9 d0cd      rcall acrc
                  ;size
-0004bb 2f21      mov r18, r17
-0004bc 2f01      mov r16, r17
-0004bd 0f00      lsl r16
-0004be 9300 0120 sts UART_BUFFER+2, r16
-0004c0 d0c7      rcall acrc
-0004c1 0d0c      add r16, CONST_5
-0004c2 9300 0073 sts TRANS_COUNT, r16
+0004aa 2f21      mov r18, r17
+0004ab 2f01      mov r16, r17
+0004ac 0f00      lsl r16
+0004ad 9300 0120 sts UART_BUFFER+2, r16
+0004af d0c7      rcall acrc
+0004b0 0d0c      add r16, CONST_5
+0004b1 9300 0073 sts TRANS_COUNT, r16
                  ;data
-0004c4 9130 0121 lds r19, UART_BUFFER + 3 ;RegAddrLo
-0004c6 e2e1      ldi r30, low(UART_BUFFER + 3)
-0004c7 e0f1      ldi r31, high(UART_BUFFER + 3)
+0004b3 9130 0121 lds r19, UART_BUFFER + 3 ;RegAddrLo
+0004b5 e2e1      ldi r30, low(UART_BUFFER + 3)
+0004b6 e0f1      ldi r31, high(UART_BUFFER + 3)
                  rhr_data_cycle:
-0004c8 2322       tst r18
-0004c9 f049       breq rhr_data_cycle_exit
+0004b7 2322       tst r18
+0004b8 f049       breq rhr_data_cycle_exit
                   ;
-0004ca d066       rcall read_holding_reg
-0004cb 9301       st z+, r16
-0004cc d0bb       rcall acrc
-0004cd 2f01       mov r16, r17
-0004ce 9301       st z+, r16
-0004cf d0b8       rcall acrc
+0004b9 d066       rcall read_holding_reg
+0004ba 9301       st z+, r16
+0004bb d0bb       rcall acrc
+0004bc 2f01       mov r16, r17
+0004bd 9301       st z+, r16
+0004be d0b8       rcall acrc
                   ;
-0004d0 9533       inc r19
-0004d1 952a       dec r18
-0004d2 cff5       rjmp rhr_data_cycle
+0004bf 9533       inc r19
+0004c0 952a       dec r18
+0004c1 cff5       rjmp rhr_data_cycle
                  rhr_data_cycle_exit:
                  ;crc
-0004d3 9100 0074 lds r16, CRCHI
-0004d5 9301      st z+, r16
-0004d6 9100 0075 lds r16, CRCLO
-0004d8 9301      st z+, r16
+0004c2 9100 0074 lds r16, CRCHI
+0004c4 9301      st z+, r16
+0004c5 9100 0075 lds r16, CRCLO
+0004c7 9301      st z+, r16
                  ;
-0004d9 91ff      pop r31
-0004da 91ef      pop r30
-0004db 913f      pop r19
-0004dc 912f      pop r18
-0004dd 9508      ret
+0004c8 91ff      pop r31
+0004c9 91ef      pop r30
+0004ca 913f      pop r19
+0004cb 912f      pop r18
+0004cc 9508      ret
                  
                  writeSingleRegister:
-0004de 932f      push r18
+0004cd 932f      push r18
                  ;check address
-0004df 9100 0120 lds r16, UART_BUFFER + 2 ;RegAddrHi
-0004e1 2300      tst r16
-0004e2 f421      brne wsr1
-0004e3 9100 0121 lds r16, UART_BUFFER + 3 ;RegAddrLo
-0004e5 3009      cpi r16, MODBUS_HOLDING_REGS_COUNT+1
-0004e6 f418      brsh wsr2
+0004ce 9100 0120 lds r16, UART_BUFFER + 2 ;RegAddrHi
+0004d0 2300      tst r16
+0004d1 f421      brne wsr1
+0004d2 9100 0121 lds r16, UART_BUFFER + 3 ;RegAddrLo
+0004d4 3009      cpi r16, MODBUS_HOLDING_REGS_COUNT+1
+0004d5 f418      brsh wsr2
                  wsr1:	
-0004e7 e012       ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
-0004e8 d011       rcall makeerr
-0004e9 c00e       rjmp wsr_exit
+0004d6 e012       ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
+0004d7 d011       rcall makeerr
+0004d8 c00e       rjmp wsr_exit
                  ;
                  wsr2:
-0004ea 9120 0121 lds r18, UART_BUFFER + 3 ;RegAddrLo
-0004ec 9110 0122 lds r17, UART_BUFFER + 4 ;Data High
-0004ee 9100 0123 lds r16, UART_BUFFER + 5 ;Data Low
-0004f0 d05f      rcall write_single_reg
-0004f1 f41e      brtc wsr3
-0004f2 e014       ldi r17, ERROR_SLAVE_DEVICE_FAILURE
-0004f3 d006       rcall makeerr
-0004f4 c003       rjmp wsr_exit
+0004d9 9120 0121 lds r18, UART_BUFFER + 3 ;RegAddrLo
+0004db 9110 0122 lds r17, UART_BUFFER + 4 ;Data High
+0004dd 9100 0123 lds r16, UART_BUFFER + 5 ;Data Low
+0004df d05f      rcall write_single_reg
+0004e0 f41e      brtc wsr3
+0004e1 e014       ldi r17, ERROR_SLAVE_DEVICE_FAILURE
+0004e2 d006       rcall makeerr
+0004e3 c003       rjmp wsr_exit
                  ;
                  wsr3:
-0004f5 0d2c      add r18, CONST_5
-0004f6 9320 0073 sts TRANS_COUNT, r18
+0004e4 0d2c      add r18, CONST_5
+0004e5 9320 0073 sts TRANS_COUNT, r18
                  ;
                  wsr_exit:
-0004f8 912f      pop r18
-0004f9 9508      ret
+0004e7 912f      pop r18
+0004e8 9508      ret
                  
                  ;in: error - r17
                  makeerr:
                  ;clear crc
-0004fa ef0f      ser r16
-0004fb 9300 0075 sts CRCLO, r16
-0004fd 9300 0074 sts CRCHI, r16
+0004e9 ef0f      ser r16
+0004ea 9300 0075 sts CRCLO, r16
+0004ec 9300 0074 sts CRCHI, r16
                  ;address
-0004ff 9100 011e lds r16, UART_BUFFER+0
-000501 d086      rcall acrc
+0004ee 9100 011e lds r16, UART_BUFFER+0
+0004f0 d086      rcall acrc
                  ;command
-000502 9100 011f lds r16, UART_BUFFER+1
-000504 6800      sbr r16, 0b10000000
-000505 9300 011f sts UART_BUFFER+1, r16
-000507 d080      rcall acrc
+0004f1 9100 011f lds r16, UART_BUFFER+1
+0004f3 6800      sbr r16, 0b10000000
+0004f4 9300 011f sts UART_BUFFER+1, r16
+0004f6 d080      rcall acrc
                  ;error
-000508 9310 0120 sts UART_BUFFER+2, r17
-00050a 2f01      mov r16, r17
-00050b d07c      rcall acrc
+0004f7 9310 0120 sts UART_BUFFER+2, r17
+0004f9 2f01      mov r16, r17
+0004fa d07c      rcall acrc
                  ;crc
-00050c 9100 0074 lds r16, CRCHI
-00050e 9300 0121 sts UART_BUFFER+3, r16
-000510 9100 0075 lds r16, CRCLO
-000512 9300 0122 sts UART_BUFFER+4, r16
+0004fb 9100 0074 lds r16, CRCHI
+0004fd 9300 0121 sts UART_BUFFER+3, r16
+0004ff 9100 0075 lds r16, CRCLO
+000501 9300 0122 sts UART_BUFFER+4, r16
                  ;start
-000514 e005      ldi r16, 5
-000515 9300 0073 sts TRANS_COUNT, r16
+000503 e005      ldi r16, 5
+000504 9300 0073 sts TRANS_COUNT, r16
                  ;
-000517 9508      ret
+000506 9508      ret
                  
                  ;in - r19 addr
                  ;out - r16-17 data
                  read_input_reg:
-000518 3030      cpi r19, 0
-000519 f421      brne ri1
+000507 3030      cpi r19, 0
+000508 f421      brne ri1
                   ;18b20 count
-00051a 9100 0079  lds r16, D18B20_COUNT
-00051c 2711       clr r17
-00051d 9508       ret
+000509 9100 0079  lds r16, D18B20_COUNT
+00050b 2711       clr r17
+00050c 9508       ret
                  ri1:
-00051e 303c      cpi r19, 12
-00051f f470      brsh ri2
+00050d 303c      cpi r19, 12
+00050e f470      brsh ri2
                   ;temperatures
-000520 933f       push r19
-000521 93ef       push r30
-000522 93ff       push r31
+00050f 933f       push r19
+000510 93ef       push r30
+000511 93ff       push r31
                   ;
-000523 0f33       lsl r19
-000524 e7e8       ldi r30, low(D18B20_TEMPERATURES - 2)
-000525 e0f0       ldi r31, high(D18B20_TEMPERATURES - 2)
-000526 0fe3       add r30, r19
-000527 1df2       adc r31, CONST_0
-000528 9101       ld r16, z+
-000529 8110       ld r17, z
+000512 0f33       lsl r19
+000513 e7e8       ldi r30, low(D18B20_TEMPERATURES - 2)
+000514 e0f0       ldi r31, high(D18B20_TEMPERATURES - 2)
+000515 0fe3       add r30, r19
+000516 1df2       adc r31, CONST_0
+000517 9101       ld r16, z+
+000518 8110       ld r17, z
                   ;
-00052a 91ff       pop r31
-00052b 91ef       pop r30
-00052c 913f       pop r19
-00052d 9508       ret
+000519 91ff       pop r31
+00051a 91ef       pop r30
+00051b 913f       pop r19
+00051c 9508       ret
                  ri2:
-00052e 2700       clr r16
-00052f 2711       clr r17 
-000530 9508      ret
+00051d 2700       clr r16
+00051e 2711       clr r17 
+00051f 9508      ret
                  
                  ;in - r19 addr
                  ;out - r16-17 data
                  read_holding_reg:
-000531 3030      cpi r19, 0
-000532 f421      brne h1
+000520 3030      cpi r19, 0
+000521 f421      brne h1
                   ;modbus address
-000533 9110 006e  lds r17, MODBUS_ADDRESS
-000535 2700       clr r16
-000536 9508       ret
+000522 9110 006e  lds r17, MODBUS_ADDRESS
+000524 2700       clr r16
+000525 9508       ret
                  h1:
-000537 3031      cpi r19, 1
-000538 f419      brne h2
+000526 3031      cpi r19, 1
+000527 f419      brne h2
                   ;target temperature
-000539 2f16       mov r17, TTARGET_REG
-00053a 2700       clr r16
-00053b 9508       ret
+000528 2f16       mov r17, TTARGET_REG
+000529 2700       clr r16
+00052a 9508       ret
                  h2:
-00053c 3032      cpi r19, 2
-00053d f419      brne h3
+00052b 3032      cpi r19, 2
+00052c f419      brne h3
                   ;mode
-00053e 2f1a       mov r17, MODE_REG
-00053f 2700       clr r16
-000540 9508       ret
+00052d 2f1a       mov r17, MODE_REG
+00052e 2700       clr r16
+00052f 9508       ret
                  h3: 
-000541 3033      cpi r19, 3
-000542 f419      brne h4
+000530 3033      cpi r19, 3
+000531 f419      brne h4
                   ;brightness
-000543 b513       in r17, OCR2
-000544 2700       clr r16
-000545 9508       ret
+000532 b513       in r17, OCR2
+000533 2700       clr r16
+000534 9508       ret
                  h4:
-000546 3038      cpi r19, 8
-000547 f428      brsh h5
+000535 3038      cpi r19, 8
+000536 f428      brsh h5
                   ;1307 regs
-000548 2f13       mov r17, r19
-000549 5014       subi r17, 4
-00054a 0f11       lsl r17
-00054b d3b5       rcall i2c_read_pair
-00054c 9508       ret
+000537 2f13       mov r17, r19
+000538 5014       subi r17, 4
+000539 0f11       lsl r17
+00053a d3bb       rcall i2c_read_pair
+00053b 9508       ret
                  h5:
-00054d 2700       clr r16
-00054e 2711       clr r17 
-00054f 9508       ret
+00053c 2700       clr r16
+00053d 2711       clr r17 
+00053e 9508       ret
                  
                  ;in r18 - addr, r16:17 - data
                  ;out r16 - error 
                  write_single_reg:
-000550 94e8      clt
-000551 3020      cpi r18, 0
-000552 f439      brne ws1
+00053f 94e8      clt
+000540 3020      cpi r18, 0
+000541 f439      brne ws1
                   ;---modbus address---
-000553 2311       tst r17
-000554 f579       brne data_error
-000555 9300 006e  sts MODBUS_ADDRESS, r16
-000557 d455       rcall save_modbus_address
-000558 2700       clr r16
-000559 9508       ret
+000542 2311       tst r17
+000543 f579       brne data_error
+000544 9300 006e  sts MODBUS_ADDRESS, r16
+000546 d45b       rcall save_modbus_address
+000547 2700       clr r16
+000548 9508       ret
                  ws1:
-00055a 3031      cpi r19, 1
-00055b f449      brne ws2
+000549 3031      cpi r19, 1
+00054a f449      brne ws2
                   ;---target temperature---
-00055c 2311       tst r17
-00055d f531       brne data_error
-00055e 3d09       cpi r16, MIN_TARGET_TEMP
-00055f f124       brlt data_error
-000560 340c       cpi r16, MAX_TARGET_TEMP+1
-000561 f514       brge data_error
-000562 2f60       mov TTARGET_REG, r16
-000563 2700       clr r16
-000564 9508       ret
+00054b 2311       tst r17
+00054c f531       brne data_error
+00054d 3d09       cpi r16, MIN_TARGET_TEMP
+00054e f124       brlt data_error
+00054f 340c       cpi r16, MAX_TARGET_TEMP+1
+000550 f514       brge data_error
+000551 2f60       mov TTARGET_REG, r16
+000552 2700       clr r16
+000553 9508       ret
                  ws2:
-000565 3032      cpi r19, 2
-000566 f439      brne ws3
+000554 3032      cpi r19, 2
+000555 f439      brne ws3
                   ;---mode---
-000567 2311       tst r17
-000568 f4d9       brne data_error
-000569 3005       cpi r16, MODE_COUNT
-00056a f4c8       brsh data_error
-00056b 2fa0       mov MODE_REG, r16
-00056c 2700       clr r16
-00056d 9508       ret
+000556 2311       tst r17
+000557 f4d9       brne data_error
+000558 3005       cpi r16, MODE_COUNT
+000559 f4c8       brsh data_error
+00055a 2fa0       mov MODE_REG, r16
+00055b 2700       clr r16
+00055c 9508       ret
                  ws3: 
-00056e 3033      cpi r19, 3
-00056f f441      brne ws4
+00055d 3033      cpi r19, 3
+00055e f441      brne ws4
                   ;---brightness---
-000570 2311       tst r17
-000571 f491       brne data_error
-000572 3005       cpi r16, MODE_COUNT
-000573 f480       brsh data_error
-000574 bd03       out OCR2, r16
-000575 d431       rcall ds1307_savebrightness
-000576 2700       clr r16
-000577 9508       ret
+00055f 2311       tst r17
+000560 f491       brne data_error
+000561 3005       cpi r16, MODE_COUNT
+000562 f480       brsh data_error
+000563 bd03       out OCR2, r16
+000564 d437       rcall ds1307_savebrightness
+000565 2700       clr r16
+000566 9508       ret
                  ws4:
-000578 3038      cpi r19, 8
-000579 f438      brsh ws5
+000567 3038      cpi r19, 8
+000568 f438      brsh ws5
                   ;1307 regs
-00057a 2311       tst r17
-00057b f441       brne data_error
-00057c 2f12       mov r17, r18
-00057d d394       rcall i2c_write
-00057e f03e       brts not_ready
-00057f 2700       clr r16
-000580 9508       ret
+000569 2311       tst r17
+00056a f441       brne data_error
+00056b 2f12       mov r17, r18
+00056c d39a       rcall i2c_write
+00056d f03e       brts not_ready
+00056e 2700       clr r16
+00056f 9508       ret
                  ws5:
-000581 2700       clr r16
-000582 2711       clr r17 
-000583 9508       ret
+000570 2700       clr r16
+000571 2711       clr r17 
+000572 9508       ret
                  data_error:
-000584 e003       ldi r16, ERROR_ILLEGAL_DATA_VALUE
-000585 9508       ret
+000573 e003       ldi r16, ERROR_ILLEGAL_DATA_VALUE
+000574 9508       ret
                  not_ready:
-000586 e006       ldi r16, ERROR_SLAVE_DEVICE_BUSY
+000575 e006       ldi r16, ERROR_SLAVE_DEVICE_BUSY
                  #include "ModbusCrc.asm"
-000587 9508      
+000576 9508      
                  ;in r16
                  acrc:
-000588 930f      push r16
-000589 931f      push r17
-00058a 93ef      push r30
-00058b 93ff      push r31
+000577 930f      push r16
+000578 931f      push r17
+000579 93ef      push r30
+00057a 93ff      push r31
                  ;uIndex = uchCRCHi ^ *adr_buffer++; 
-00058c 9110 0074 lds r17, CRCHI
-00058e 2701      eor r16, r17
+00057b 9110 0074 lds r17, CRCHI
+00057d 2701      eor r16, r17
                  ;uchCRCHi = uchCRCLo ^ auchCRCHi[uIndex];
-00058f e4ea      ldi r30, low(auchCRCH*2)
-000590 e0fb      ldi r31, high(auchCRCH*2)
-000591 0fe0      add r30, r16
-000592 1df2      adc r31, CONST_0
-000593 9114      lpm r17, z
-000594 91e0 0075 lds r30, CRCLO
-000596 271e      eor r17, r30
-000597 9310 0074 sts CRCHI, r17
+00057e e2e8      ldi r30, low(auchCRCH*2)
+00057f e0fb      ldi r31, high(auchCRCH*2)
+000580 0fe0      add r30, r16
+000581 1df2      adc r31, CONST_0
+000582 9114      lpm r17, z
+000583 91e0 0075 lds r30, CRCLO
+000585 271e      eor r17, r30
+000586 9310 0074 sts CRCHI, r17
                  ;uchCRCLo = auchCRCLo[uIndex];
-000599 e4ea      ldi r30, low(auchCRCL*2)
-00059a e0fc      ldi r31, high(auchCRCL*2)
-00059b 0fe0      add r30, r16
-00059c 1df2      adc r31, r2
-00059d 9114      lpm r17, z
-00059e 9310 0075 sts CRCLO, r17
+000588 e2e8      ldi r30, low(auchCRCL*2)
+000589 e0fc      ldi r31, high(auchCRCL*2)
+00058a 0fe0      add r30, r16
+00058b 1df2      adc r31, r2
+00058c 9114      lpm r17, z
+00058d 9310 0075 sts CRCLO, r17
                  ;
-0005a0 91ff      pop r31
-0005a1 91ef      pop r30
-0005a2 911f      pop r17
-0005a3 910f      pop r16
-0005a4 9508      ret
+00058f 91ff      pop r31
+000590 91ef      pop r30
+000591 911f      pop r17
+000592 910f      pop r16
+000593 9508      ret
                  
                  auchCRCH:
-0005a5 c100
-0005a6 4081
-0005a7 c001
-0005a8 4180
-0005a9 c001
-0005aa 4180
-0005ab c100
-0005ac 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
-0005ad c001
-0005ae 4180
-0005af c100
-0005b0 4081
-0005b1 c100
-0005b2 4081
-0005b3 c001
-0005b4 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
-0005b5 c001
-0005b6 4180
-0005b7 c100
-0005b8 4081
-0005b9 c100
-0005ba 4081
-0005bb c001
-0005bc 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
-0005bd c100
-0005be 4081
-0005bf c001
-0005c0 4180
-0005c1 c001
-0005c2 4180
-0005c3 c100
-0005c4 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
-0005c5 c001
-0005c6 4180
-0005c7 c100
-0005c8 4081
-0005c9 c100
-0005ca 4081
-0005cb c001
-0005cc 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
-0005cd c100
-0005ce 4081
-0005cf c001
-0005d0 4180
-0005d1 c001
-0005d2 4180
-0005d3 c100
-0005d4 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
-0005d5 c100
-0005d6 4081
-0005d7 c001
-0005d8 4180
-0005d9 c001
-0005da 4180
-0005db c100
-0005dc 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
-0005dd c001
-0005de 4180
-0005df c100
-0005e0 4081
-0005e1 c100
-0005e2 4081
-0005e3 c001
-0005e4 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
-0005e5 c001
-0005e6 4180
-0005e7 c100
-0005e8 4081
-0005e9 c100
-0005ea 4081
-0005eb c001
-0005ec 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
-0005ed c100
-0005ee 4081
-0005ef c001
-0005f0 4180
-0005f1 c001
-0005f2 4180
-0005f3 c100
-0005f4 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
-0005f5 c100
-0005f6 4081
-0005f7 c001
-0005f8 4180
-0005f9 c001
-0005fa 4180
-0005fb c100
-0005fc 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
-0005fd c001
-0005fe 4180
-0005ff c100
-000600 4081
-000601 c100
-000602 4081
-000603 c001
-000604 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
-000605 c100
-000606 4081
-000607 c001
-000608 4180
-000609 c001
-00060a 4180
-00060b c100
-00060c 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
-00060d c001
-00060e 4180
-00060f c100
-000610 4081
-000611 c100
-000612 4081
-000613 c001
-000614 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
-000615 c001
-000616 4180
-000617 c100
-000618 4081
-000619 c100
-00061a 4081
-00061b c001
-00061c 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
-00061d c100
-00061e 4081
-00061f c001
-000620 4180
-000621 c001
-000622 4180
-000623 c100
-000624 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
+000594 c100
+000595 4081
+000596 c001
+000597 4180
+000598 c001
+000599 4180
+00059a c100
+00059b 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
+00059c c001
+00059d 4180
+00059e c100
+00059f 4081
+0005a0 c100
+0005a1 4081
+0005a2 c001
+0005a3 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
+0005a4 c001
+0005a5 4180
+0005a6 c100
+0005a7 4081
+0005a8 c100
+0005a9 4081
+0005aa c001
+0005ab 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
+0005ac c100
+0005ad 4081
+0005ae c001
+0005af 4180
+0005b0 c001
+0005b1 4180
+0005b2 c100
+0005b3 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
+0005b4 c001
+0005b5 4180
+0005b6 c100
+0005b7 4081
+0005b8 c100
+0005b9 4081
+0005ba c001
+0005bb 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
+0005bc c100
+0005bd 4081
+0005be c001
+0005bf 4180
+0005c0 c001
+0005c1 4180
+0005c2 c100
+0005c3 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
+0005c4 c100
+0005c5 4081
+0005c6 c001
+0005c7 4180
+0005c8 c001
+0005c9 4180
+0005ca c100
+0005cb 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
+0005cc c001
+0005cd 4180
+0005ce c100
+0005cf 4081
+0005d0 c100
+0005d1 4081
+0005d2 c001
+0005d3 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
+0005d4 c001
+0005d5 4180
+0005d6 c100
+0005d7 4081
+0005d8 c100
+0005d9 4081
+0005da c001
+0005db 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
+0005dc c100
+0005dd 4081
+0005de c001
+0005df 4180
+0005e0 c001
+0005e1 4180
+0005e2 c100
+0005e3 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
+0005e4 c100
+0005e5 4081
+0005e6 c001
+0005e7 4180
+0005e8 c001
+0005e9 4180
+0005ea c100
+0005eb 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
+0005ec c001
+0005ed 4180
+0005ee c100
+0005ef 4081
+0005f0 c100
+0005f1 4081
+0005f2 c001
+0005f3 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
+0005f4 c100
+0005f5 4081
+0005f6 c001
+0005f7 4180
+0005f8 c001
+0005f9 4180
+0005fa c100
+0005fb 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
+0005fc c001
+0005fd 4180
+0005fe c100
+0005ff 4081
+000600 c100
+000601 4081
+000602 c001
+000603 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
+000604 c001
+000605 4180
+000606 c100
+000607 4081
+000608 c100
+000609 4081
+00060a c001
+00060b 4180      .DB 0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40,0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41
+00060c c100
+00060d 4081
+00060e c001
+00060f 4180
+000610 c001
+000611 4180
+000612 c100
+000613 4081      .DB 0x00,0xC1,0x81,0x40,0x01,0xC0,0x80,0x41,0x01,0xC0,0x80,0x41,0x00,0xC1,0x81,0x40
                  
                  auchCRCL:
-000625 c000
-000626 01c1
-000627 03c3
-000628 c202
-000629 06c6
-00062a c707
-00062b c505
-00062c 04c4      .DB 0x00,0xC0,0xC1,0x01,0xC3,0x03,0x02,0xC2,0xC6,0x06,0x07,0xC7,0x05,0xC5,0xC4,0x04
-00062d 0ccc
-00062e cd0d
-00062f cf0f
-000630 0ece
-000631 ca0a
-000632 0bcb
-000633 09c9
-000634 c808      .DB 0xCC,0x0C,0x0D,0xCD,0x0F,0xCF,0xCE,0x0E,0x0A,0xCA,0xCB,0x0B,0xC9,0x09,0x08,0xC8
-000635 18d8
-000636 d919
-000637 db1b
-000638 1ada
-000639 de1e
-00063a 1fdf
-00063b 1ddd
-00063c dc1c      .DB 0xD8,0x18,0x19,0xD9,0x1B,0xDB,0xDA,0x1A,0x1E,0xDE,0xDF,0x1F,0xDD,0x1D,0x1C,0xDC
-00063d d414
-00063e 15d5
-00063f 17d7
-000640 d616
-000641 12d2
-000642 d313
-000643 d111
-000644 10d0      .DB 0x14,0xD4,0xD5,0x15,0xD7,0x17,0x16,0xD6,0xD2,0x12,0x13,0xD3,0x11,0xD1,0xD0,0x10
-000645 30f0
-000646 f131
-000647 f333
-000648 32f2
-000649 f636
-00064a 37f7
-00064b 35f5
-00064c f434      .DB 0xF0,0x30,0x31,0xF1,0x33,0xF3,0xF2,0x32,0x36,0xF6,0xF7,0x37,0xF5,0x35,0x34,0xF4
-00064d fc3c
-00064e 3dfd
-00064f 3fff
-000650 fe3e
-000651 3afa
-000652 fb3b
-000653 f939
-000654 38f8      .DB 0x3C,0xFC,0xFD,0x3D,0xFF,0x3F,0x3E,0xFE,0xFA,0x3A,0x3B,0xFB,0x39,0xF9,0xF8,0x38
-000655 e828
-000656 29e9
-000657 2beb
-000658 ea2a
-000659 2eee
-00065a ef2f
-00065b ed2d
-00065c 2cec      .DB 0x28,0xE8,0xE9,0x29,0xEB,0x2B,0x2A,0xEA,0xEE,0x2E,0x2F,0xEF,0x2D,0xED,0xEC,0x2C
-00065d 24e4
-00065e e525
-00065f e727
-000660 26e6
-000661 e222
-000662 23e3
-000663 21e1
-000664 e020      .DB 0xE4,0x24,0x25,0xE5,0x27,0xE7,0xE6,0x26,0x22,0xE2,0xE3,0x23,0xE1,0x21,0x20,0xE0
-000665 60a0
-000666 a161
-000667 a363
-000668 62a2
-000669 a666
-00066a 67a7
-00066b 65a5
-00066c a464      .DB 0xA0,0x60,0x61,0xA1,0x63,0xA3,0xA2,0x62,0x66,0xA6,0xA7,0x67,0xA5,0x65,0x64,0xA4
-00066d ac6c
-00066e 6dad
-00066f 6faf
-000670 ae6e
-000671 6aaa
-000672 ab6b
-000673 a969
-000674 68a8      .DB 0x6C,0xAC,0xAD,0x6D,0xAF,0x6F,0x6E,0xAE,0xAA,0x6A,0x6B,0xAB,0x69,0xA9,0xA8,0x68
-000675 b878
-000676 79b9
-000677 7bbb
-000678 ba7a
-000679 7ebe
-00067a bf7f
-00067b bd7d
-00067c 7cbc      .DB 0x78,0xB8,0xB9,0x79,0xBB,0x7B,0x7A,0xBA,0xBE,0x7E,0x7F,0xBF,0x7D,0xBD,0xBC,0x7C
-00067d 74b4
-00067e b575
-00067f b777
-000680 76b6
-000681 b272
-000682 73b3
-000683 71b1
-000684 b070      .DB 0xB4,0x74,0x75,0xB5,0x77,0xB7,0xB6,0x76,0x72,0xB2,0xB3,0x73,0xB1,0x71,0x70,0xB0
-000685 9050
-000686 5191
-000687 5393
-000688 9252
-000689 5696
-00068a 9757
-00068b 9555
-00068c 5494      .DB 0x50,0x90,0x91,0x51,0x93,0x53,0x52,0x92,0x96,0x56,0x57,0x97,0x55,0x95,0x94,0x54
-00068d 5c9c
-00068e 9d5d
-00068f 9f5f
-000690 5e9e
-000691 9a5a
-000692 5b9b
-000693 5999
-000694 9858      .DB 0x9C,0x5C,0x5D,0x9D,0x5F,0x9F,0x9E,0x5E,0x5A,0x9A,0x9B,0x5B,0x99,0x59,0x58,0x98
-000695 4888
-000696 8949
-000697 8b4b
-000698 4a8a
-000699 8e4e
-00069a 4f8f
-00069b 4d8d
-00069c 8c4c      .DB 0x88,0x48,0x49,0x89,0x4B,0x8B,0x8A,0x4A,0x4E,0x8E,0x8F,0x4F,0x8D,0x4D,0x4C,0x8C
-00069d 8444
-00069e 4585
-00069f 4787
-0006a0 8646
-0006a1 4282
-0006a2 8343
-0006a3 8141
-0006a4 4080      .DB 0x44,0x84,0x85,0x45,0x87,0x47,0x46,0x86,0x82,0x42,0x43,0x83,0x41,0x81,0x80,0x40
+000614 c000
+000615 01c1
+000616 03c3
+000617 c202
+000618 06c6
+000619 c707
+00061a c505
+00061b 04c4      .DB 0x00,0xC0,0xC1,0x01,0xC3,0x03,0x02,0xC2,0xC6,0x06,0x07,0xC7,0x05,0xC5,0xC4,0x04
+00061c 0ccc
+00061d cd0d
+00061e cf0f
+00061f 0ece
+000620 ca0a
+000621 0bcb
+000622 09c9
+000623 c808      .DB 0xCC,0x0C,0x0D,0xCD,0x0F,0xCF,0xCE,0x0E,0x0A,0xCA,0xCB,0x0B,0xC9,0x09,0x08,0xC8
+000624 18d8
+000625 d919
+000626 db1b
+000627 1ada
+000628 de1e
+000629 1fdf
+00062a 1ddd
+00062b dc1c      .DB 0xD8,0x18,0x19,0xD9,0x1B,0xDB,0xDA,0x1A,0x1E,0xDE,0xDF,0x1F,0xDD,0x1D,0x1C,0xDC
+00062c d414
+00062d 15d5
+00062e 17d7
+00062f d616
+000630 12d2
+000631 d313
+000632 d111
+000633 10d0      .DB 0x14,0xD4,0xD5,0x15,0xD7,0x17,0x16,0xD6,0xD2,0x12,0x13,0xD3,0x11,0xD1,0xD0,0x10
+000634 30f0
+000635 f131
+000636 f333
+000637 32f2
+000638 f636
+000639 37f7
+00063a 35f5
+00063b f434      .DB 0xF0,0x30,0x31,0xF1,0x33,0xF3,0xF2,0x32,0x36,0xF6,0xF7,0x37,0xF5,0x35,0x34,0xF4
+00063c fc3c
+00063d 3dfd
+00063e 3fff
+00063f fe3e
+000640 3afa
+000641 fb3b
+000642 f939
+000643 38f8      .DB 0x3C,0xFC,0xFD,0x3D,0xFF,0x3F,0x3E,0xFE,0xFA,0x3A,0x3B,0xFB,0x39,0xF9,0xF8,0x38
+000644 e828
+000645 29e9
+000646 2beb
+000647 ea2a
+000648 2eee
+000649 ef2f
+00064a ed2d
+00064b 2cec      .DB 0x28,0xE8,0xE9,0x29,0xEB,0x2B,0x2A,0xEA,0xEE,0x2E,0x2F,0xEF,0x2D,0xED,0xEC,0x2C
+00064c 24e4
+00064d e525
+00064e e727
+00064f 26e6
+000650 e222
+000651 23e3
+000652 21e1
+000653 e020      .DB 0xE4,0x24,0x25,0xE5,0x27,0xE7,0xE6,0x26,0x22,0xE2,0xE3,0x23,0xE1,0x21,0x20,0xE0
+000654 60a0
+000655 a161
+000656 a363
+000657 62a2
+000658 a666
+000659 67a7
+00065a 65a5
+00065b a464      .DB 0xA0,0x60,0x61,0xA1,0x63,0xA3,0xA2,0x62,0x66,0xA6,0xA7,0x67,0xA5,0x65,0x64,0xA4
+00065c ac6c
+00065d 6dad
+00065e 6faf
+00065f ae6e
+000660 6aaa
+000661 ab6b
+000662 a969
+000663 68a8      .DB 0x6C,0xAC,0xAD,0x6D,0xAF,0x6F,0x6E,0xAE,0xAA,0x6A,0x6B,0xAB,0x69,0xA9,0xA8,0x68
+000664 b878
+000665 79b9
+000666 7bbb
+000667 ba7a
+000668 7ebe
+000669 bf7f
+00066a bd7d
+00066b 7cbc      .DB 0x78,0xB8,0xB9,0x79,0xBB,0x7B,0x7A,0xBA,0xBE,0x7E,0x7F,0xBF,0x7D,0xBD,0xBC,0x7C
+00066c 74b4
+00066d b575
+00066e b777
+00066f 76b6
+000670 b272
+000671 73b3
+000672 71b1
+000673 b070      .DB 0xB4,0x74,0x75,0xB5,0x77,0xB7,0xB6,0x76,0x72,0xB2,0xB3,0x73,0xB1,0x71,0x70,0xB0
+000674 9050
+000675 5191
+000676 5393
+000677 9252
+000678 5696
+000679 9757
+00067a 9555
+00067b 5494      .DB 0x50,0x90,0x91,0x51,0x93,0x53,0x52,0x92,0x96,0x56,0x57,0x97,0x55,0x95,0x94,0x54
+00067c 5c9c
+00067d 9d5d
+00067e 9f5f
+00067f 5e9e
+000680 9a5a
+000681 5b9b
+000682 5999
+000683 9858      .DB 0x9C,0x5C,0x5D,0x9D,0x5F,0x9F,0x9E,0x5E,0x5A,0x9A,0x9B,0x5B,0x99,0x59,0x58,0x98
+000684 4888
+000685 8949
+000686 8b4b
+000687 4a8a
+000688 8e4e
+000689 4f8f
+00068a 4d8d
+00068b 8c4c      .DB 0x88,0x48,0x49,0x89,0x4B,0x8B,0x8A,0x4A,0x4E,0x8E,0x8F,0x4F,0x8D,0x4D,0x4C,0x8C
+00068c 8444
+00068d 4585
+00068e 4787
+00068f 8646
+000690 4282
+000691 8343
+000692 8141
+000693 4080      .DB 0x44,0x84,0x85,0x45,0x87,0x47,0x46,0x86,0x82,0x42,0x43,0x83,0x41,0x81,0x80,0x40
                  #include "1Wire.asm"
                  
                  ow_reset:
                  ;---init---
-0006a5 930f      push r16
-0006a6 931f      push r17
+000694 930f      push r16
+000695 931f      push r17
                  ;Tx
-0006a7 9a8b      sbi ddrd, 3
-0006a8 9893      cbi portd, 3
-0006a9 ed0f      ldi r16, 0xDF
-0006aa e011      ldi r17, 0x01
-0006ab d059      rcall ipause
-0006ac 988b      cbi ddrd, 3
-0006ad 9a93      sbi portd, 3
+000696 9a8b      sbi ddrd, 3
+000697 9893      cbi portd, 3
+000698 ed0f      ldi r16, 0xDF
+000699 e011      ldi r17, 0x01
+00069a d057      rcall ipause
+00069b 988b      cbi ddrd, 3
+00069c 9a93      sbi portd, 3
                  ;Rx
-0006ae e30b      ldi r16, 59
-0006af 2711      clr r17
-0006b0 d054      rcall ipause
-0006b1 9468      set
-0006b2 9983      sbic pind, 3
-0006b3 c006       rjmp ow_resetexit
-0006b4 94e8      clt
-0006b5 ea03      ldi r16, 0xA3
-0006b6 e011      ldi r17, 0x01
-0006b7 d04d      rcall ipause
+00069d e30b      ldi r16, 59
+00069e 2711      clr r17
+00069f d052      rcall ipause
+0006a0 9468      set
+0006a1 9983      sbic pind, 3
+0006a2 c006       rjmp ow_resetexit
+0006a3 94e8      clt
+0006a4 ea03      ldi r16, 0xA3
+0006a5 e011      ldi r17, 0x01
+0006a6 d04b      rcall ipause
                  ow_reset1:
-0006b8 9b83      sbis pind, 3
-0006b9 cffe      rjmp ow_reset1;
+0006a7 9b83      sbis pind, 3
+0006a8 cffe      rjmp ow_reset1;
                  ;
                  ow_resetexit:
-0006ba 911f      pop r17
-0006bb 910f      pop r16
-0006bc 9508      ret
+0006a9 911f      pop r17
+0006aa 910f      pop r16
+0006ab 9508      ret
                  
                  ow_read_bit:
-0006bd 930f      push r16
-0006be 931f      push r17
+0006ac 930f      push r16
+0006ad 931f      push r17
                  ;
-0006bf 9893      cbi portd, 3
-0006c0 9a8b      sbi ddrd, 3
-0006c1 d04b      rcall pause_1us
+0006ae 9893      cbi portd, 3
+0006af 9a8b      sbi ddrd, 3
+0006b0 d049      rcall pause_1us
                  ;
-0006c2 988b      cbi ddrd, 3
-0006c3 9a93      sbi portd,3
-0006c4 e00c      ldi r16, 12
-0006c5 2711      clr r17
-0006c6 d03e      rcall ipause
+0006b1 988b      cbi ddrd, 3
+0006b2 9a93      sbi portd,3
+0006b3 e00c      ldi r16, 12
+0006b4 2711      clr r17
+0006b5 d03c      rcall ipause
                  ;
-0006c7 94e8      clt
-0006c8 9983      sbic pind, 3
-0006c9 9468      set
+0006b6 94e8      clt
+0006b7 9983      sbic pind, 3
+0006b8 9468      set
                  ;
-0006ca e206      ldi r16, 38
-0006cb 2711      clr r17
-0006cc d038      rcall ipause
+0006b9 e206      ldi r16, 38
+0006ba 2711      clr r17
+0006bb d036      rcall ipause
                  ;
-                 ow_read_bit_wait:
-0006cd 9b83      sbis pind, 3
-0006ce cffe      rjmp ow_read_bit_wait
+                 ;ow_read_bit_wait:
+                 ;sbis pind, 3
+                 ;rjmp ow_read_bit_wait
                  ;
-0006cf 911f      pop r17
-0006d0 910f      pop r16
-0006d1 9508      ret
+0006bc 911f      pop r17
+0006bd 910f      pop r16
+0006be 9508      ret
                  
                  ow_write_bit:
-0006d2 930f      push r16 
-0006d3 931f      push r17
+0006bf 930f      push r16 
+0006c0 931f      push r17
                  ;
-0006d4 9893      cbi portd, 3
-0006d5 9a8b      sbi ddrd, 3
-0006d6 d036      rcall pause_1us
+0006c1 9893      cbi portd, 3
+0006c2 9a8b      sbi ddrd, 3
+0006c3 d036      rcall pause_1us
                  ;
-0006d7 f416      brtc w1
-0006d8 988b       cbi ddrd, 3
-0006d9 9a93       sbi portd, 3 
+0006c4 f416      brtc w1
+0006c5 988b       cbi ddrd, 3
+0006c6 9a93       sbi portd, 3 
                  w1:
-0006da 2711      clr r17
-0006db e306      ldi r16, 54
-0006dc d028      rcall ipause
+0006c7 2711      clr r17
+0006c8 e306      ldi r16, 54
+0006c9 d028      rcall ipause
                  ;
-0006dd 988b      cbi ddrd, 3
-0006de 9a93      sbi portd, 3
+0006ca 988b      cbi ddrd, 3
+0006cb 9a93      sbi portd, 3
                  ;
-0006df 911f      pop r17
-0006e0 910f      pop r16
-0006e1 9508      ret
+0006cc 911f      pop r17
+0006cd 910f      pop r16
+0006ce 9508      ret
                  
                  ow_read_byte:
-0006e2 931f      push r17
+0006cf 931f      push r17
                  ;
-0006e3 e018      ldi r17, 8
+0006d0 e018      ldi r17, 8
                  rr1:
-0006e4 dfd8      rcall ow_read_bit;
-0006e5 9507      ror r16
-0006e6 f907      bld r16, 7
-0006e7 951a      dec r17
-0006e8 f7d9      brne rr1;
+0006d1 dfda      rcall ow_read_bit;
+0006d2 9507      ror r16
+0006d3 f907      bld r16, 7
+0006d4 951a      dec r17
+0006d5 f7d9      brne rr1;
                  ;
-0006e9 911f      pop r17
-0006ea 9508      ret
+0006d6 911f      pop r17
+0006d7 9508      ret
                  
                  ow_write_byte:
-0006eb 931f      push r17
+0006d8 931f      push r17
                  ;
-0006ec e018      ldi r17, 8
+0006d9 e018      ldi r17, 8
                  rw1:
-0006ed fb00      bst r16, 0
-0006ee 9507      ror r16
-0006ef dfe2      rcall ow_write_bit;
-0006f0 951a      dec r17
-0006f1 f7d9      brne rw1;
+0006da fb00      bst r16, 0
+0006db 9507      ror r16
+0006dc dfe2      rcall ow_write_bit;
+0006dd 951a      dec r17
+0006de f7d9      brne rw1;
                  ;
-0006f2 e005      ldi r16, 5
-0006f3 2711      clr r17
-0006f4 d010      rcall ipause
-0006f5 911f      pop r17
-0006f6 9508      ret
+0006df e005      ldi r16, 5
+0006e0 2711      clr r17
+0006e1 d010      rcall ipause
+0006e2 911f      pop r17
+0006e3 9508      ret
                  
                  ow_write_byte_with_check:
-0006f7 931f      push r17
+0006e4 931f      push r17
                  ;
-0006f8 e018      ldi r17, 8
+0006e5 e018      ldi r17, 8
                  rw1c:
-0006f9 dfc3      rcall ow_read_bit
-0006fa dfc2      rcall ow_read_bit
-0006fb fb00      bst r16, 0
-0006fc 9507      ror r16
-0006fd dfd4      rcall ow_write_bit;
-0006fe 951a      dec r17
-0006ff f7c9      brne rw1c;
+0006e6 dfc5      rcall ow_read_bit
+0006e7 dfc4      rcall ow_read_bit
+0006e8 fb00      bst r16, 0
+0006e9 9507      ror r16
+0006ea dfd4      rcall ow_write_bit;
+0006eb 951a      dec r17
+0006ec f7c9      brne rw1c;
                  ;
-000700 e005      ldi r16, 5
-000701 2711      clr r17
-000702 d002      rcall ipause
-000703 911f      pop r17
-000704 9508      ret
+0006ed e005      ldi r16, 5
+0006ee 2711      clr r17
+0006ef d002      rcall ipause
+0006f0 911f      pop r17
+0006f1 9508      ret
                  
                  ipause:
-000705 0000      nop
-000706 0000      nop
-000707 0000      nop
-000708 0000      nop
-000709 5001      subi r16, 1
-00070a 0912      sbc r17, r2
-00070b f7c8      brcc ipause;
-00070c 9508      ret
+0006f2 0000      nop
+0006f3 0000      nop
+0006f4 0000      nop
+0006f5 0000      nop
+0006f6 5001      subi r16, 1
+0006f7 0912      sbc r17, r2
+0006f8 f7c8      brcc ipause;
+0006f9 9508      ret
                  
                  pause_1us:
-00070d 0000      nop
+0006fa 0000      nop
                  #include "18b20.asm"
-00070e 9508      
+0006fb 9508      
                  #define MATCH_ROM 0x55
                  #define SEARCH_ROM 0xF0
                  #define ALARM_SEARCH 0xEC
@@ -3074,596 +3062,605 @@ main.asm(192): Including file 'EEPROM.asm'
                  #define MEAS_TIME 70
                  
                  init_18b20:
-00070f 928f      push r8
-000710 929f      push r9
-000711 92af      push r10
-000712 92bf      push r11
-000713 92cf      push r12
-000714 92df      push r13
-000715 92ef      push r14
-000716 92ff      push r15
-000717 93ef      push r30
-000718 93ff      push r31
+0006fc 928f      push r8
+0006fd 929f      push r9
+0006fe 92af      push r10
+0006ff 92bf      push r11
+000700 92cf      push r12
+000701 92df      push r13
+000702 92ef      push r14
+000703 92ff      push r15
+000704 93ef      push r30
+000705 93ff      push r31
                  ;
-000719 d071      rcall search_18b20
+000706 d072      rcall search_18b20
                  ;
-00071a 9110 0079 lds r17, D18B20_COUNT
-00071c 2311      tst r17
-00071d f411      brne init_18b20_f
-00071e 6071       sbr ERRORL_REG, 1 << ERRORL_NO18B20
-00071f c001       rjmp init_18b20_exit
+000707 9110 0079 lds r17, D18B20_COUNT
+000709 2311      tst r17
+00070a f411      brne init_18b20_f
+00070b 6071       sbr ERRORL_REG, 1 << ERRORL_NO18B20
+00070c c001       rjmp init_18b20_exit
                  init_18b20_f:
-000720 d0ea      rcall set_resolution
+00070d d0eb      rcall set_resolution
                  ;
                  init_18b20_exit:
-000721 91ff      pop r31
-000722 91ef      pop r30
-000723 90ff      pop r15
-000724 90ef      pop r14
-000725 90df      pop r13
-000726 90cf      pop r12
-000727 90bf      pop r11
-000728 90af      pop r10
-000729 909f      pop r9
-00072a 908f      pop r8
-00072b 9508      ret
+00070e 91ff      pop r31
+00070f 91ef      pop r30
+000710 90ff      pop r15
+000711 90ef      pop r14
+000712 90df      pop r13
+000713 90cf      pop r12
+000714 90bf      pop r11
+000715 90af      pop r10
+000716 909f      pop r9
+000717 908f      pop r8
+000718 9508      ret
                  
                  read_18b20:
-00072c 9100 0077 lds r16, D18B20_STATE
-00072e 2300      tst r16
-00072f f091      breq r18b20_read
+000719 9100 0077 lds r16, D18B20_STATE
+00071b 2300      tst r16
+00071c f091      breq r18b20_read
                   ;check delay
-000730 9100 006d  lds r16, SYSTICK
-000732 9110 0078  lds r17, D18B20_TIMESTAMP
-000734 1b10       sub r17, r16
-000735 ff17       sbrs r17, 7
-000736 9508       ret
+00071d 9100 006d  lds r16, SYSTICK
+00071f 9110 0078  lds r17, D18B20_TIMESTAMP
+000721 1b10       sub r17, r16
+000722 ff17       sbrs r17, 7
+000723 9508       ret
                   ;start conversion (all)
-000737 df6d       rcall ow_reset
-000738 f416       brtc r183
-000739 6071        sbr ERRORL_REG, 1 << ERRORL_NO18B20
-00073a 9508        ret
+000724 df6f       rcall ow_reset
+000725 f416       brtc r183
+000726 6071        sbr ERRORL_REG, 1 << ERRORL_NO18B20
+000727 9508        ret
                   r183:
-00073b ec0c       ldi r16, SKIP_ROM
-00073c dfae       rcall ow_write_byte
-00073d e404       ldi r16, CONVERT_TEMPERATURE
-00073e dfac       rcall ow_write_byte
+000728 ec0c       ldi r16, SKIP_ROM
+000729 dfae       rcall ow_write_byte
+00072a e404       ldi r16, CONVERT_TEMPERATURE
+00072b dfac       rcall ow_write_byte
                   ;set state
-00073f 9220 0077  sts D18B20_STATE, CONST_0
-000741 9508       ret
+00072c 9220 0077  sts D18B20_STATE, CONST_0
+00072e 9508       ret
                  ; 
                  r18b20_read:
-000742 df7a      rcall ow_read_bit
-000743 f00e      brts r181
+00072f df7c      rcall ow_read_bit
+000730 f00e      brts r181
                   ;conversation in progress
-000744 9508       ret
+000731 9508       ret
                  r181:
-000745 928f      push r8
-000746 929f      push r9
-000747 92af      push r10
-000748 92bf      push r11
-000749 92cf      push r12
-00074a 92df      push r13
-00074b 92ef      push r14
-00074c 92ff      push r15
-00074d 936f      push r22
-00074e 93cf      push r28
-00074f 93df      push r29
-000750 93ef      push r30
-000751 93ff      push r31
+000732 928f      push r8
+000733 929f      push r9
+000734 92af      push r10
+000735 92bf      push r11
+000736 92cf      push r12
+000737 92df      push r13
+000738 92ef      push r14
+000739 92ff      push r15
+00073a 936f      push r22
+00073b 93cf      push r28
+00073c 93df      push r29
+00073d 93ef      push r30
+00073e 93ff      push r31
                  ;clear current min, max temperature
-000752 e73f      ldi TLowH_REG, 0x7F
-000753 ef2f      ldi TLowL_REG, 0xFF
-000754 e850      ldi THighH_REG, 0x80
-000755 e040      ldi THighL_REG, 0x00
+00073f e73f      ldi TLowH_REG, 0x7F
+000740 ef2f      ldi TLowL_REG, 0xFF
+000741 e850      ldi THighH_REG, 0x80
+000742 e040      ldi THighL_REG, 0x00
                  ;
-000756 9160 0079 lds r22, D18B20_COUNT
-000758 e7ca      ldi r28, low(D18B20_TEMPERATURES)
-000759 e0d0      ldi r29, high(D18B20_TEMPERATURES)
-00075a e8ee      ldi r30, low(D18B20_ADDRESSES)
-00075b e0f0      ldi r31, high(D18B20_ADDRESSES)
+000743 9160 0079 lds r22, D18B20_COUNT
+000745 e7ca      ldi r28, low(D18B20_TEMPERATURES)
+000746 e0d0      ldi r29, high(D18B20_TEMPERATURES)
+000747 e8ee      ldi r30, low(D18B20_ADDRESSES)
+000748 e0f0      ldi r31, high(D18B20_ADDRESSES)
                  ;
                  read_18b20_cycle:
-00075c 9081      ld r8, z+
-00075d 9091      ld r9, z+
-00075e 90a1      ld r10, z+
-00075f 90b1      ld r11, z+
-000760 90c1      ld r12, z+
-000761 90d1      ld r13, z+
-000762 90e1      ld r14, z+
-000763 90f1      ld r15, z+
-000764 d0bb      rcall read_single_18b20
-000765 f076      brts read_18b20_fail
+000749 9081      ld r8, z+
+00074a 9091      ld r9, z+
+00074b 90a1      ld r10, z+
+00074c 90b1      ld r11, z+
+00074d 90c1      ld r12, z+
+00074e 90d1      ld r13, z+
+00074f 90e1      ld r14, z+
+000750 90f1      ld r15, z+
+000751 d0bc      rcall read_single_18b20
+000752 f07e      brts read_18b20_fail
                  ;store
-000766 9319      st y+, r17
-000767 9309      st y+, r16
+000753 9319      st y+, r17
+000754 9309      st y+, r16
                  ;
-000768 1712      cp r17, TLowL_REG
-000769 0703      cpc r16, TLowH_REG
-00076a f414      brge read_18b20_low
-00076b 2f21       mov TLowL_REG, r17
-00076c 2f30       mov TLowH_REG, r16
+000755 1712      cp r17, TLowL_REG
+000756 0703      cpc r16, TLowH_REG
+000757 f414      brge read_18b20_low
+000758 2f21       mov TLowL_REG, r17
+000759 2f30       mov TLowH_REG, r16
                  ;
                  read_18b20_low:
-00076d 1714      cp r17, THighL_REG
-00076e 0705      cpc r16, THighH_REG
-00076f f014      brlt read_18b20_high
-000770 2f41       mov THighL_REG, r17
-000771 2f50       mov THighH_REG, r16 
+00075a 1714      cp r17, THighL_REG
+00075b 0705      cpc r16, THighH_REG
+00075c f014      brlt read_18b20_high
+00075d 2f41       mov THighL_REG, r17
+00075e 2f50       mov THighH_REG, r16 
                  ;
                  read_18b20_high:
-000772 956a      dec r22
-000773 f009      breq read_18b20_exit
+00075f 956a      dec r22
+000760 f011      breq read_18b20_exit
+000761 cfe7      rjmp read_18b20_cycle
                  ;
                  read_18b20_fail:
-000774 6071      sbr ERRORL_REG, 1 << ERRORL_NO18B20
+000762 6071      sbr ERRORL_REG, 1 << ERRORL_NO18B20
                  ;
                  read_18b20_exit:
-000775 9100 006d lds r16, SYSTICK
-000777 e416      ldi r17, MEAS_TIME
-000778 0f01      add r16, r17
-000779 9300 0078 sts D18B20_TIMESTAMP, r16
+000763 9100 006d lds r16, SYSTICK
+000765 e416      ldi r17, MEAS_TIME
+000766 0f01      add r16, r17
+000767 9300 0078 sts D18B20_TIMESTAMP, r16
                  ;
-00077b 9230 0077 sts D18B20_STATE, CONST_10
+000769 9230 0077 sts D18B20_STATE, CONST_10
                  ;
-00077d 91ff      pop r31
-00077e 91ef      pop r30
-00077f 91df      pop r29
-000780 91cf      pop r28
-000781 916f      pop r22
-000782 90ff      pop r15
-000783 90ef      pop r14
-000784 90df      pop r13
-000785 90cf      pop r12
-000786 90bf      pop r11
-000787 90af      pop r10
-000788 909f      pop r9
-000789 908f      pop r8
+00076b 91ff      pop r31
+00076c 91ef      pop r30
+00076d 91df      pop r29
+00076e 91cf      pop r28
+00076f 916f      pop r22
+000770 90ff      pop r15
+000771 90ef      pop r14
+000772 90df      pop r13
+000773 90cf      pop r12
+000774 90bf      pop r11
+000775 90af      pop r10
+000776 909f      pop r9
+000777 908f      pop r8
                  ;
-00078a 9508      ret
+000778 9508      ret
                  
                  search_18b20:
-00078b 930f      push r16
-00078c 931f      push r17
-00078d 932f      push r18
-00078e 933f      push r19
-00078f 934f      push r20
-000790 938f      push r24
-000791 939f      push r25
-000792 93af      push r26
-000793 93bf      push r27
-000794 93cf      push r28
-000795 93df      push r29
-000796 93ef      push r30
-000797 93ff      push r31
+000779 930f      push r16
+00077a 931f      push r17
+00077b 932f      push r18
+00077c 933f      push r19
+00077d 934f      push r20
+00077e 938f      push r24
+00077f 939f      push r25
+000780 93af      push r26
+000781 93bf      push r27
+000782 93cf      push r28
+000783 93df      push r29
+000784 93ef      push r30
+000785 93ff      push r31
                  ;---search all 18b20---
-000798 ef3f      ldi r19, 0xFF ;last cycle last zero-wented branch
+000786 ef3f      ldi r19, 0xFF ;last cycle last zero-wented branch
                  ;handle to store
-000799 e8ee      ldi r30, low(D18B20_ADDRESSES)
-00079a e0f0      ldi r31, high(D18B20_ADDRESSES)
+000787 e8ee      ldi r30, low(D18B20_ADDRESSES)
+000788 e0f0      ldi r31, high(D18B20_ADDRESSES)
                  ;address
-00079b 2788      clr r24
-00079c 2799      clr r25
-00079d 27aa      clr r26
-00079e 27bb      clr r27
-00079f 27cc      clr r28
-0007a0 27dd      clr r29
+000789 2788      clr r24
+00078a 2799      clr r25
+00078b 27aa      clr r26
+00078c 27bb      clr r27
+00078d 27cc      clr r28
+00078e 27dd      clr r29
                  ;
                  search_cycle:
-0007a1 014c        movw r8, r24
-0007a2 015d        movw r10, r26
-0007a3 016e        movw r12, r28
-0007a4 e320        ldi r18, 48
-0007a5 2744        clr r20 ;current cycle last zero-wented branch
+00078f 014c        movw r8, r24
+000790 015d        movw r10, r26
+000791 016e        movw r12, r28
+000792 e320        ldi r18, 48
+000793 2744        clr r20 ;current cycle last zero-wented branch
                    ;
-0007a6 defe        rcall ow_reset
-0007a7 ef00        ldi r16, SEARCH_ROM
-0007a8 df42        rcall ow_write_byte
-0007a9 e208        ldi r16, 0x28
-0007aa df4c        rcall ow_write_byte_with_check
-0007ab f40e        brtc search0
-0007ac c050         rjmp search_exit
+000794 deff        rcall ow_reset
+000795 ef00        ldi r16, SEARCH_ROM
+000796 df41        rcall ow_write_byte
+000797 e208        ldi r16, 0x28
+000798 df4b        rcall ow_write_byte_with_check
+000799 f40e        brtc search0
+00079a c050         rjmp search_exit
                    search0: 
                    ;-----bit cycle------
                    search_bit_cycle:
-0007ad 2711          clr r17
+00079b 2711          clr r17
                      ;old value bit
-0007ae 94d7          ror r13
-0007af 94c7          ror r12
-0007b0 94b7          ror r11
-0007b1 94a7          ror r10
-0007b2 9497          ror r9
-0007b3 9487          ror r8
-0007b4 f408          brcc search1
-0007b5 6011           sbr r17, 0b00000001
+00079c 94d7          ror r13
+00079d 94c7          ror r12
+00079e 94b7          ror r11
+00079f 94a7          ror r10
+0007a0 9497          ror r9
+0007a1 9487          ror r8
+0007a2 f408          brcc search1
+0007a3 6011           sbr r17, 0b00000001
                      search1:
                    ;----- read -----
-0007b6 df06        rcall ow_read_bit
-0007b7 f42e        brtc search2
-0007b8 df04          rcall ow_read_bit
-0007b9 f40e          brtc search3
+0007a4 df07        rcall ow_read_bit
+0007a5 f42e        brtc search2
+0007a6 df05          rcall ow_read_bit
+0007a7 f40e          brtc search3
                      ;none present
-0007ba c042           rjmp search_exit
+0007a8 c042           rjmp search_exit
                      search3:
                       ;one present
-0007bb 9408           sec
-0007bc c011           rjmp search_savebit 
+0007a9 9408           sec
+0007aa c011           rjmp search_savebit 
                    search2:
-0007bd deff          rcall ow_read_bit
-0007be f416          brtc search4
+0007ab df00          rcall ow_read_bit
+0007ac f416          brtc search4
                      ;zero present
-0007bf 9488           clc
-0007c0 c00d           rjmp search_savebit
+0007ad 9488           clc
+0007ae c00d           rjmp search_savebit
                      search4:
                       ;both present
-0007c1 1723           cp r18, r19
-0007c2 f051           breq search_curr
-0007c3 f418           brsh search_out
+0007af 1723           cp r18, r19
+0007b0 f051           breq search_curr
+0007b1 f418           brsh search_out
                        ;it's branch inside current - use default
-0007c4 2f42            mov r20, r18
-0007c5 9488            clc ;go to one
-0007c6 c007            rjmp search_savebit
+0007b2 2f42            mov r20, r18
+0007b3 9488            clc ;go to one
+0007b4 c007            rjmp search_savebit
                       search_out:
                       ;it's brach outside current - use stored
-0007c7 9408           sec
-0007c8 fd10           sbrc r17, 0
-0007c9 c004           rjmp search_savebit
-0007ca 2f42            mov r20, r18
-0007cb 9488            clc
-0007cc c001            rjmp search_savebit
+0007b5 9408           sec
+0007b6 fd10           sbrc r17, 0
+0007b7 c004           rjmp search_savebit
+0007b8 2f42            mov r20, r18
+0007b9 9488            clc
+0007ba c001            rjmp search_savebit
                       search_curr:
                        ;-current bit - branch-
-0007cd 9408            sec
+0007bb 9408            sec
                        ;rjmp search_savebit
                  search_savebit:
-0007ce 95d7      ror r29
-0007cf 95c7      ror r28
-0007d0 95b7      ror r27
-0007d1 95a7      ror r26
-0007d2 9597      ror r25
-0007d3 9587      ror r24
-0007d4 94e8      clt
-0007d5 fdd7      sbrc r29, 7
-0007d6 9468       set
-0007d7 defa      rcall ow_write_bit
+0007bc 95d7      ror r29
+0007bd 95c7      ror r28
+0007be 95b7      ror r27
+0007bf 95a7      ror r26
+0007c0 9597      ror r25
+0007c1 9587      ror r24
+0007c2 94e8      clt
+0007c3 fdd7      sbrc r29, 7
+0007c4 9468       set
+0007c5 def9      rcall ow_write_bit
                  ;
-0007d8 952a      dec r18
-0007d9 f699      brne search_bit_cycle
+0007c6 952a      dec r18
+0007c7 f699      brne search_bit_cycle
                  ;-----save-----
-0007da 2711      clr r17
-0007db e208      ldi r16, 0x28
-0007dc d0df      rcall calculate_dallas_crc
-0007dd 2f08      mov r16, r24
-0007de d0dd      rcall calculate_dallas_crc
-0007df 2f09      mov r16, r25
-0007e0 d0db      rcall calculate_dallas_crc
-0007e1 2f0a      mov r16, r26
-0007e2 d0d9      rcall calculate_dallas_crc
-0007e3 2f0b      mov r16, r27
-0007e4 d0d7      rcall calculate_dallas_crc
-0007e5 2f0c      mov r16, r28
-0007e6 d0d5      rcall calculate_dallas_crc
-0007e7 2f0d      mov r16, r29
-0007e8 d0d3      rcall calculate_dallas_crc
+0007c8 2711      clr r17
+0007c9 e208      ldi r16, 0x28
+0007ca d0df      rcall calculate_dallas_crc
+0007cb 2f08      mov r16, r24
+0007cc d0dd      rcall calculate_dallas_crc
+0007cd 2f09      mov r16, r25
+0007ce d0db      rcall calculate_dallas_crc
+0007cf 2f0a      mov r16, r26
+0007d0 d0d9      rcall calculate_dallas_crc
+0007d1 2f0b      mov r16, r27
+0007d2 d0d7      rcall calculate_dallas_crc
+0007d3 2f0c      mov r16, r28
+0007d4 d0d5      rcall calculate_dallas_crc
+0007d5 2f0d      mov r16, r29
+0007d6 d0d3      rcall calculate_dallas_crc
                  ;check crc
                  ;mov r16, r17
                  ;rcall ow_write_byte_with_check
                  ;brts 
                  ;-----save-----
                  ;device id
-0007e9 e208      ldi r16, 0x28
-0007ea 9301      st z+, r16
+0007d7 e208      ldi r16, 0x28
+0007d8 9301      st z+, r16
                  ;addr
-0007eb 9381      st z+, r24
-0007ec 9391      st z+, r25
-0007ed 93a1      st z+, r26
-0007ee 93b1      st z+, r27
-0007ef 93c1      st z+, r28
-0007f0 93d1      st z+, r29
+0007d9 9381      st z+, r24
+0007da 9391      st z+, r25
+0007db 93a1      st z+, r26
+0007dc 93b1      st z+, r27
+0007dd 93c1      st z+, r28
+0007de 93d1      st z+, r29
                  ;crc
-0007f1 9311      st z+, r17
+0007df 9311      st z+, r17
                  ;
-0007f2 9100 0079 lds r16, D18B20_COUNT
-0007f4 9503      inc r16
-0007f5 9300 0079 sts D18B20_COUNT, r16
-0007f7 300a      cpi r16, D18B20_MAX_COUNT
-0007f8 f021      breq search_exit
+0007e0 9100 0079 lds r16, D18B20_COUNT
+0007e2 9503      inc r16
+0007e3 9300 0079 sts D18B20_COUNT, r16
+0007e5 300a      cpi r16, D18B20_MAX_COUNT
+0007e6 f021      breq search_exit
                  ;---
-0007f9 2f34      mov r19, r20
-0007fa 2344      tst r20
-0007fb f009      breq search_exit;no more branch
-0007fc cfa4      rjmp search_cycle
+0007e7 2f34      mov r19, r20
+0007e8 2344      tst r20
+0007e9 f009      breq search_exit;no more branch
+0007ea cfa4      rjmp search_cycle
                  ;save
                  search_exit:
                  ;
-0007fd 91ff      pop r31
-0007fe 91ef      pop r30
-0007ff 91df      pop r29
-000800 91cf      pop r28
-000801 91bf      pop r27
-000802 91af      pop r26
-000803 919f      pop r25
-000804 918f      pop r24
-000805 914f      pop r20
-000806 913f      pop r19
-000807 912f      pop r18
-000808 911f      pop r17
-000809 910f      pop r16
-00080a 9508      ret
+0007eb 91ff      pop r31
+0007ec 91ef      pop r30
+0007ed 91df      pop r29
+0007ee 91cf      pop r28
+0007ef 91bf      pop r27
+0007f0 91af      pop r26
+0007f1 919f      pop r25
+0007f2 918f      pop r24
+0007f3 914f      pop r20
+0007f4 913f      pop r19
+0007f5 912f      pop r18
+0007f6 911f      pop r17
+0007f7 910f      pop r16
+0007f8 9508      ret
                  
                  set_resolution:
-00080b de99      rcall ow_reset
-00080c f40e      brtc i180
-00080d 9508       ret
+0007f9 de9a      rcall ow_reset
+0007fa f40e      brtc i180
+0007fb 9508       ret
                  i180:
-00080e ec0c      ldi r16, SKIP_ROM
-00080f dedb      rcall ow_write_byte
+0007fc ec0c      ldi r16, SKIP_ROM
+0007fd deda      rcall ow_write_byte
                  ;
-000810 e40e      ldi r16, WRITE_SCRATCHPAD
-000811 ded9      rcall ow_write_byte
-000812 2700      clr r16
-000813 ded7      rcall ow_write_byte
-000814 2700      clr r16
-000815 ded5      rcall ow_write_byte
-000816 e70f      ldi r16, 0b01111111
-000817 ded3      rcall ow_write_byte
+0007fe e40e      ldi r16, WRITE_SCRATCHPAD
+0007ff ded8      rcall ow_write_byte
+000800 2700      clr r16
+000801 ded6      rcall ow_write_byte
+000802 2700      clr r16
+000803 ded4      rcall ow_write_byte
+000804 e70f      ldi r16, 0b01111111
+000805 ded2      rcall ow_write_byte
                  ;---read scrathpad---
                  .IFDEF CHECK_18B20_GENUINE
                  .ENDIF
                  ;start conversion
-000818 de8c      rcall ow_reset
-000819 f40e      brtc i182
-00081a 9508       ret
+000806 de8d      rcall ow_reset
+000807 f40e      brtc i182
+000808 9508       ret
                  i182:
-00081b ec0c      ldi r16, SKIP_ROM
-00081c dece      rcall ow_write_byte
-00081d e404      ldi r16, CONVERT_TEMPERATURE
-00081e decc      rcall ow_write_byte
+000809 ec0c      ldi r16, SKIP_ROM
+00080a decd      rcall ow_write_byte
+00080b e404      ldi r16, CONVERT_TEMPERATURE
+00080c decb      rcall ow_write_byte
                  ;
-00081f 9508      ret
+00080d 9508      ret
                  
                  ;in r8-r15 - addr
                  ;out r17:16 - temp, T - error
                  read_single_18b20:
                  ;
-000820 de84      rcall ow_reset
-000821 f40e      brtc r182
-000822 9508       ret
+00080e de85      rcall ow_reset
+00080f f40e      brtc r182
+000810 9508       ret
                  r182:
-000823 e505      ldi r16, MATCH_ROM
-000824 dec6      rcall ow_write_byte
-000825 2d08      mov r16, r8
-000826 dec4      rcall ow_write_byte
-000827 2d09      mov r16, r9
-000828 dec2      rcall ow_write_byte
-000829 2d0a      mov r16, r10
-00082a dec0      rcall ow_write_byte
-00082b 2d0b      mov r16, r11
-00082c debe      rcall ow_write_byte
-00082d 2d0c      mov r16, r12
-00082e debc      rcall ow_write_byte
-00082f 2d0d      mov r16, r13
-000830 deba      rcall ow_write_byte
-000831 2d0e      mov r16, r14
-000832 deb8      rcall ow_write_byte
-000833 2d0f      mov r16, r15
-000834 deb6      rcall ow_write_byte
+000811 e505      ldi r16, MATCH_ROM
+000812 dec5      rcall ow_write_byte
+000813 2d08      mov r16, r8
+000814 dec3      rcall ow_write_byte
+000815 2d09      mov r16, r9
+000816 dec1      rcall ow_write_byte
+000817 2d0a      mov r16, r10
+000818 debf      rcall ow_write_byte
+000819 2d0b      mov r16, r11
+00081a debd      rcall ow_write_byte
+00081b 2d0c      mov r16, r12
+00081c debb      rcall ow_write_byte
+00081d 2d0d      mov r16, r13
+00081e deb9      rcall ow_write_byte
+00081f 2d0e      mov r16, r14
+000820 deb7      rcall ow_write_byte
+000821 2d0f      mov r16, r15
+000822 deb5      rcall ow_write_byte
                  ;
-000835 eb0e      ldi r16, READ_SCRATCHPAD
-000836 deb4      rcall ow_write_byte
+000823 eb0e      ldi r16, READ_SCRATCHPAD
+000824 deb3      rcall ow_write_byte
                  ;
-000837 deaa      rcall ow_read_byte
-000838 2f10      mov r17, r16
+000825 dea9      rcall ow_read_byte
+000826 2f10      mov r17, r16
                  ;
-000839 dea8      rcall ow_read_byte
+000827 dea7      rcall ow_read_byte
                  ;
-00083a 94e8      clt
-00083b 9508      ret
+000828 94e8      clt
+000829 9508      ret
                  
                  #include "dallasCrc.asm"
                  
-00083c 5e00
-00083d e2bc
-00083e 3f61
-00083f 83dd      .DB 0x00, 0x5e, 0xbc, 0xe2, 0x61, 0x3f, 0xdd, 0x83
-000840 9cc2
-000841 207e
-000842 fda3
-000843 411f      .DB 0xc2, 0x9c, 0x7e, 0x20, 0xa3, 0xfd, 0x1f, 0x41
-000844 c39d
-000845 7f21
-000846 a2fc
-000847 1e40      .DB 0x9d, 0xc3, 0x21, 0x7f, 0xfc, 0xa2, 0x40, 0x1e
-000848 015f
-000849 bde3
-00084a 603e
-00084b dc82      .DB 0x5f, 0x01, 0xe3, 0xbd, 0x3e, 0x60, 0x82, 0xdc
-00084c 7d23
-00084d c19f
-00084e 1c42
-00084f a0fe      .DB 0x23, 0x7d, 0x9f, 0xc1, 0x42, 0x1c, 0xfe, 0xa0
-000850 bfe1
-000851 035d
-000852 de80
-000853 623c      .DB 0xe1, 0xbf, 0x5d, 0x03, 0x80, 0xde, 0x3c, 0x62
-000854 e0be
-000855 5c02
-000856 81df
-000857 3d63      .DB 0xbe, 0xe0, 0x02, 0x5c, 0xdf, 0x81, 0x63, 0x3d
-000858 227c
-000859 9ec0
-00085a 431d
-00085b ffa1      .DB 0x7c, 0x22, 0xc0, 0x9e, 0x1d, 0x43, 0xa1, 0xff
-00085c 1846
-00085d a4fa
-00085e 7927
-00085f c59b      .DB 0x46, 0x18, 0xfa, 0xa4, 0x27, 0x79, 0x9b, 0xc5
-000860 da84
-000861 6638
-000862 bbe5
-000863 0759      .DB 0x84, 0xda, 0x38, 0x66, 0xe5, 0xbb, 0x59, 0x07
-000864 85db
-000865 3967
-000866 e4ba
-000867 5806      .DB 0xdb, 0x85, 0x67, 0x39, 0xba, 0xe4, 0x06, 0x58
-000868 4719
-000869 fba5
-00086a 2678
-00086b 9ac4      .DB 0x19, 0x47, 0xa5, 0xfb, 0x78, 0x26, 0xc4, 0x9a
-00086c 3b65
-00086d 87d9
-00086e 5a04
-00086f e6b8      .DB 0x65, 0x3b, 0xd9, 0x87, 0x04, 0x5a, 0xb8, 0xe6
-000870 f9a7
-000871 451b
-000872 98c6
-000873 247a      .DB 0xa7, 0xf9, 0x1b, 0x45, 0xc6, 0x98, 0x7a, 0x24
-000874 a6f8
-000875 1a44
-000876 c799
-000877 7b25      .DB 0xf8, 0xa6, 0x44, 0x1a, 0x99, 0xc7, 0x25, 0x7b
-000878 643a
-000879 d886
-00087a 055b
-00087b b9e7      .DB 0x3a, 0x64, 0x86, 0xd8, 0x5b, 0x05, 0xe7, 0xb9
-00087c d28c
-00087d 6e30
-00087e b3ed
-00087f 0f51      .DB 0x8c, 0xd2, 0x30, 0x6e, 0xed, 0xb3, 0x51, 0x0f
-000880 104e
-000881 acf2
-000882 712f
-000883 cd93      .DB 0x4e, 0x10, 0xf2, 0xac, 0x2f, 0x71, 0x93, 0xcd
-000884 4f11
-000885 f3ad
-000886 2e70
-000887 92cc      .DB 0x11, 0x4f, 0xad, 0xf3, 0x70, 0x2e, 0xcc, 0x92
-000888 8dd3
-000889 316f
-00088a ecb2
-00088b 500e      .DB 0xd3, 0x8d, 0x6f, 0x31, 0xb2, 0xec, 0x0e, 0x50
-00088c f1af
-00088d 4d13
-00088e 90ce
-00088f 2c72      .DB 0xaf, 0xf1, 0x13, 0x4d, 0xce, 0x90, 0x72, 0x2c
-000890 336d
-000891 8fd1
-000892 520c
-000893 eeb0      .DB 0x6d, 0x33, 0xd1, 0x8f, 0x0c, 0x52, 0xb0, 0xee
-000894 6c32
-000895 d08e
-000896 0d53
-000897 b1ef      .DB 0x32, 0x6c, 0x8e, 0xd0, 0x53, 0x0d, 0xef, 0xb1
-000898 aef0
-000899 124c
-00089a cf91
-00089b 732d      .DB 0xf0, 0xae, 0x4c, 0x12, 0x91, 0xcf, 0x2d, 0x73
-00089c 94ca
-00089d 2876
-00089e f5ab
-00089f 4917      .DB 0xca, 0x94, 0x76, 0x28, 0xab, 0xf5, 0x17, 0x49
-0008a0 5608
-0008a1 eab4
-0008a2 3769
-0008a3 8bd5      .DB 0x08, 0x56, 0xb4, 0xea, 0x69, 0x37, 0xd5, 0x8b
-0008a4 0957
-0008a5 b5eb
-0008a6 6836
-0008a7 d48a      .DB 0x57, 0x09, 0xeb, 0xb5, 0x36, 0x68, 0x8a, 0xd4
-0008a8 cb95
-0008a9 7729
-0008aa aaf4
-0008ab 1648      .DB 0x95, 0xcb, 0x29, 0x77, 0xf4, 0xaa, 0x48, 0x16
-0008ac b7e9
-0008ad 0b55
-0008ae d688
-0008af 6a34      .DB 0xe9, 0xb7, 0x55, 0x0b, 0x88, 0xd6, 0x34, 0x6a
-0008b0 752b
-0008b1 c997
-0008b2 144a
-0008b3 a8f6      .DB 0x2b, 0x75, 0x97, 0xc9, 0x4a, 0x14, 0xf6, 0xa8
-0008b4 2a74
-0008b5 96c8
-0008b6 4b15
-0008b7 f7a9      .DB 0x74, 0x2a, 0xc8, 0x96, 0x15, 0x4b, 0xa9, 0xf7
-0008b8 e8b6
-0008b9 540a
-0008ba 89d7
-0008bb 356b      .DB 0xb6, 0xe8, 0x0a, 0x54, 0xd7, 0x89, 0x6b, 0x35
+00082a 5e00
+00082b e2bc
+00082c 3f61
+00082d 83dd      .DB 0x00, 0x5e, 0xbc, 0xe2, 0x61, 0x3f, 0xdd, 0x83
+00082e 9cc2
+00082f 207e
+000830 fda3
+000831 411f      .DB 0xc2, 0x9c, 0x7e, 0x20, 0xa3, 0xfd, 0x1f, 0x41
+000832 c39d
+000833 7f21
+000834 a2fc
+000835 1e40      .DB 0x9d, 0xc3, 0x21, 0x7f, 0xfc, 0xa2, 0x40, 0x1e
+000836 015f
+000837 bde3
+000838 603e
+000839 dc82      .DB 0x5f, 0x01, 0xe3, 0xbd, 0x3e, 0x60, 0x82, 0xdc
+00083a 7d23
+00083b c19f
+00083c 1c42
+00083d a0fe      .DB 0x23, 0x7d, 0x9f, 0xc1, 0x42, 0x1c, 0xfe, 0xa0
+00083e bfe1
+00083f 035d
+000840 de80
+000841 623c      .DB 0xe1, 0xbf, 0x5d, 0x03, 0x80, 0xde, 0x3c, 0x62
+000842 e0be
+000843 5c02
+000844 81df
+000845 3d63      .DB 0xbe, 0xe0, 0x02, 0x5c, 0xdf, 0x81, 0x63, 0x3d
+000846 227c
+000847 9ec0
+000848 431d
+000849 ffa1      .DB 0x7c, 0x22, 0xc0, 0x9e, 0x1d, 0x43, 0xa1, 0xff
+00084a 1846
+00084b a4fa
+00084c 7927
+00084d c59b      .DB 0x46, 0x18, 0xfa, 0xa4, 0x27, 0x79, 0x9b, 0xc5
+00084e da84
+00084f 6638
+000850 bbe5
+000851 0759      .DB 0x84, 0xda, 0x38, 0x66, 0xe5, 0xbb, 0x59, 0x07
+000852 85db
+000853 3967
+000854 e4ba
+000855 5806      .DB 0xdb, 0x85, 0x67, 0x39, 0xba, 0xe4, 0x06, 0x58
+000856 4719
+000857 fba5
+000858 2678
+000859 9ac4      .DB 0x19, 0x47, 0xa5, 0xfb, 0x78, 0x26, 0xc4, 0x9a
+00085a 3b65
+00085b 87d9
+00085c 5a04
+00085d e6b8      .DB 0x65, 0x3b, 0xd9, 0x87, 0x04, 0x5a, 0xb8, 0xe6
+00085e f9a7
+00085f 451b
+000860 98c6
+000861 247a      .DB 0xa7, 0xf9, 0x1b, 0x45, 0xc6, 0x98, 0x7a, 0x24
+000862 a6f8
+000863 1a44
+000864 c799
+000865 7b25      .DB 0xf8, 0xa6, 0x44, 0x1a, 0x99, 0xc7, 0x25, 0x7b
+000866 643a
+000867 d886
+000868 055b
+000869 b9e7      .DB 0x3a, 0x64, 0x86, 0xd8, 0x5b, 0x05, 0xe7, 0xb9
+00086a d28c
+00086b 6e30
+00086c b3ed
+00086d 0f51      .DB 0x8c, 0xd2, 0x30, 0x6e, 0xed, 0xb3, 0x51, 0x0f
+00086e 104e
+00086f acf2
+000870 712f
+000871 cd93      .DB 0x4e, 0x10, 0xf2, 0xac, 0x2f, 0x71, 0x93, 0xcd
+000872 4f11
+000873 f3ad
+000874 2e70
+000875 92cc      .DB 0x11, 0x4f, 0xad, 0xf3, 0x70, 0x2e, 0xcc, 0x92
+000876 8dd3
+000877 316f
+000878 ecb2
+000879 500e      .DB 0xd3, 0x8d, 0x6f, 0x31, 0xb2, 0xec, 0x0e, 0x50
+00087a f1af
+00087b 4d13
+00087c 90ce
+00087d 2c72      .DB 0xaf, 0xf1, 0x13, 0x4d, 0xce, 0x90, 0x72, 0x2c
+00087e 336d
+00087f 8fd1
+000880 520c
+000881 eeb0      .DB 0x6d, 0x33, 0xd1, 0x8f, 0x0c, 0x52, 0xb0, 0xee
+000882 6c32
+000883 d08e
+000884 0d53
+000885 b1ef      .DB 0x32, 0x6c, 0x8e, 0xd0, 0x53, 0x0d, 0xef, 0xb1
+000886 aef0
+000887 124c
+000888 cf91
+000889 732d      .DB 0xf0, 0xae, 0x4c, 0x12, 0x91, 0xcf, 0x2d, 0x73
+00088a 94ca
+00088b 2876
+00088c f5ab
+00088d 4917      .DB 0xca, 0x94, 0x76, 0x28, 0xab, 0xf5, 0x17, 0x49
+00088e 5608
+00088f eab4
+000890 3769
+000891 8bd5      .DB 0x08, 0x56, 0xb4, 0xea, 0x69, 0x37, 0xd5, 0x8b
+000892 0957
+000893 b5eb
+000894 6836
+000895 d48a      .DB 0x57, 0x09, 0xeb, 0xb5, 0x36, 0x68, 0x8a, 0xd4
+000896 cb95
+000897 7729
+000898 aaf4
+000899 1648      .DB 0x95, 0xcb, 0x29, 0x77, 0xf4, 0xaa, 0x48, 0x16
+00089a b7e9
+00089b 0b55
+00089c d688
+00089d 6a34      .DB 0xe9, 0xb7, 0x55, 0x0b, 0x88, 0xd6, 0x34, 0x6a
+00089e 752b
+00089f c997
+0008a0 144a
+0008a1 a8f6      .DB 0x2b, 0x75, 0x97, 0xc9, 0x4a, 0x14, 0xf6, 0xa8
+0008a2 2a74
+0008a3 96c8
+0008a4 4b15
+0008a5 f7a9      .DB 0x74, 0x2a, 0xc8, 0x96, 0x15, 0x4b, 0xa9, 0xf7
+0008a6 e8b6
+0008a7 540a
+0008a8 89d7
+0008a9 356b      .DB 0xb6, 0xe8, 0x0a, 0x54, 0xd7, 0x89, 0x6b, 0x35
                  
                  ;in r16 - data, r17 - crc
                  ;out r17 - crc
                  calculate_dallas_crc:
-0008bc 930f      push r16
-0008bd 93ef      push r30
-0008be 93ff      push r31
+0008aa 930f      push r16
+0008ab 93ef      push r30
+0008ac 93ff      push r31
                  ;
-0008bf 2701      eor r16, r17
-0008c0 e7e8      ldi r30, low(dallas_crc_array*2)
-0008c1 e1f0      ldi r31, high(dallas_crc_array*2)
-0008c2 0fe0      add r30, r16
-0008c3 1df2      adc r31, CONST_0
-0008c4 9114      lpm r17, z
+0008ad 2701      eor r16, r17
+0008ae e5e4      ldi r30, low(dallas_crc_array*2)
+0008af e1f0      ldi r31, high(dallas_crc_array*2)
+0008b0 0fe0      add r30, r16
+0008b1 1df2      adc r31, CONST_0
+0008b2 9114      lpm r17, z
                  ;
-0008c5 91ff      pop r31
-0008c6 91ef      pop r30
-0008c7 910f      pop r16
+0008b3 91ff      pop r31
+0008b4 91ef      pop r30
+0008b5 910f      pop r16
                  #include "Logic.asm"
-0008c8 9508      
+0008b6 9508      
                  ;checks
-0008c9 2377      tst ERRORL_REG
-0008ca f521      brne logic_off
-0008cb 2388      tst ERRORH_REG
-0008cc f511      brne logic_off
-0008cd 30a0      cpi MODE_REG, MODE_OFF
-0008ce f101      breq logic_off
-                 ;temperature
-0008cf 0189      movw r16, TLowL_REG
-0008d0 7f00      andi r16, 0b11110000
-0008d1 701f      andi r17, 0b00001111
-0008d2 2b01      or r16, r17
-0008d3 9502      swap r16
-0008d4 1706      cp r16, TTARGET_REG
-0008d5 f4cc      brge logic_off
+0008b7 2377      tst ERRORL_REG
+0008b8 f559      brne logic_off
+0008b9 2388      tst ERRORH_REG
+0008ba f549      brne logic_off
+0008bb 30a0      cpi MODE_REG, MODE_OFF
+0008bc f139      breq logic_off
+                 ;temperature high
+0008bd 018a      movw r16, THighL_REG
+0008be 7f00      andi r16, 0b11110000
+0008bf 701f      andi r17, 0b00001111
+0008c0 2b01      or r16, r17
+0008c1 9502      swap r16
+0008c2 3406      cpi r16, 70
+0008c3 f504      brge logic_off
+                 ;temperature low
+0008c4 0189      movw r16, TLowL_REG
+0008c5 7f00      andi r16, 0b11110000
+0008c6 701f      andi r17, 0b00001111
+0008c7 2b01      or r16, r17
+0008c8 9502      swap r16
+0008c9 1706      cp r16, TTARGET_REG
+0008ca f4cc      brge logic_off
                  ;
-0008d6 30a1      cpi MODE_REG, MODE_1
-0008d7 f421      brne lo1
+0008cb 30a1      cpi MODE_REG, MODE_1
+0008cc f421      brne lo1
                   ;1
-0008d8 9aa8       sbi portc, 0
-0008d9 98aa       cbi portc, 2
-0008da 9892       cbi portd, 2
-0008db 9508       ret
+0008cd 9aa8       sbi portc, 0
+0008ce 98aa       cbi portc, 2
+0008cf 9892       cbi portd, 2
+0008d0 9508       ret
                  lo1: 
-0008dc 30a2      cpi MODE_REG, MODE_2
-0008dd f421      brne lo2
+0008d1 30a2      cpi MODE_REG, MODE_2
+0008d2 f421      brne lo2
                   ;2
-0008de 98a8       cbi portc, 0
-0008df 9aaa       sbi portc, 2
-0008e0 9892       cbi portd, 2
-0008e1 9508       ret
+0008d3 98a8       cbi portc, 0
+0008d4 9aaa       sbi portc, 2
+0008d5 9892       cbi portd, 2
+0008d6 9508       ret
                  lo2:
-0008e2 30a3      cpi MODE_REG, MODE_3
-0008e3 f421      brne lo3
+0008d7 30a3      cpi MODE_REG, MODE_3
+0008d8 f421      brne lo3
                   ;3
-0008e4 9aa8       sbi portc, 0
-0008e5 9aaa       sbi portc, 2
-0008e6 9892       cbi portd, 2
-0008e7 9508       ret
+0008d9 9aa8       sbi portc, 0
+0008da 9aaa       sbi portc, 2
+0008db 9892       cbi portd, 2
+0008dc 9508       ret
                  lo3:
-0008e8 30a4      cpi MODE_REG, MODE_FAN
-0008e9 f421      brne lo4
+0008dd 30a4      cpi MODE_REG, MODE_FAN
+0008de f421      brne lo4
                   ;FAN
-0008ea 98a8       cbi portc, 0
-0008eb 98aa       cbi portc, 2
-0008ec 9a92       sbi portd, 2
-0008ed 9508       ret
+0008df 98a8       cbi portc, 0
+0008e0 98aa       cbi portc, 2
+0008e1 9a92       sbi portd, 2
+0008e2 9508       ret
                  lo4: 
-0008ee 6072      sbr ERRORL_REG, 1 << ERRORL_SOFTWARE
+0008e3 6072      sbr ERRORL_REG, 1 << ERRORL_SOFTWARE
                  logic_off:
-0008ef 98a8       cbi portc, 0
-0008f0 98aa       cbi portc, 2
-0008f1 9892       cbi portd, 2
-0008f2 9508      ret
+0008e4 98a8       cbi portc, 0
+0008e5 98aa       cbi portc, 2
+0008e6 9892       cbi portd, 2
+0008e7 9508      ret
                  #include "I2C.asm"
                  
                  #define START 0x08
@@ -3685,241 +3682,241 @@ main.asm(192): Including file 'EEPROM.asm'
                  ;out: r16 - data
                  i2c_read:
                  ;
-0008f3 d030      rcall i2c_send_start
-0008f4 f05e      brts i2c_read_exit
+0008e8 d030      rcall i2c_send_start
+0008e9 f05e      brts i2c_read_exit
                  ;
-0008f5 d046      rcall i2c_send_address_w
-0008f6 f04e      brts i2c_read_exit
+0008ea d046      rcall i2c_send_address_w
+0008eb f04e      brts i2c_read_exit
                  ;
-0008f7 d05e      rcall i2c_send_byte
-0008f8 f03e      brts i2c_read_exit
+0008ec d05e      rcall i2c_send_byte
+0008ed f03e      brts i2c_read_exit
                  ;
-0008f9 d037      rcall i2c_send_repeat_start
-0008fa f02e      brts i2c_read_exit
+0008ee d037      rcall i2c_send_repeat_start
+0008ef f02e      brts i2c_read_exit
                  
-0008fb d04d      rcall i2c_send_address_r
-0008fc f01e      brts i2c_read_exit
+0008f0 d04d      rcall i2c_send_address_r
+0008f1 f01e      brts i2c_read_exit
                  
-0008fd d072      rcall i2c_receive_byte_nack
-0008fe f00e      brts i2c_read_exit
+0008f2 d072      rcall i2c_receive_byte_nack
+0008f3 f00e      brts i2c_read_exit
                  ;
-0008ff d081      rcall i2c_send_stop
+0008f4 d081      rcall i2c_send_stop
                  ;
                  i2c_read_exit:
-000900 9508      ret
+0008f5 9508      ret
                  
                  ;in: r17 - addr
                  ;out: r16:17 - data
                  i2c_read_pair:
                  ;
-000901 d022      rcall i2c_send_start
-000902 f076      brts i2c_read_pair_exit
+0008f6 d022      rcall i2c_send_start
+0008f7 f076      brts i2c_read_pair_exit
                  ;
-000903 d038      rcall i2c_send_address_w
-000904 f066      brts i2c_read_pair_exit
+0008f8 d038      rcall i2c_send_address_w
+0008f9 f066      brts i2c_read_pair_exit
                  ;
-000905 d050      rcall i2c_send_byte
-000906 f056      brts i2c_read_pair_exit
+0008fa d050      rcall i2c_send_byte
+0008fb f056      brts i2c_read_pair_exit
                  ;
-000907 d029      rcall i2c_send_repeat_start
-000908 f046      brts i2c_read_pair_exit
+0008fc d029      rcall i2c_send_repeat_start
+0008fd f046      brts i2c_read_pair_exit
                  
-000909 d03f      rcall i2c_send_address_r
-00090a f036      brts i2c_read_pair_exit
+0008fe d03f      rcall i2c_send_address_r
+0008ff f036      brts i2c_read_pair_exit
                  
-00090b d056      rcall i2c_receive_byte_ack
-00090c f026      brts i2c_read_pair_exit
-00090d 2f10      mov r17, r16
+000900 d056      rcall i2c_receive_byte_ack
+000901 f026      brts i2c_read_pair_exit
+000902 2f10      mov r17, r16
                  
-00090e d061      rcall i2c_receive_byte_nack
-00090f f00e      brts i2c_read_pair_exit
+000903 d061      rcall i2c_receive_byte_nack
+000904 f00e      brts i2c_read_pair_exit
                  ;
-000910 d070      rcall i2c_send_stop
+000905 d070      rcall i2c_send_stop
                  ;
                  i2c_read_pair_exit:
-000911 9508      ret
+000906 9508      ret
                  
                  ;in: r16 - data, r17 - addr
                  i2c_write:
-000912 930f      push r16
-000913 931f      push r17
+000907 930f      push r16
+000908 931f      push r17
                  ;
-000914 9300 0076 sts TEMP1, r16
+000909 9300 0076 sts TEMP1, r16
                  ;
-000916 d00d      rcall i2c_send_start
-000917 f04e      brts i2c_write_exit
+00090b d00d      rcall i2c_send_start
+00090c f04e      brts i2c_write_exit
                  ;
-000918 d023      rcall i2c_send_address_w
-000919 f03e      brts i2c_write_exit
+00090d d023      rcall i2c_send_address_w
+00090e f03e      brts i2c_write_exit
                  ;
-00091a d03b      rcall i2c_send_byte
-00091b f02e      brts i2c_write_exit
+00090f d03b      rcall i2c_send_byte
+000910 f02e      brts i2c_write_exit
                  ;
-00091c 9110 0076 lds r17, TEMP1
-00091e d037      rcall i2c_send_byte
-00091f f00e      brts i2c_write_exit
+000911 9110 0076 lds r17, TEMP1
+000913 d037      rcall i2c_send_byte
+000914 f00e      brts i2c_write_exit
                  ;
-000920 d060      rcall i2c_send_stop
+000915 d060      rcall i2c_send_stop
                  ;
                  i2c_write_exit:
-000921 911f      pop r17
-000922 910f      pop r16
-000923 9508      ret
+000916 911f      pop r17
+000917 910f      pop r16
+000918 9508      ret
                  
                  i2c_send_start:
-000924 94e8      clt
+000919 94e8      clt
                  ;set start bit
-000925 ea04      ldi r16, (1<<TWINT)|(1<<TWSTA)|(1<<TWEN)
-000926 bf06      out TWCR, r16
+00091a ea04      ldi r16, (1<<TWINT)|(1<<TWSTA)|(1<<TWEN)
+00091b bf06      out TWCR, r16
                  ;wait
                  i1:
-000927 b706      in r16,TWCR
-000928 ff07      sbrs r16,TWINT
-000929 cffd      rjmp i1
+00091c b706      in r16,TWCR
+00091d ff07      sbrs r16,TWINT
+00091e cffd      rjmp i1
                  ;process result
-00092a b101      in r16,TWSR
-00092b 7f08      andi r16, 0xF8
-00092c 3008      cpi r16, START
-00092d f409      brne i2
-00092e 9508      ret
+00091f b101      in r16,TWSR
+000920 7f08      andi r16, 0xF8
+000921 3008      cpi r16, START
+000922 f409      brne i2
+000923 9508      ret
                  i2:
-00092f 9468      set
-000930 9508      ret
+000924 9468      set
+000925 9508      ret
                  
                  i2c_send_repeat_start:
-000931 94e8      clt
+000926 94e8      clt
                  ;set start bit
-000932 ea04      ldi r16, (1<<TWINT)|(1<<TWSTA)|(1<<TWEN)
-000933 bf06      out TWCR, r16
+000927 ea04      ldi r16, (1<<TWINT)|(1<<TWSTA)|(1<<TWEN)
+000928 bf06      out TWCR, r16
                  ;wait
                  i9:
-000934 b706      in r16,TWCR
-000935 ff07      sbrs r16,TWINT
-000936 cffd      rjmp i9
+000929 b706      in r16,TWCR
+00092a ff07      sbrs r16,TWINT
+00092b cffd      rjmp i9
                  ;process result
-000937 b101      in r16,TWSR
-000938 7f08      andi r16, 0xF8
-000939 3100      cpi r16, RESTART
-00093a f7a1      brne i2
-00093b 9508      ret
+00092c b101      in r16,TWSR
+00092d 7f08      andi r16, 0xF8
+00092e 3100      cpi r16, RESTART
+00092f f7a1      brne i2
+000930 9508      ret
                  
                  i2c_send_address_w:
-00093c 94e8      clt
-00093d ed00      ldi r16, ADDRESS_WRITE
-00093e b903      out TWDR, r16
-00093f e804      ldi r16, (1<<TWINT) | (1<<TWEN)
-000940 bf06      out TWCR, r16
+000931 94e8      clt
+000932 ed00      ldi r16, ADDRESS_WRITE
+000933 b903      out TWDR, r16
+000934 e804      ldi r16, (1<<TWINT) | (1<<TWEN)
+000935 bf06      out TWCR, r16
                  ;
                  i5:
-000941 b706      in r16,TWCR
-000942 ff07      sbrs r16,TWINT
-000943 cffd      rjmp i5
+000936 b706      in r16,TWCR
+000937 ff07      sbrs r16,TWINT
+000938 cffd      rjmp i5
                  ;
-000944 b101      in r16,TWSR
-000945 7f08      andi r16, 0xF8
-000946 3108      cpi r16, SLA_W_ACK
-000947 f739      brne i2
-000948 9508      ret
+000939 b101      in r16,TWSR
+00093a 7f08      andi r16, 0xF8
+00093b 3108      cpi r16, SLA_W_ACK
+00093c f739      brne i2
+00093d 9508      ret
                  
                  i2c_send_address_r:
-000949 94e8      clt
-00094a ed01      ldi r16, ADDRESS_READ
-00094b b903      out TWDR, r16
-00094c e804      ldi r16, (1<<TWINT) | (1<<TWEN)
-00094d bf06      out TWCR, r16
+00093e 94e8      clt
+00093f ed01      ldi r16, ADDRESS_READ
+000940 b903      out TWDR, r16
+000941 e804      ldi r16, (1<<TWINT) | (1<<TWEN)
+000942 bf06      out TWCR, r16
                  ;
                  i3:
-00094e b706      in r16,TWCR
-00094f ff07      sbrs r16,TWINT
-000950 cffd      rjmp i3
+000943 b706      in r16,TWCR
+000944 ff07      sbrs r16,TWINT
+000945 cffd      rjmp i3
                  ;
-000951 b101      in r16,TWSR
-000952 7f08      andi r16, 0xF8
-000953 3400      cpi r16, SLA_R_ACK
-000954 f6d1      brne i2
-000955 9508      ret
+000946 b101      in r16,TWSR
+000947 7f08      andi r16, 0xF8
+000948 3400      cpi r16, SLA_R_ACK
+000949 f6d1      brne i2
+00094a 9508      ret
                  
                  ;data - r17
                  i2c_send_byte:
-000956 94e8      clt
-000957 b913      out TWDR, r17
-000958 e804      ldi r16, (1<<TWINT) | (1<<TWEN)
-000959 bf06      out TWCR, r16
+00094b 94e8      clt
+00094c b913      out TWDR, r17
+00094d e804      ldi r16, (1<<TWINT) | (1<<TWEN)
+00094e bf06      out TWCR, r16
                  ;
                  i6:
-00095a b706      in r16,TWCR
-00095b ff07      sbrs r16,TWINT
-00095c cffd      rjmp i6
+00094f b706      in r16,TWCR
+000950 ff07      sbrs r16,TWINT
+000951 cffd      rjmp i6
                  ;
-00095d b101      in r16,TWSR
-00095e 7f08      andi r16, 0xF8
-00095f 3208      cpi r16, BYTE_ACK
-000960 f671      brne i2
-000961 9508      ret
+000952 b101      in r16,TWSR
+000953 7f08      andi r16, 0xF8
+000954 3208      cpi r16, BYTE_ACK
+000955 f671      brne i2
+000956 9508      ret
                  
                  i2c_receive_byte_ack:
-000962 931f      push r17
+000957 931f      push r17
                  ;
-000963 94e8      clt
-000964 ec14      ldi r17, (1<<TWEA) | (1<<TWINT) | (1<<TWEN)
-000965 bf16      out TWCR, r17
+000958 94e8      clt
+000959 ec14      ldi r17, (1<<TWEA) | (1<<TWINT) | (1<<TWEN)
+00095a bf16      out TWCR, r17
                  ;
                  i7:
-000966 b716      in r17,TWCR
-000967 ff17      sbrs r17,TWINT
-000968 cffd      rjmp i7
+00095b b716      in r17,TWCR
+00095c ff17      sbrs r17,TWINT
+00095d cffd      rjmp i7
                  ;
-000969 b111      in r17,TWSR
-00096a 7f18      andi r17, 0xF8
-00096b 3510      cpi r17, RECEIVE_BYTE
-00096c f611      brne i2
+00095e b111      in r17,TWSR
+00095f 7f18      andi r17, 0xF8
+000960 3510      cpi r17, RECEIVE_BYTE
+000961 f611      brne i2
                  ;
-00096d b103      in r16, TWDR
+000962 b103      in r16, TWDR
                  ;
-00096e 911f      pop r17
-00096f 9508      ret
+000963 911f      pop r17
+000964 9508      ret
                  
                  i2c_receive_byte_nack:
-000970 931f      push r17
+000965 931f      push r17
                  ;
-000971 94e8      clt
-000972 e814      ldi r17, (1<<TWINT) | (1<<TWEN)
-000973 bf16      out TWCR, r17
+000966 94e8      clt
+000967 e814      ldi r17, (1<<TWINT) | (1<<TWEN)
+000968 bf16      out TWCR, r17
                  ;
                  i8:
-000974 b716      in r17,TWCR
-000975 ff17      sbrs r17,TWINT
-000976 cffd      rjmp i8
+000969 b716      in r17,TWCR
+00096a ff17      sbrs r17,TWINT
+00096b cffd      rjmp i8
                  ;
-000977 b111      in r17,TWSR
-000978 7f18      andi r17, 0xF8
-000979 3518      cpi r17, RECEIVE_BYTE_NACK
-00097a f419      brne i10
+00096c b111      in r17,TWSR
+00096d 7f18      andi r17, 0xF8
+00096e 3518      cpi r17, RECEIVE_BYTE_NACK
+00096f f419      brne i10
                  ;
-00097b b103      in r16, TWDR
+000970 b103      in r16, TWDR
                  ;
-00097c 911f      pop r17
-00097d 9508      ret
+000971 911f      pop r17
+000972 9508      ret
                  i10:
-00097e 9468      set
+000973 9468      set
                  ;
-00097f 911f      pop r17
-000980 9508      ret
+000974 911f      pop r17
+000975 9508      ret
                  
                  i2c_send_stop:
-000981 930f      push r16
+000976 930f      push r16
                  ;
-000982 e904      ldi r16, (1<<TWINT)|(1<<TWEN)|(1<<TWSTO)
-000983 bf06      out TWCR, r16
+000977 e904      ldi r16, (1<<TWINT)|(1<<TWEN)|(1<<TWSTO)
+000978 bf06      out TWCR, r16
                  ;
                  i12:
-000984 b706      in r16, TWCR
-000985 fd04      sbrc r16,TWSTO
-000986 cffd      rjmp i12
+000979 b706      in r16, TWCR
+00097a fd04      sbrc r16,TWSTO
+00097b cffd      rjmp i12
                  ;
-000987 910f      pop r16
+00097c 910f      pop r16
                  #include "DS1307.asm"
-000988 9508      
+00097d 9508      
                  #define SECONDS_TKREG 0x00
                  #define MINUTES_TKREG 0x01
                  #define HOURS_TKREG 0x02
@@ -3934,57 +3931,57 @@ main.asm(192): Including file 'EEPROM.asm'
                  
                  ds1307_init:
                  ;--start oscillator--
-000989 e010      ldi r17, SECONDS_TKREG
-00098a df68      rcall i2c_read
-00098b f0fe      brts ds1307_err
-00098c ff07      sbrs r16, 7
-00098d c003      rjmp d1
-00098e 770f      cbr r16, 0b10000000
-00098f e010      ldi r17, SECONDS_TKREG
-000990 df81      rcall i2c_write
+00097e e010      ldi r17, SECONDS_TKREG
+00097f df68      rcall i2c_read
+000980 f0fe      brts ds1307_err
+000981 ff07      sbrs r16, 7
+000982 c003      rjmp d1
+000983 770f      cbr r16, 0b10000000
+000984 e010      ldi r17, SECONDS_TKREG
+000985 df81      rcall i2c_write
                  d1:
-000991 e000      ldi r16, 0b00000000
-000992 e017      ldi r17, CONTROL_TKREG
-000993 df7e      rcall i2c_write
-000994 f0b6      brts ds1307_err
+000986 e000      ldi r16, 0b00000000
+000987 e017      ldi r17, CONTROL_TKREG
+000988 df7e      rcall i2c_write
+000989 f0b6      brts ds1307_err
                  ;--read params--
                  ;modbus address
                  ;target temperatute
-000995 e018      ldi r17, TTARGET_TKREG
-000996 df5c      rcall i2c_read
-000997 f09e      brts ds1307_err
-000998 2300      tst r16
-000999 f009      breq readBg
-00099a 2f60      mov TTARGET_REG, r16
+00098a e018      ldi r17, TTARGET_TKREG
+00098b df5c      rcall i2c_read
+00098c f09e      brts ds1307_err
+00098d 2300      tst r16
+00098e f009      breq readBg
+00098f 2f60      mov TTARGET_REG, r16
                  ;brightness
                  readBg:
-00099b e019      ldi r17, BRIGHTNESS_TKREG
-00099c df56      rcall i2c_read
-00099d f06e      brts ds1307_err
-00099e 3000      cpi r16, MIN_BRIGHTNESS
-00099f f008      brlo ds1307_init_exit
-0009a0 bd03      out OCR2, r16
+000990 e019      ldi r17, BRIGHTNESS_TKREG
+000991 df56      rcall i2c_read
+000992 f06e      brts ds1307_err
+000993 3000      cpi r16, MIN_BRIGHTNESS
+000994 f008      brlo ds1307_init_exit
+000995 bd03      out OCR2, r16
                  ;
                  ds1307_init_exit:
-0009a1 9508      ret
+000996 9508      ret
                  
                  ds1307_savetargettemp:
-0009a2 2f06      mov r16, TTARGET_REG
-0009a3 e018      ldi r17, TTARGET_TKREG
-0009a4 df6d      rcall i2c_write
-0009a5 f02e      brts ds1307_err
-0009a6 9508      ret
+000997 2f06      mov r16, TTARGET_REG
+000998 e018      ldi r17, TTARGET_TKREG
+000999 df6d      rcall i2c_write
+00099a f02e      brts ds1307_err
+00099b 9508      ret
                  
                  ds1307_savebrightness:
-0009a7 e019      ldi r17, BRIGHTNESS_TKREG
-0009a8 df69      rcall i2c_write
-0009a9 f00e      brts ds1307_err
-0009aa 9508      ret
+00099c e019      ldi r17, BRIGHTNESS_TKREG
+00099d df69      rcall i2c_write
+00099e f00e      brts ds1307_err
+00099f 9508      ret
                  
                  ds1307_err:
-0009ab 6074      sbr ERRORL_REG, 1 << ERRORL_I2C
+0009a0 6074      sbr ERRORL_REG, 1 << ERRORL_I2C
                  #include "EEPROM.asm"
-0009ac 9508      
+0009a1 9508      
 
 
 RESOURCE USE INFORMATION
@@ -4004,37 +4001,37 @@ counted separately from r26..r31 here.
 ATmega8 register use summary:
 r0 :   1 r1 :   0 r2 :  45 r3 :   2 r4 :   2 r5 :   1 r6 :   3 r7 :   1 
 r8 :  10 r9 :   8 r10:  11 r11:   9 r12:  12 r13:   7 r14:   6 r15:   6 
-r16: 596 r17: 273 r18:  30 r19:  32 r20:  10 r21:   3 r22:  17 r23:  12 
+r16: 590 r17: 275 r18:  30 r19:  32 r20:  11 r21:   3 r22:  17 r23:  12 
 r24:  17 r25:  46 r26:  31 r27:  31 r28:  19 r29:  25 r30:  33 r31:  30 
 x  :   2 y  :   2 z  :  31 
 Registers used: 34 out of 35 (97.1%)
 
 ATmega8 instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   5 add   :  11 adiw  :   0 and   :   0 
-andi  :  26 asr   :   0 bclr  :   0 bld   :   1 brbc  :   0 brbs  :   0 
-brcc  :   2 brcs  :   0 breq  :  26 brge  :   4 brhc  :   0 brhs  :   0 
+andi  :  28 asr   :   0 bclr  :   0 bld   :   1 brbc  :   0 brbs  :   0 
+brcc  :   2 brcs  :   0 breq  :  26 brge  :   5 brhc  :   0 brhs  :   0 
 brid  :   0 brie  :   0 brlo  :  20 brlt  :   3 brmi  :   0 brne  :  77 
 brpl  :   0 brsh  :  20 brtc  :  10 brts  :  27 brvc  :   0 brvs  :   0 
 bset  :   0 bst   :   2 cbi   :  29 cbr   :   5 clc   :   3 clh   :   0 
 cli   :   0 cln   :   0 clr   :  56 cls   :   0 clt   :  13 clv   :   0 
-clz   :   0 com   :   0 cp    :   8 cpc   :   2 cpi   : 109 cpse  :   0 
+clz   :   0 com   :   0 cp    :   8 cpc   :   2 cpi   : 110 cpse  :   0 
 dec   :  12 eor   :   3 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 
-ijmp  :   1 in    :  35 inc   :  30 ld    :  11 ldd   :   0 ldi   : 182 
-lds   :  75 lpm   :   8 lsl   :   9 lsr   :   2 mov   :  52 movw  :  12 
-mul   :   1 muls  :   0 mulsu :   0 neg   :   0 nop   :   5 or    :   6 
+ijmp  :   1 in    :  35 inc   :  31 ld    :  11 ldd   :   0 ldi   : 176 
+lds   :  75 lpm   :   8 lsl   :   9 lsr   :   2 mov   :  52 movw  :  13 
+mul   :   1 muls  :   0 mulsu :   0 neg   :   0 nop   :   5 or    :   7 
 ori   :   1 out   :  71 pop   : 106 push  :  88 rcall : 143 ret   : 117 
 reti  :  14 rjmp  :  97 rol   :   0 ror   :  15 sbc   :   1 sbci  :   0 
-sbi   :  25 sbic  :   2 sbis  :   2 sbiw  :   0 sbr   :  31 sbrc  :  20 
+sbi   :  25 sbic  :   2 sbis  :   1 sbiw  :   0 sbr   :  31 sbrc  :  20 
 sbrs  :  34 sec   :   3 seh   :   0 sei   :   1 sen   :   0 ser   :   5 
 ses   :   0 set   :   6 sev   :   0 sez   :   0 sleep :   0 spm   :   0 
-st    :  19 std   :   0 sts   : 131 sub   :   3 subi  :  11 swap  :   3 
+st    :  19 std   :   0 sts   : 125 sub   :   3 subi  :  11 swap  :   4 
 tst   :  26 wdr   :   1 
 Instructions used: 65 out of 110 (59.1%)
 
 ATmega8 memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00135c   4164    778   4942    8192  60.3%
+[.cseg] 0x000000 0x001346   4142    778   4920    8192  60.1%
 [.dseg] 0x000060 0x000060      0      0      0    1024   0.0%
 [.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 
