@@ -12,7 +12,7 @@ eor r16, r17
 ldi r30, low(auchCRCH*2)
 ldi r31, high(auchCRCH*2)
 add r30, r16
-adc r31, r2
+adc r31, CONST_0
 lpm r17, z
 lds r30, CRCLO
 eor r17, r30

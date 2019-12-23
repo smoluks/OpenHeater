@@ -354,29 +354,29 @@ read_holding_reg:
 cpi r19, 0
 brne h1
  ;modbus address
- lds r16, MODBUS_ADDRESS
- clr r17
+ lds r17, MODBUS_ADDRESS
+ clr r16
  ret
 h1:
 cpi r19, 1
 brne h2
  ;target temperature
- mov r16, TTARGET_REG
- clr r17
+ mov r17, TTARGET_REG
+ clr r16
  ret
 h2:
 cpi r19, 2
 brne h3
  ;mode
- mov r16, MODE_REG
- clr r17
+ mov r17, MODE_REG
+ clr r16
  ret
 h3: 
 cpi r19, 3
 brne h4
  ;brightness
- in r16, OCR2
- clr r17
+ in r17, OCR2
+ clr r16
  ret
 h4:
 cpi r19, 8

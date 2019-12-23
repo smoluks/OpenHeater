@@ -13,8 +13,13 @@
 
 #define MIN_BRIGHTNESS 0
 
-Display_handlers: .DW display_default, display_settemp, display_mode, display_brightness, display_menu
-
+Display_handlers: 
+.DW display_default
+.DW display_settemp
+.DW display_mode
+.DW display_brightness
+.DW display_menu
+ 
 process_display:
 cpi DISPLAY_MODE_REG, DISPLAY_MODE_COUNT
 brsh label_error
@@ -26,6 +31,7 @@ add r30, r16
 adc r31, CONST_0
 lpm r16, z+
 lpm r17, z+
+movw r30, r16
 ijmp
 ;
 label_error:

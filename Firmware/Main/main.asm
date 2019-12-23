@@ -137,6 +137,20 @@ rcall init_18b20
 rcall ds1307_init
 ;
 sei
+;
+ldi r16, 0x00
+sts UART_BUFFER + 0, r16
+ldi r16, 0x03
+sts UART_BUFFER + 1, r16
+ldi r16, 0x00
+sts UART_BUFFER + 2, r16
+ldi r16, 0x00
+sts UART_BUFFER + 3, r16
+ldi r16, 0x00
+sts UART_BUFFER + 4, r16
+ldi r16, 0x01
+sts UART_BUFFER + 5, r16
+rcall process_modbus
 ;rcall selfdignostics
 ;----------main-cycle----------
 main_cycle:

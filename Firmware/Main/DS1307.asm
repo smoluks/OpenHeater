@@ -12,13 +12,13 @@
 #define BRIGHTNESS_TKREG 0x09
 
 ds1307_init:
-;--stop oscillator--
+;--start oscillator--
 ldi r17, SECONDS_TKREG
 rcall i2c_read
 brts ds1307_err
-sbrc r16, 7
+sbrs r16, 7
 rjmp d1
-sbr r16, 0b10000000
+cbr r16, 0b10000000
 ldi r17, SECONDS_TKREG
 rcall i2c_write
 d1:

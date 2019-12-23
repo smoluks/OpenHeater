@@ -60,6 +60,10 @@ brts i2c_read_pair_exit
 rcall i2c_send_address_r
 brts i2c_read_pair_exit
 
+rcall i2c_receive_byte_ack
+brts i2c_read_pair_exit
+mov r17, r16
+
 rcall i2c_receive_byte_nack
 brts i2c_read_pair_exit
 ;
@@ -112,7 +116,6 @@ cpi r16, START
 brne i2
 ret
 i2:
-out UDR, r16
 set
 ret
 
@@ -188,6 +191,8 @@ brne i2
 ret
 
 i2c_receive_byte_ack:
+push r17
+;
 clt
 ldi r17, (1<<TWEA) | (1<<TWINT) | (1<<TWEN)
 out TWCR, r17
@@ -203,9 +208,13 @@ cpi r17, RECEIVE_BYTE
 brne i2
 ;
 in r16, TWDR
+;
+pop r17
 ret
 
 i2c_receive_byte_nack:
+push r17
+;
 clt
 ldi r17, (1<<TWINT) | (1<<TWEN)
 out TWCR, r17
@@ -221,9 +230,13 @@ cpi r17, RECEIVE_BYTE_NACK
 brne i10
 ;
 in r16, TWDR
+;
+pop r17
 ret
 i10:
 set
+;
+pop r17
 ret
 
 i2c_send_stop:
