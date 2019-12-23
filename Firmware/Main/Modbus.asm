@@ -48,8 +48,9 @@ t0_ovf_p:
  sts ACTION, r16
 t0_ovf_exit:
 ;repair all for new packet
-sts CRCLO, CONST_0
-sts CRCHI, CONST_0
+ser r16
+sts CRCLO, r16
+sts CRCHI, r16
 ldi r16, low(UART_BUFFER)
 sts RECV_HANDLE_L, r16
 ldi r16, high(UART_BUFFER)

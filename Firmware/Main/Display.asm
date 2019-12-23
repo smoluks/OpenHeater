@@ -1,28 +1,34 @@
+#define DISPLAY_MODE_COUNT 5
+
 #define DISPLAY_MODE_DEFAULT 0
 #define DISPLAY_MODE_SETTEMP 1
 #define DISPLAY_MODE_SETMODE 2
 #define DISPLAY_MODE_BRIGHTNESS 3
 #define DISPLAY_MODE_MENU 4
 
+#define DISPLAY_MENU_COUNT 2
+
 #define DISPLAY_MENU_BRIGHTNESS 0
+#define DISPLAY_MENU_EXIT 1
 
 #define MIN_BRIGHTNESS 0
 
+Display_handlers: .DW display_default, display_settemp, display_mode, display_brightness, display_menu
+
 process_display:
-cpi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
-breq display_default
-cpi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
-brne label1 
- rjmp display_settemp
-label1: 
-cpi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
-brne label2
- rjmp display_mode
-label2: 
-cpi DISPLAY_MODE_REG, DISPLAY_MODE_BRIGHTNESS
-breq display_brightness
-cpi DISPLAY_MODE_REG, DISPLAY_MODE_MENU
-breq display_menu
+cpi DISPLAY_MODE_REG, DISPLAY_MODE_COUNT
+brsh label_error
+ldi r30, low(Display_handlers * 2)
+ldi r31, high(Display_handlers * 2)
+mov r16, DISPLAY_MODE_REG
+lsl r16
+add r30, r16
+adc r31, CONST_0
+lpm r16, z+
+lpm r17, z+
+ijmp
+;
+label_error:
 sbr ERRORL_REG, 1 << ERRORL_SOFTWARE 
 ret
 
@@ -54,28 +60,72 @@ rjmp showTemperature
 pdi2:
  rjmp showError
 
-
 ;-----------menu---------------
 display_menu:
-;buttons
-;
-;cpi DISPLAY_MENU_REG, DISPLAY_MENU_BRIGHTNESS
-;brne 
- ;--brgihtness--
- sbrs BUTTONS_REG, BUTTON_MODE_FLAG
- rjmp dm1
+;---buttons---
+;+
+sbrc BUTTONS_REG, BUTTON_PLUS_FLAG
+rjmp dm_plus
+sbrs BUTTONS_REG, BUTTON_PLUS_HOLD_FLAG
+rjmp dm1
+ dm_plus:
+ inc DISPLAY_MENU_REG
+ cpi DISPLAY_MENU_REG, DISPLAY_MENU_COUNT
+ brlo dm1
+  clr DISPLAY_MENU_REG
+dm1:
+;-
+sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
+rjmp dm_minus
+sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
+rjmp dm2
+ dm_minus:
+ dec DISPLAY_MENU_REG
+ cpi DISPLAY_MENU_REG, -1
+ brne dm2
+  ldi DISPLAY_MENU_REG, DISPLAY_MENU_COUNT-1
+dm2:
+;mode
+sbrs BUTTONS_REG, BUTTON_MODE_FLAG
+rjmp dm3
+ cpi DISPLAY_MENU_REG, DISPLAY_MENU_BRIGHTNESS
+ brne dm2_1
+  ;go to brightness
   ldi DISPLAY_MODE_REG, DISPLAY_MODE_BRIGHTNESS
- dm1:
- clr BUTTONS_REG
- ;
- sts SEG1, CONST_0
+  rjmp dm3
+ dm2_1:
+  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
+  ;rjmp dm3
+dm3:
+;menu
+sbrs BUTTONS_REG, BUTTON_MENU_FLAG
+rjmp dm4
+ ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
+dm4:
+clr BUTTONS_REG
+;---display
+cpi DISPLAY_MENU_REG, DISPLAY_MENU_BRIGHTNESS
+brne dm5
+ ;bri
+ ldi r16, 0b01101011
+ sts SEG1, r16
+ ldi r16, 0b01000010
+ sts SEG2, r16
+ ldi r16, 0b00000100
+ sts SEG3, r16
+ ldi r16, 0b00000000
+ sts SEG4, r16
+dm5:
+ ;exit
+ ldi r16, 0b01110011
+ sts SEG1, r16
  ldi r16, 0b01110010
  sts SEG2, r16
- ldi r16, 0b10111101
+ ldi r16, 0b00000100
  sts SEG3, r16
- ldi r16, 0b00111101
+ ldi r16, 0b10000111
  sts SEG4, r16
- ret  
+ret  
 
 ;-----------set brightness-----------
 display_brightness:
@@ -269,7 +319,6 @@ showNumber:
 ;-1-
 sts SEG1, CONST_0
 ;-2-
-sts SEG2, CONST_0
 clr r17
 ssn0:
 cpi r16, 100
@@ -278,15 +327,17 @@ brlo ssn1
  subi r16, 100
  rjmp ssn0
 ssn1:
-clt
 tst r17
-breq ssn1n
+breq ssn1p
  set
  rcall convertnumberto7segment2
  sts SEG2, r17
+ rjmp ssn1n
+ssn1p:
+ clt
+ sts SEG2, CONST_0
 ssn1n:
 ;-3-
-sts SEG3, CONST_0
 clr r17
 ssn2:
 cpi r16, 10
@@ -297,10 +348,13 @@ brlo ssn3
 ssn3:
 brts ssn3t
 tst r17
-breq ssn3n
+breq ssn3p
 ssn3t:
-rcall convertnumberto7segment2
-sts SEG3, r17
+ rcall convertnumberto7segment2
+ sts SEG3, r17
+ rjmp ssn3n
+ssn3p: 
+ sts SEG3, CONST_0
 ssn3n:
 ;-4-
 mov r17, r16
