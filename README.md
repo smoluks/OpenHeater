@@ -8,6 +8,7 @@
 - [x] Monitoring and diagnostics over feedback
 - [x] Additional 18b20 оn J1(on heater) or J5(external sensor)
 - [x] Remote control over Modbus on J3
+- [ ] Wifi Modbus TCP-Uart bridge
 #### WARNING: external sensor cause electric shock in current version of power pcb with LNK306. Use alternate power source such as phone charger
 
 #### Toolchain:
