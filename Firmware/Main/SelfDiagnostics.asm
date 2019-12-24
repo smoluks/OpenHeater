@@ -3,6 +3,7 @@ selfdignostics:
 lds r16, SYSTICK
 inc r16
 inc r16
+inc r16
 s1:
 ;timeout
 lds r17, SYSTICK
@@ -31,6 +32,7 @@ cbi portc, 0
 cbi portc, 2
 cbi portd, 2
 lds r16, SYSTICK
+inc r16
 inc r16
 inc r16
 s3:

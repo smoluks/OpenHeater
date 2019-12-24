@@ -40,7 +40,8 @@ ret
 
 ;-----------default-----------
 display_default:
-;buttons
+;---buttons---
+;+ -
 sbrc BUTTONS_REG, BUTTON_PLUS_FLAG
 rjmp pdi3
 sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
@@ -48,16 +49,18 @@ rjmp pdi4
 pdi3:
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
 pdi4:
+;mode
 sbrs BUTTONS_REG, BUTTON_MODE_FLAG
 rjmp pdi5
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
 pdi5:
+;menu
 sbrs BUTTONS_REG, BUTTON_MENU_FLAG
 rjmp pdi6
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_MENU
 pdi6:
 clr BUTTONS_REG
-;display
+;---display---
 tst ERRORL_REG
 brne pdi2
 tst ERRORH_REG 
@@ -109,7 +112,7 @@ rjmp dm4
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 dm4:
 clr BUTTONS_REG
-;---display
+;---display---
 cpi DISPLAY_MENU_REG, DISPLAY_MENU_BRIGHTNESS
 brne dm5
  ;bri
@@ -121,6 +124,7 @@ brne dm5
  sts SEG3, r16
  ldi r16, 0b00000000
  sts SEG4, r16
+ ret
 dm5:
  ;exit
  ldi r16, 0b01110011
@@ -336,7 +340,7 @@ ssn1:
 tst r17
 breq ssn1p
  set
- rcall convertnumberto7segment2
+ rcall convertnumberto7segment1
  sts SEG2, r17
  rjmp ssn1n
 ssn1p:
@@ -395,7 +399,7 @@ breq wt10
  sts SEG1, r17
  rjmp wt11
 wt10:
- sts SEG1, r2	
+ sts SEG1, CONST_0	
 wt11:
 ;
 mov r17, r16

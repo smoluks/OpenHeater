@@ -37,7 +37,7 @@ ldi r16, low(RAMEND)
 out SPL, r16
 ;const
 clr r16
-ldi r17, 10
+ser r17
 movw r2, r16
 ldi r16, TCNT0_START
 ldi r17, TCCR0_START
@@ -52,6 +52,7 @@ ldi r16, MINUS_1SEG
 ldi r17, BUTTON_IDLE
 movw r10, r16
 ldi r16, 5
+ldi r17, 10
 movw r12, r16
 ;gpio
 ldi r16, 0b11111111
@@ -95,7 +96,7 @@ ldi r16, 1
 sts MODBUS_ADDRESS, r16
 ;T0 - modbus timeout 4ms
 ;T1 - button read  + systick 100 ms
-out TCCR1A, r2
+out TCCR1A, CONST_0
 ldi r16, 0b00001011
 out TCCR1B, r16
 ldi r16, 0x30
@@ -103,7 +104,7 @@ out OCR1AH, r16
 ldi r16, 0xD4
 out OCR1AL, r16
 ;T2 - indication
-out TCNT2, r2
+out TCNT2, CONST_0
 ldi r16, 128 ;Brightness
 out OCR2, r16
 ldi r16, 0b00000100 ;F/64

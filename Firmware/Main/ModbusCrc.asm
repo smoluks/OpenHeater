@@ -21,7 +21,7 @@ sts CRCHI, r17
 ldi r30, low(auchCRCL*2)
 ldi r31, high(auchCRCL*2)
 add r30, r16
-adc r31, r2
+adc r31, CONST_0
 lpm r17, z
 sts CRCLO, r17
 ;

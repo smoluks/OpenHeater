@@ -140,7 +140,7 @@ nop
 nop
 nop
 subi r16, 1
-sbc r17, r2
+sbc r17, CONST_0
 brcc ipause;
 ret
 

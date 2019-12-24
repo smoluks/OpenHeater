@@ -4,7 +4,7 @@
 
 ;-----------Regs-----------
 #define CONST_0 r2
-#define CONST_10 r3
+#define CONST_FF r3
 
 #define TCNT0_START 131
 #define CONST_TCNT0_START r4
@@ -22,6 +22,7 @@
 #define CONST_BUTTON_IDLE r11
 
 #define CONST_5 r12
+#define CONST_10 r13
 
 ;Temperature
 #define TLowL_REG  r18
