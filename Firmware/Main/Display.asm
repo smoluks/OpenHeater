@@ -11,8 +11,6 @@
 #define DISPLAY_MENU_BRIGHTNESS 0
 #define DISPLAY_MENU_EXIT 1
 
-#define MIN_BRIGHTNESS 0
-
 Display_handlers: 
 .DW display_default
 .DW display_settemp
@@ -150,15 +148,15 @@ rjmp pdb3
  breq pdb3
   inc r16
   out OCR2, r16
-  rcall ds1307_savetargettemp
+  rcall ds1307_savebrightness
 pdb3:
 sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
 rjmp pdb2
 sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
 rjmp pdb4
  pdb2:
- cpi r16, MIN_BRIGHTNESS
- brlo pdb4
+ cpi r16, 0
+ breq pdb4
   dec r16
   out OCR2, r16
   rcall ds1307_savebrightness

@@ -28,13 +28,16 @@
 
 RESET:
 ;----init----
-clr ERRORL_REG
-clr ERRORH_REG
 ;stack
 ldi r16, high(RAMEND)
 out SPH, r16
 ldi r16, low(RAMEND)
 out SPL, r16
+;wdt
+ldi r16, 0b00011110
+out WDTCR, r16
+ldi r16, 0b00001110
+out WDTCR, r16
 ;const
 clr r16
 ser r17
@@ -73,7 +76,10 @@ ldi BUTTONS_REG, 0
 ldi MODE_REG, MODE_OFF
 ldi DISPLAY_MODE_REG, 0
 ldi DISPLAY_MENU_REG, 0
+clr ERRORL_REG
+clr ERRORH_REG
 ;----ram----
+rcall check_ram
 ser r16
 sts SEG1, r16
 sts SEG2, r16
@@ -122,7 +128,7 @@ out TWCR, r16
 out UCSRA, CONST_0
 ldi r16, 0b11011000
 out UCSRB, r16
-ldi r16, 0b10000110
+ldi r16, 0b10110110
 out UCSRC, r16
 out UBRRH, CONST_0
 ldi r16, 51
@@ -139,7 +145,7 @@ rcall ds1307_init
 ;
 sei
 ;
-rcall selfdignostics
+rcall check_heaters
 ;----------main-cycle----------
 main_cycle:
 wdr

@@ -26,12 +26,12 @@ push r16
 ;stop t0
 out TCCR0, CONST_0
 ;check crc
-;lds r16, CRCHI
-;tst r16
-;brne t0_ovf_exit
-;lds r16, CRCLO
-;tst r16
-;brne t0_ovf_exit
+lds r16, CRCHI
+tst r16
+brne t0_ovf_exit
+lds r16, CRCLO
+tst r16
+brne t0_ovf_exit
 ;check addr
 lds r16, UART_BUFFER + 0
 tst r16
@@ -99,6 +99,9 @@ ldi r16, high(UART_BUFFER)
 sts TRANS_HANDLE_H, r16
 ;start transmit
 rcall USART_TXC
+;
+sts CRCLO, CONST_FF
+sts CRCHI, CONST_FF
 ret
 
 ;IN UART_BUFFER
@@ -261,7 +264,7 @@ tst r16
 brne wsr1
 lds r16, UART_BUFFER + 3 ;RegAddrLo
 cpi r16, MODBUS_HOLDING_REGS_COUNT
-brsh wsr2
+brlo wsr2
 wsr1:	
  ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
  ret

@@ -1,5 +1,34 @@
-selfdignostics:
-;-----check heaters-----
+check_ram:
+in r16, MCUCSR
+sbrs r16, WDRF
+rjmp init0
+ sbr ERRORH_REG, 1 << ERRORH_WATCHDOG
+init0:
+;
+ldi r30, 0x60
+clr r31
+cr1:
+st z, CONST_FF
+ld r16, z
+cpi r16, 0xFF
+brne check_ram_error
+st z, CONST_0
+ld r16, z
+cpi r16, 0x00
+brne check_ram_error
+adiw r30, 1
+;
+cpi r31, 0x04
+brne cr1
+cpi r30, 0x5E
+brne cr1
+;
+ret
+check_ram_error:
+ sbr ERRORH_REG, 1 << ERRORH_RAM
+ret
+
+check_heaters:
 lds r16, SYSTICK
 inc r16
 inc r16
@@ -32,6 +61,8 @@ cbi portc, 0
 cbi portc, 2
 cbi portd, 2
 lds r16, SYSTICK
+inc r16
+inc r16
 inc r16
 inc r16
 inc r16

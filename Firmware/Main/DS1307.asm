@@ -40,8 +40,6 @@ readBg:
 ldi r17, BRIGHTNESS_TKREG
 rcall i2c_read
 brts ds1307_err
-cpi r16, MIN_BRIGHTNESS
-brlo ds1307_init_exit
 out OCR2, r16
 ;
 ds1307_init_exit:

@@ -12,7 +12,7 @@ andi r16, 0b11110000
 andi r17, 0b00001111
 or r16, r17
 swap r16
-cpi r16, 70
+cpi r16, 60
 brge logic_off
 ;temperature low
 movw r16, TLowL_REG

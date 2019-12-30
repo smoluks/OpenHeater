@@ -15,8 +15,8 @@
   <FILE GROUP="Source Files" NAME="Indication.asm"/>
   <FILE GROUP="Source Files" NAME="logic.asm"/>
   <FILE GROUP="Source Files" NAME="Modbus.asm"/>
-  <FILE GROUP="Source Files" NAME="ModbusCrc.asm"/>
   <FILE GROUP="Source Files" NAME="RamMapping.asm"/>
+  <FILE GROUP="Source Files" NAME="ModbusCrc.asm"/>
   <FILE GROUP="Source Files" NAME="SelfDiagnostics.asm"/>
   <FILE GROUP="Source Files" NAME="Systick.asm"/>
   <FILE GROUP="Source Files" NAME="Uart.asm"/>

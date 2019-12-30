@@ -87,6 +87,8 @@ push r13
 push r14
 push r15
 push r22
+push r26
+push r27
 push r28
 push r29
 push r30
@@ -98,8 +100,8 @@ ldi THighH_REG, 0x80
 ldi THighL_REG, 0x00
 ;
 lds r22, D18B20_COUNT
-ldi r28, low(D18B20_TEMPERATURES)
-ldi r29, high(D18B20_TEMPERATURES)
+ldi r26, low(D18B20_TEMPERATURES)
+ldi r27, high(D18B20_TEMPERATURES)
 ldi r30, low(D18B20_ADDRESSES)
 ldi r31, high(D18B20_ADDRESSES)
 ;
@@ -115,8 +117,8 @@ ld r15, z+
 rcall read_single_18b20
 brts read_18b20_fail
 ;store
-st y+, r17
-st y+, r16
+st x+, r17
+st x+, r16
 ;
 cp r17, TLowL_REG
 cpc r16, TLowH_REG
@@ -151,6 +153,8 @@ pop r31
 pop r30
 pop r29
 pop r28
+pop r27
+pop r26
 pop r22
 pop r15
 pop r14
