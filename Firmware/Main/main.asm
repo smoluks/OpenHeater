@@ -139,7 +139,9 @@ rcall ds1307_init
 ;
 sei
 ;
+.IFNDEF DEBUG
 rcall selfdignostics
+.ENDIF
 ;----------main-cycle----------
 main_cycle:
 wdr

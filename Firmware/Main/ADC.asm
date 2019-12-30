@@ -30,7 +30,12 @@ reti
 ;buttons
 adc_buttons: 
 in r16, ADCH
+lds r17, BUTTONS_TEMP1
+brne adc_buttons1
 sts BUTTONS_ADC, r16
+adc_buttons1:
+sts BUTTONS_TEMP1, r16
+;
 out ADMUX, CONST_ADMUX_FEEDBACK1
 sbi ADCSRA, ADSC
 ;
@@ -40,12 +45,17 @@ pop r16
 reti
 
 adc_feedback1:
-cbr FEEDBACK_REG, 1 << FEEDBACK1
 in r16, ADCH
 cpi r16, FEEDBACK_LEVEL
-brlo adc1
- sbr FEEDBACK_REG, 1 << FEEDBACK1
-adc1: 
+brlo adc_fb1
+ lds r16, FEEDBACKS
+ sbr r16, 1 << FEEDBACK1
+ rjmp adc_fb2 
+adc_fb1:
+ lds r16, FEEDBACKS
+ cbr r16, 1 << FEEDBACK1
+adc_fb2:
+sts FEEDBACKS, r16
 out ADMUX, CONST_ADMUX_FEEDBACK2
 sbi ADCSRA, ADSC
 ; 
@@ -55,12 +65,17 @@ pop r16
 reti
 
 adc_feedback2:
-cbr FEEDBACK_REG, 1 << FEEDBACK2
 in r16, ADCH
 cpi r16, FEEDBACK_LEVEL
-brlo adc2
- sbr FEEDBACK_REG, 1 << FEEDBACK2
-adc2: 
+brlo adc_fb3
+ lds r16, FEEDBACKS
+ sbr r16, 1 << FEEDBACK2
+ rjmp adc_fb4 
+adc_fb3:
+ lds r16, FEEDBACKS
+ cbr r16, 1 << FEEDBACK2
+adc_fb4:
+sts FEEDBACKS, r16
 out ADMUX, CONST_ADMUX_FEEDBACK3
 sbi ADCSRA, ADSC
 ; 
@@ -70,12 +85,17 @@ pop r16
 reti
 
 adc_feedback3:
-cbr FEEDBACK_REG, 1 << FEEDBACK3
 in r16, ADCH
 cpi r16, FEEDBACK_LEVEL
-brlo adc3
- sbr FEEDBACK_REG, 1 << FEEDBACK3
-adc3: 
+brlo adc_fb5
+ lds r16, FEEDBACKS
+ sbr r16, 1 << FEEDBACK3
+ rjmp adc_fb6 
+adc_fb5:
+ lds r16, FEEDBACKS
+ cbr r16, 1 << FEEDBACK3
+adc_fb6:
+sts FEEDBACKS, r16
 out ADMUX, CONST_ADMUX_BUTTONS
 sbi ADCSRA, ADSC
 ; 

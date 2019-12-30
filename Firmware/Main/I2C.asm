@@ -38,6 +38,7 @@ brts i2c_read_exit
 ;
 rcall i2c_send_stop
 ;
+clt
 i2c_read_exit:
 ret
 
@@ -69,7 +70,46 @@ brts i2c_read_pair_exit
 ;
 rcall i2c_send_stop
 ;
+clt
 i2c_read_pair_exit:
+ret
+
+;in: r17 - addr, r18 - count, Z - buffer
+i2c_read_buffer:
+;
+rcall i2c_send_start
+brts i2c_read_buffer_exit
+;
+rcall i2c_send_address_w
+brts i2c_read_buffer_exit
+;addr
+rcall i2c_send_byte
+brts i2c_read_buffer_exit
+;
+rcall i2c_send_repeat_start
+brts i2c_read_buffer_exit
+;
+rcall i2c_send_address_r
+brts i2c_read_buffer_exit
+;
+i2c_read_buffer_cycle:
+cpi r18, 1
+breq i30
+ rcall i2c_receive_byte_ack
+ brts i2c_read_buffer_exit
+ rjmp i31
+i30: 
+ rcall i2c_receive_byte_nack
+ brts i2c_read_buffer_exit
+i31: 
+st z+, r16
+dec r18
+brne i2c_read_buffer_cycle
+;
+rcall i2c_send_stop
+;
+clt
+i2c_read_buffer_exit:
 ret
 
 ;in: r16 - data, r17 - addr
@@ -94,161 +134,35 @@ brts i2c_write_exit
 ;
 rcall i2c_send_stop
 ;
+clt
 i2c_write_exit:
 pop r17
 pop r16
 ret
 
-i2c_send_start:
-clt
-;set start bit
-ldi r16, (1<<TWINT)|(1<<TWSTA)|(1<<TWEN)
-out TWCR, r16
-;wait
-i1:
-in r16,TWCR
-sbrs r16,TWINT
-rjmp i1
-;process result
-in r16,TWSR
-andi r16, 0xF8
-cpi r16, START
-brne i2
-ret
-i2:
-set
-ret
-
-i2c_send_repeat_start:
-clt
-;set start bit
-ldi r16, (1<<TWINT)|(1<<TWSTA)|(1<<TWEN)
-out TWCR, r16
-;wait
-i9:
-in r16,TWCR
-sbrs r16,TWINT
-rjmp i9
-;process result
-in r16,TWSR
-andi r16, 0xF8
-cpi r16, RESTART
-brne i2
-ret
-
-i2c_send_address_w:
-clt
-ldi r16, ADDRESS_WRITE
-out TWDR, r16
-ldi r16, (1<<TWINT) | (1<<TWEN)
-out TWCR, r16
+;in: r18 - count, r17 - addr
+i2c_flush:
 ;
-i5:
-in r16,TWCR
-sbrs r16,TWINT
-rjmp i5
+rcall i2c_send_start
+brts i2c_flush_exit
 ;
-in r16,TWSR
-andi r16, 0xF8
-cpi r16, SLA_W_ACK
-brne i2
-ret
-
-i2c_send_address_r:
-clt
-ldi r16, ADDRESS_READ
-out TWDR, r16
-ldi r16, (1<<TWINT) | (1<<TWEN)
-out TWCR, r16
+rcall i2c_send_address_w
+brts i2c_flush_exit
 ;
-i3:
-in r16,TWCR
-sbrs r16,TWINT
-rjmp i3
+rcall i2c_send_byte
+brts i2c_write_exit
 ;
-in r16,TWSR
-andi r16, 0xF8
-cpi r16, SLA_R_ACK
-brne i2
-ret
-
-;data - r17
-i2c_send_byte:
-clt
-out TWDR, r17
-ldi r16, (1<<TWINT) | (1<<TWEN)
-out TWCR, r16
+ldi r17, 0x00
+i2c_flush_cycle:
+rcall i2c_send_byte
+brts i2c_flush_exit
+dec r18
+brne i2c_flush_cycle
 ;
-i6:
-in r16,TWCR
-sbrs r16,TWINT
-rjmp i6
-;
-in r16,TWSR
-andi r16, 0xF8
-cpi r16, BYTE_ACK
-brne i2
-ret
-
-i2c_receive_byte_ack:
-push r17
+rcall i2c_send_stop
 ;
 clt
-ldi r17, (1<<TWEA) | (1<<TWINT) | (1<<TWEN)
-out TWCR, r17
-;
-i7:
-in r17,TWCR
-sbrs r17,TWINT
-rjmp i7
-;
-in r17,TWSR
-andi r17, 0xF8
-cpi r17, RECEIVE_BYTE
-brne i2
-;
-in r16, TWDR
-;
-pop r17
+i2c_flush_exit:
 ret
 
-i2c_receive_byte_nack:
-push r17
-;
-clt
-ldi r17, (1<<TWINT) | (1<<TWEN)
-out TWCR, r17
-;
-i8:
-in r17,TWCR
-sbrs r17,TWINT
-rjmp i8
-;
-in r17,TWSR
-andi r17, 0xF8
-cpi r17, RECEIVE_BYTE_NACK
-brne i10
-;
-in r16, TWDR
-;
-pop r17
-ret
-i10:
-set
-;
-pop r17
-ret
-
-i2c_send_stop:
-push r16
-;
-ldi r16, (1<<TWINT)|(1<<TWEN)|(1<<TWSTO)
-out TWCR, r16
-;
-i12:
-in r16, TWCR
-sbrc r16,TWSTO
-rjmp i12
-;
-pop r16
-ret
+#include "I2CRoutine.asm"

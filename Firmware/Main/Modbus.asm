@@ -26,12 +26,12 @@ push r16
 ;stop t0
 out TCCR0, CONST_0
 ;check crc
-;lds r16, CRCHI
-;tst r16
-;brne t0_ovf_exit
-;lds r16, CRCLO
-;tst r16
-;brne t0_ovf_exit
+lds r16, CRCHI
+tst r16
+brne t0_ovf_exit
+lds r16, CRCLO
+tst r16
+brne t0_ovf_exit
 ;check addr
 lds r16, UART_BUFFER + 0
 tst r16
