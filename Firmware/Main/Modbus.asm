@@ -456,7 +456,7 @@ brne ws4
  cpi r16, MODE_COUNT
  brsh data_error
  out OCR2, r16
- rcall ds1307_savebrightness
+ rcall save_brightness
  ;
  clr r17
  ret

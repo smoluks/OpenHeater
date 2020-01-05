@@ -4,7 +4,6 @@ push r17
 in r16, SREG
 push r16
 ;
-;
 lds r16, SYSTICK
 inc r16
 sts SYSTICK, r16
