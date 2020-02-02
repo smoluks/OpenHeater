@@ -1,6 +1,6 @@
 # OpenHeater
 3-channel controller for oil-filled heater based on ATMEGA8 & 18B20
-![Photo](/Docs/E.png)
+![Photo](/Docs/Wiki/PCBs.png) ![Photo](/Docs/Wiki/Disassembled.png)
 
 #### Roadmap:
 - [x] PCB
@@ -18,6 +18,8 @@ Heater - polaris PRE C 1129 HF
 
 #### Building:
 - Make PCB
+- Build firmware
+- Assembly
 
 Main:
 ![Main](/Docs/Schemas/Main.png)
