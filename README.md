@@ -17,15 +17,4 @@ Firmware - AVRASM
 Heater - polaris PRE C 1129 HF
 
 #### Building:
-see wiki: ttps://github.com/smoluks/OpenHeater/wiki
-
-Main:
-![Main](/Docs/Schemas/Main.png)
-Power:
-![Power](/Docs/Schemas/Power.png)
-Remote (if needed)
-![Remote_WIFI](/Docs/Schemas/Remote_WIFI.png)
-- Flash Atmega8 with USBASP or similarly
-- Assemble the heater
-![Common](/Docs/Schemas/Common.png)
-
+[see wiki](https://github.com/smoluks/OpenHeater/wiki)
