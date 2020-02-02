@@ -1,6 +1,6 @@
 # OpenHeater
 3-channel controller for oil-filled heater based on ATMEGA8 & 18B20
-![Photo](/Docs/Wiki/PCBs.png) ![Photo](/Docs/Wiki/Disassembled.png)
+![Photo](/Docs/Wiki/PCBs.png)
 
 #### Roadmap:
 - [x] PCB
