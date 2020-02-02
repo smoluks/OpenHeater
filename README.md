@@ -17,9 +17,7 @@ Firmware - AVRASM
 Heater - polaris PRE C 1129 HF
 
 #### Building:
-- Make PCB
-- Build firmware
-- Assembly
+see wiki: ttps://github.com/smoluks/OpenHeater/wiki
 
 Main:
 ![Main](/Docs/Schemas/Main.png)
