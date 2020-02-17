@@ -11,6 +11,8 @@
 #define DISPLAY_MENU_BRIGHTNESS 0
 #define DISPLAY_MENU_EXIT 1
 
+#define MIN_BRIGHTNESS 0
+
 Display_handlers: 
 .DW display_default
 .DW display_settemp
@@ -39,25 +41,27 @@ ret
 ;-----------default-----------
 display_default:
 ;---buttons---
+lds r16, BUTTONS_PRESSED
 ;+ -
-sbrc BUTTONS_REG, BUTTON_PLUS_FLAG
+sbrc r16, BUTTON_PLUS_FLAG
 rjmp pdi3
-sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
+sbrs r16, BUTTON_MINUS_FLAG
 rjmp pdi4
 pdi3:
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
 pdi4:
 ;mode
-sbrs BUTTONS_REG, BUTTON_MODE_FLAG
+sbrs r16, BUTTON_MODE_FLAG
 rjmp pdi5
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
 pdi5:
 ;menu
-sbrs BUTTONS_REG, BUTTON_MENU_FLAG
+sbrs r16, BUTTON_MENU_FLAG
 rjmp pdi6
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_MENU
 pdi6:
-clr BUTTONS_REG
+;
+sts BUTTONS_PRESSED, CONST_0
 ;---display---
 tst ERRORL_REG
 brne pdi2
@@ -70,10 +74,11 @@ pdi2:
 ;-----------menu---------------
 display_menu:
 ;---buttons---
+lds r16, BUTTONS_PRESSED
 ;+
-sbrc BUTTONS_REG, BUTTON_PLUS_FLAG
+sbrc r16, BUTTON_PLUS_FLAG
 rjmp dm_plus
-sbrs BUTTONS_REG, BUTTON_PLUS_HOLD_FLAG
+sbrs r16, BUTTON_PLUS_HOLD_FLAG
 rjmp dm1
  dm_plus:
  inc DISPLAY_MENU_REG
@@ -82,9 +87,9 @@ rjmp dm1
   clr DISPLAY_MENU_REG
 dm1:
 ;-
-sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
+sbrc r16, BUTTON_MINUS_FLAG
 rjmp dm_minus
-sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
+sbrs r16, BUTTON_MINUS_HOLD_FLAG
 rjmp dm2
  dm_minus:
  dec DISPLAY_MENU_REG
@@ -93,7 +98,7 @@ rjmp dm2
   ldi DISPLAY_MENU_REG, DISPLAY_MENU_COUNT-1
 dm2:
 ;mode
-sbrs BUTTONS_REG, BUTTON_MODE_FLAG
+sbrs r16, BUTTON_MODE_FLAG
 rjmp dm3
  cpi DISPLAY_MENU_REG, DISPLAY_MENU_BRIGHTNESS
  brne dm2_1
@@ -105,11 +110,12 @@ rjmp dm3
   ;rjmp dm3
 dm3:
 ;menu
-sbrs BUTTONS_REG, BUTTON_MENU_FLAG
+sbrs r16, BUTTON_MENU_FLAG
 rjmp dm4
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 dm4:
-clr BUTTONS_REG
+;
+sts BUTTONS_PRESSED, CONST_0
 ;---display---
 cpi DISPLAY_MENU_REG, DISPLAY_MENU_BRIGHTNESS
 brne dm5
@@ -137,48 +143,51 @@ ret
 
 ;-----------set brightness-----------
 display_brightness:
-in r16, OCR2
+lds r16, BUTTONS_PRESSED
+in r17, OCR2
 ;buttons
-sbrc BUTTONS_REG, BUTTON_PLUS_FLAG
+sbrc r16, BUTTON_PLUS_FLAG
 rjmp pdb1
-sbrs BUTTONS_REG, BUTTON_PLUS_HOLD_FLAG
+sbrs r16, BUTTON_PLUS_HOLD_FLAG
 rjmp pdb3
- pdb1:
- cpi r16, 255
+ pdb1: 
+ cpi r17, 255
  breq pdb3
-  inc r16
-  out OCR2, r16
+  inc r17
+  out OCR2, r17
   rcall ds1307_savebrightness
 pdb3:
-sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
+sbrc r16, BUTTON_MINUS_FLAG
 rjmp pdb2
-sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
+sbrs r16, BUTTON_MINUS_HOLD_FLAG
 rjmp pdb4
  pdb2:
- cpi r16, 0
- breq pdb4
-  dec r16
-  out OCR2, r16
+ cpi r17, MIN_BRIGHTNESS
+ brlo pdb4
+  dec r17
+  out OCR2, r17
   rcall ds1307_savebrightness
 pdb4:
-sbrs BUTTONS_REG, BUTTON_MODE_FLAG
+sbrs r16, BUTTON_MODE_FLAG
 rjmp pdb5
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_MENU
 pdb5:
-sbrs BUTTONS_REG, BUTTON_MENU_FLAG
+sbrs r16, BUTTON_MENU_FLAG
 rjmp pdb6
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 pdb6:
-clr BUTTONS_REG
+sts BUTTONS_PRESSED, CONST_0
 ;display
 rjmp showNumber
 
 ;-----------set temp-----------
 display_settemp:
 ;buttons
-sbrc BUTTONS_REG, BUTTON_PLUS_FLAG
+lds r16, BUTTONS_PRESSED
+;---+---
+sbrc r16, BUTTON_PLUS_FLAG
 rjmp pdt1
-sbrs BUTTONS_REG, BUTTON_PLUS_HOLD_FLAG
+sbrs r16, BUTTON_PLUS_HOLD_FLAG
 rjmp pdt3
  pdt1:
  cpi TTARGET_REG, MAX_TARGET_TEMP
@@ -186,9 +195,9 @@ rjmp pdt3
   inc TTARGET_REG
   rcall ds1307_savetargettemp
 pdt3:
-sbrc BUTTONS_REG, BUTTON_MINUS_FLAG
+sbrc r16, BUTTON_MINUS_FLAG
 rjmp pdt2
-sbrs BUTTONS_REG, BUTTON_MINUS_HOLD_FLAG
+sbrs r16, BUTTON_MINUS_HOLD_FLAG
 rjmp pdt4
  pdt2:
  cpi TTARGET_REG, MIN_TARGET_TEMP
@@ -196,42 +205,50 @@ rjmp pdt4
   dec TTARGET_REG
   rcall ds1307_savetargettemp
 pdt4:
-sbrs BUTTONS_REG, BUTTON_MODE_FLAG
+sbrs r16, BUTTON_MODE_FLAG
 rjmp pdt5
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
 pdt5:
-sbrs BUTTONS_REG, BUTTON_MENU_FLAG
+sbrs r16, BUTTON_MENU_FLAG
 rjmp pdt6
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 pdt6:
-clr BUTTONS_REG
+sts BUTTONS_PRESSED, CONST_0
 ;display
 rjmp showSetTemperature
 
- ;-----------mode-----------
- display_mode:
- ;buttons
- sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
- rjmp pdm3
-  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
- pdm3:
- sbrs BUTTONS_REG, BUTTON_MINUS_FLAG
- rjmp pdm4
-  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
- pdm4:
- sbrs BUTTONS_REG, BUTTON_MODE_FLAG
- rjmp pdm5
-  inc MODE_REG
-  cpi MODE_REG, MODE_COUNT
-  brlo pdm5
-   clr MODE_REG
+;-----------mode-----------
+display_mode:
+;buttons
+lds r16, BUTTONS_PRESSED
+;--- +/- ---
+sbrc r16, BUTTON_MINUS_FLAG
+rjmp pdm3
+sbrc r16, BUTTON_MINUS_HOLD_FLAG
+rjmp pdm3
+sbrc r16, BUTTON_PLUS_FLAG
+rjmp pdm3
+sbrs r16, BUTTON_PLUS_HOLD_FLAG
+rjmp pdm4
+pdm3:
+ ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETTEMP
+pdm4:
+;--- Mode ---
+sbrs r16, BUTTON_MODE_FLAG
+rjmp pdm5
+ inc MODE_REG
+ cpi MODE_REG, MODE_COUNT
+ brlo pdm5
+  clr MODE_REG
 pdm5:
-sbrs BUTTONS_REG, BUTTON_MENU_FLAG
+;--- Menu ---
+sbrs r16, BUTTON_MENU_FLAG
 rjmp pdm6
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 pdm6:
- clr BUTTONS_REG
-;display
+;
+sts BUTTONS_PRESSED, CONST_0
+;----- display -----
 showMode:
 cpi MODE_REG, MODE_OFF
 brne ccm1
@@ -496,7 +513,7 @@ rjmp we4
  lsr r17
  cpi r16, 16
  brne we6
-clr r16 
+clr r16
 ;2
 we4:
 clr r17

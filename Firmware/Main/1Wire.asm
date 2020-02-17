@@ -1,29 +1,35 @@
-;----------------------1Wire----------------------
+;----------------------1Wire routine 8MHz----------------------
+#define OW_DDR ddrd, 3
+#define OW_PORT portd, 3
+#define OW_PIN pind, 3
+
 ow_reset:
 ;---init---
 push r16
 push r17
 ;Tx
-sbi ddrd, 3
-cbi portd, 3
-ldi r16, 0xDF
-ldi r17, 0x01
+cbi OW_PORT
+sbi OW_DDR
+ldi r16, low(479)
+ldi r17, high(479)
 rcall ipause
-cbi ddrd, 3
-sbi portd, 3
+cbi OW_DDR
+sbi OW_PORT
 ;Rx
 ldi r16, 59
 clr r17
 rcall ipause
 set
-sbic pind, 3
+sbic OW_PIN
  rjmp ow_resetexit
 clt
-ldi r16, 0xA3
-ldi r17, 0x01
+;
+ldi r16, low(419)
+ldi r17, high(419)
 rcall ipause
+;
 ow_reset1:
-sbis pind, 3
+sbis OW_PIN
 rjmp ow_reset1;
 ;
 ow_resetexit:
@@ -35,27 +41,27 @@ ow_read_bit:
 push r16
 push r17
 ;
-cbi portd, 3
-sbi ddrd, 3
+cbi OW_PORT
+sbi OW_DDR
 rcall pause_1us
 ;
-cbi ddrd, 3
-sbi portd,3
+cbi OW_DDR
+sbi OW_PORT
 ldi r16, 12
 clr r17
 rcall ipause
 ;
 clt
-sbic pind, 3
+sbic OW_PIN
 set
 ;
-ldi r16, 38
-clr r17
-rcall ipause
+;ldi r16, 38
+;clr r17
+;rcall ipause
 ;
-;ow_read_bit_wait:
-;sbis pind, 3
-;rjmp ow_read_bit_wait
+ow_read_bit_wait:
+sbis OW_PIN
+rjmp ow_read_bit_wait
 ;
 pop r17
 pop r16
@@ -65,20 +71,20 @@ ow_write_bit:
 push r16 
 push r17
 ;
-cbi portd, 3
-sbi ddrd, 3
+cbi OW_PORT
+sbi OW_DDR
 rcall pause_1us
 ;
 brtc w1
- cbi ddrd, 3
- sbi portd, 3 
+ cbi OW_DDR
+ sbi OW_PORT 
 w1:
 clr r17
 ldi r16, 54
 rcall ipause
 ;
-cbi ddrd, 3
-sbi portd, 3
+cbi OW_DDR
+sbi OW_PORT
 ;
 pop r17
 pop r16
@@ -109,9 +115,9 @@ rcall ow_write_bit;
 dec r17
 brne rw1;
 ;
-ldi r16, 5
-clr r17
-rcall ipause
+;ldi r16, 5
+;clr r17
+;rcall ipause
 pop r17
 ret
 
@@ -120,18 +126,32 @@ push r17
 ;
 ldi r17, 8
 rw1c:
+;direct
 rcall ow_read_bit
+sbrc r16, 0
+rjmp owbwc1
+ brts owbwc_error
+owbwc1:
+;inverted
 rcall ow_read_bit
+sbrs r16, 0
+rjmp owbwc2
+ brts owbwc_error
+owbwc2:
+;send bit
 bst r16, 0
 ror r16
 rcall ow_write_bit;
+;
 dec r17
 brne rw1c;
 ;
-ldi r16, 5
-clr r17
-rcall ipause
-pop r17
+;ldi r16, 5
+;clr r17
+;rcall ipause
+;pop r17
+clt
+owbwc_error:
 ret
 
 ipause:
