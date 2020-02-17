@@ -2,7 +2,7 @@
 #define BUTTON_IDLE 100
 
 process_buttons:
-;
+lds r17, BUTTONS_PRESSED
 lds r16, BUTTONS_ADC
 cpi r16, 223
 brlo adc0
@@ -42,7 +42,8 @@ rjmp adc11
   ;first press
   sbr r16, 1 << BUTTON_MENU_FLAG
   sts PREVBUTTONS, r16
-  sbr BUTTONS_REG, 1 << BUTTON_MENU_FLAG
+  sbr r17, 1 << BUTTON_MENU_FLAG
+  sts BUTTONS_PRESSED, r17
   ret
 adc11:
   ;long press detect
@@ -53,7 +54,8 @@ adc11:
    sts BUTTON_MENU_PRESS_COUNT, r16
    ret
   adc12: 
-   sbr BUTTONS_REG, 1 << BUTTON_MENU_HOLD_FLAG
+   sbr r17, 1 << BUTTON_MENU_HOLD_FLAG
+   sts BUTTONS_PRESSED, r17
    ret
 
  ;---------- Mode ----------
@@ -64,7 +66,8 @@ adc11:
   ;first press
   sbr r16, 1 << BUTTON_MODE_FLAG
   sts PREVBUTTONS, r16
-  sbr BUTTONS_REG, 1 << BUTTON_MODE_FLAG
+  sbr r17, 1 << BUTTON_MODE_FLAG
+  sts BUTTONS_PRESSED, r17
   ret
  adc21:
   ;long press detect
@@ -75,29 +78,8 @@ adc11:
    sts BUTTON_MODE_PRESS_COUNT, r16
    ret
   adc22: 
-   sbr BUTTONS_REG, 1 << BUTTON_MODE_HOLD_FLAG
-   ret
-
-;---------- + ----------
-plus_btn: 
-lds r16, PREVBUTTONS
-sbrc r16, BUTTON_PLUS_FLAG
-rjmp adc31
- ;first press
- sbr r16, 1 << BUTTON_PLUS_FLAG
- sts PREVBUTTONS, r16
- sbr BUTTONS_REG, 1 << BUTTON_PLUS_FLAG
- ret
-adc31:
- ;long press detect
- lds r16, BUTTON_PLUS_PRESS_COUNT
- cpi r16, CONST_LONG_PRESS
- brsh adc32
-   inc r16
-   sts BUTTON_PLUS_PRESS_COUNT, r16
-   ret
-  adc32: 
-   sbr BUTTONS_REG, 1 << BUTTON_PLUS_HOLD_FLAG
+   sbr r17, 1 << BUTTON_MODE_HOLD_FLAG
+   sts BUTTONS_PRESSED, r17
    ret
 
 ;---------- - ----------
@@ -108,7 +90,8 @@ rjmp adc41
  ;first press
  sbr r16, 1 << BUTTON_MINUS_FLAG
  sts PREVBUTTONS, r16
- sbr BUTTONS_REG, 1 << BUTTON_MINUS_FLAG
+ sbr r17, 1 << BUTTON_MINUS_FLAG
+ sts BUTTONS_PRESSED, r17
  ret
 adc41:
  ;long press detect
@@ -119,5 +102,30 @@ adc41:
   sts BUTTON_MINUS_PRESS_COUNT, r16
   ret
  adc42: 
-  sbr BUTTONS_REG, 1 << BUTTON_MINUS_HOLD_FLAG
+  sbr r17, 1 << BUTTON_MINUS_HOLD_FLAG
+  sts BUTTONS_PRESSED, r17
   ret
+  
+;---------- + ----------
+plus_btn: 
+lds r16, PREVBUTTONS
+sbrc r16, BUTTON_PLUS_FLAG
+rjmp adc31
+ ;first press
+ sbr r16, 1 << BUTTON_PLUS_FLAG
+ sts PREVBUTTONS, r16
+ sbr r17, 1 << BUTTON_PLUS_FLAG
+ sts BUTTONS_PRESSED, r17
+ ret
+adc31:
+ ;long press detect
+ lds r16, BUTTON_PLUS_PRESS_COUNT
+ cpi r16, CONST_LONG_PRESS
+ brsh adc32
+   inc r16
+   sts BUTTON_PLUS_PRESS_COUNT, r16
+   ret
+  adc32: 
+   sbr r17, 1 << BUTTON_PLUS_HOLD_FLAG
+   sts BUTTONS_PRESSED, r17
+   ret

@@ -44,6 +44,7 @@
 #define ERRORL_SOFTWARE 1
 #define ERRORL_I2C 2
 #define ERRORL_FAKE_18B20 3
+#define ERRORL_BAD_RAM 4
 ;
 #define ERRORH_REG r27
 #define ERRORH_CHANNEL1_BREAK 0

@@ -4,7 +4,6 @@
 #define OW_PIN pind, 3
 
 ow_reset:
-;---init---
 push r16
 push r17
 ;Tx

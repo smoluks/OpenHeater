@@ -1,41 +1,61 @@
-
+#define MODBUSADDR_TKREG 0x00
+#define BRIGHTNESS_TKREG 0x01
+#define TTARGET_TKREG 0x02
 
 eeprom_readall:
 ;modbus address
+ldi r17, MODBUSADDR_TKREG
+rcall EEPROM_read
+cpi r16, 0xFF
+brne era1
+ sts MODBUS_ADDRESS, r16
+era1:
 ;target temperatute
 ldi r17, TTARGET_TKREG
-rcall i2c_read
-brts ds1307_err
-tst r16
-breq readBg
-mov TTARGET_REG, r16
+rcall EEPROM_read
+cpi r16, MAX_TARGET_TEMP
+brge era2
+cpi r16, MIN_TARGET_TEMP
+brlt era2
+ mov TTARGET_REG, r16
+era2:
 ;brightness
-readBg:
 ldi r17, BRIGHTNESS_TKREG
-rcall i2c_read
-brts ds1307_err
-cpi r16, MIN_BRIGHTNESS
-brlo ds1307_init_exit
+rcall EEPROM_read
 out OCR2, r16
+ret
 
+;in r16 - address
 save_modbus_address:
+push r17
+;
+ldi r17, MODBUSADDR_TKREG
+rcall EEPROM_write
+;
+pop r17
 ret
 
-;in - TTARGET_REG
-ds1307_savetargettemp:
-mov r16, TTARGET_REG
+;in - r16
+save_target_temp:
+push r17
+;
 ldi r17, TTARGET_TKREG
-rcall i2c_write
-brts ds1307_err
+rcall EEPROM_write
+;
+pop r17
 ret
 
-;in: r17
-ds1307_savebrightness:
+;in: r16
+save_brightness:
+push r17
+;
 ldi r17, BRIGHTNESS_TKREG
-rcall i2c_write
-brts ds1307_err
+rcall EEPROM_write
+;
+pop r17
 ret
 
+;in r16 - data, r17 - address
 EEPROM_write:
 ; Wait for completion of previous write
 sbic EECR,EEWE
@@ -51,6 +71,8 @@ sbi EECR,EEMWE
 sbi EECR,EEWE
 ret
 
+;in r17 - addr
+;out r16 - data
 EEPROM_read:
 ; Wait for completion of previous write
 sbic EECR,EEWE

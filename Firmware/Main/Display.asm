@@ -143,36 +143,36 @@ ret
 
 ;-----------set brightness-----------
 display_brightness:
-lds r16, BUTTONS_PRESSED
-in r17, OCR2
+lds r17, BUTTONS_PRESSED
+in r16, OCR2
 ;buttons
-sbrc r16, BUTTON_PLUS_FLAG
+sbrc r17, BUTTON_PLUS_FLAG
 rjmp pdb1
-sbrs r16, BUTTON_PLUS_HOLD_FLAG
+sbrs r17, BUTTON_PLUS_HOLD_FLAG
 rjmp pdb3
  pdb1: 
- cpi r17, 255
+ cpi r16, 255
  breq pdb3
-  inc r17
-  out OCR2, r17
-  rcall ds1307_savebrightness
+  inc r16
+  out OCR2, r16
+  rcall save_brightness
 pdb3:
-sbrc r16, BUTTON_MINUS_FLAG
+sbrc r17, BUTTON_MINUS_FLAG
 rjmp pdb2
-sbrs r16, BUTTON_MINUS_HOLD_FLAG
+sbrs r17, BUTTON_MINUS_HOLD_FLAG
 rjmp pdb4
  pdb2:
- cpi r17, MIN_BRIGHTNESS
+ cpi r16, MIN_BRIGHTNESS
  brlo pdb4
-  dec r17
-  out OCR2, r17
-  rcall ds1307_savebrightness
+  dec r16
+  out OCR2, r16
+  rcall save_brightness
 pdb4:
-sbrs r16, BUTTON_MODE_FLAG
+sbrs r17, BUTTON_MODE_FLAG
 rjmp pdb5
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_MENU
 pdb5:
-sbrs r16, BUTTON_MENU_FLAG
+sbrs r17, BUTTON_MENU_FLAG
 rjmp pdb6
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 pdb6:
@@ -183,33 +183,35 @@ rjmp showNumber
 ;-----------set temp-----------
 display_settemp:
 ;buttons
-lds r16, BUTTONS_PRESSED
+lds r17, BUTTONS_PRESSED
 ;---+---
-sbrc r16, BUTTON_PLUS_FLAG
+sbrc r17, BUTTON_PLUS_FLAG
 rjmp pdt1
-sbrs r16, BUTTON_PLUS_HOLD_FLAG
+sbrs r17, BUTTON_PLUS_HOLD_FLAG
 rjmp pdt3
  pdt1:
  cpi TTARGET_REG, MAX_TARGET_TEMP
  brge pdt3
   inc TTARGET_REG
-  rcall ds1307_savetargettemp
+  mov r16, TTARGET_REG
+  rcall save_target_temp
 pdt3:
-sbrc r16, BUTTON_MINUS_FLAG
+sbrc r17, BUTTON_MINUS_FLAG
 rjmp pdt2
-sbrs r16, BUTTON_MINUS_HOLD_FLAG
+sbrs r17, BUTTON_MINUS_HOLD_FLAG
 rjmp pdt4
  pdt2:
  cpi TTARGET_REG, MIN_TARGET_TEMP
  brlt pdt4
   dec TTARGET_REG
-  rcall ds1307_savetargettemp
+  mov r16, TTARGET_REG
+  rcall save_target_temp
 pdt4:
-sbrs r16, BUTTON_MODE_FLAG
+sbrs r17, BUTTON_MODE_FLAG
 rjmp pdt5
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_SETMODE
 pdt5:
-sbrs r16, BUTTON_MENU_FLAG
+sbrs r17, BUTTON_MENU_FLAG
 rjmp pdt6
  ldi DISPLAY_MODE_REG, DISPLAY_MODE_DEFAULT
 pdt6:
@@ -340,6 +342,7 @@ rcall convertnumberto7segment2
 sts SEG4, r17
 ret
 
+;in - r16
 showNumber:
 ;-1-
 sts SEG1, CONST_0

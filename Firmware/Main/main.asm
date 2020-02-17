@@ -27,9 +27,7 @@
 #include "Buttons.asm"
 
 RESET:
-;----init----
-clr ERRORL_REG
-clr ERRORH_REG
+;----------init----------
 ;stack
 ldi r16, high(RAMEND)
 out SPH, r16
@@ -68,26 +66,19 @@ out PORTD, r16
 ldi r16, 0b11110110
 out DDRD, r16
 ;regs
-ldi TTARGET_REG, 28
-ldi BUTTONS_REG, 0
+clr ERRORL_REG
+clr ERRORH_REG
+ldi TTARGET_REG, 22
 ldi MODE_REG, MODE_OFF
 ldi DISPLAY_MODE_REG, 0
 ldi DISPLAY_MENU_REG, 0
 ;----ram----
+#include "CheckRam.asm"
 ser r16
 sts SEG1, r16
 sts SEG2, r16
 sts SEG3, r16
 sts SEG4, r16
-sts BUTTONS_IDLETIMEOUT, CONST_0
-sts SEGNUMBER, CONST_0
-sts PREVBUTTONS, CONST_0
-sts BUTTON_PLUS_PRESS_COUNT, CONST_0
-sts BUTTON_MINUS_PRESS_COUNT, CONST_0
-sts BUTTON_MODE_PRESS_COUNT, CONST_0
-sts BUTTON_MENU_PRESS_COUNT, CONST_0
-sts D18B20_STATE, CONST_0
-sts D18B20_COUNT, CONST_0
 ldi r16, low(UART_BUFFER)
 sts RECV_HANDLE_L, r16
 ldi r16, high(UART_BUFFER)
