@@ -11,9 +11,11 @@ cbi OW_PORT
 sbi OW_DDR
 ldi r16, low(479)
 ldi r17, high(479)
+nop
 rcall ipause
 cbi OW_DDR
 sbi OW_PORT
+;
 ;Rx
 ldi r16, 59
 clr r17
@@ -154,6 +156,8 @@ owbwc_error:
 ret
 
 ipause:
+sts SEG1, r16
+sts SEG2, r17
 nop
 nop
 nop

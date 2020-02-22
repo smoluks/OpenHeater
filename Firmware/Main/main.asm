@@ -65,7 +65,7 @@ ldi r16, 0b11111011
 out PORTD, r16
 ldi r16, 0b11110110
 out DDRD, r16
-;regs
+;----regs----
 clr ERRORL_REG
 clr ERRORH_REG
 ldi TTARGET_REG, 22
@@ -73,7 +73,7 @@ ldi MODE_REG, MODE_OFF
 ldi DISPLAY_MODE_REG, 0
 ldi DISPLAY_MENU_REG, 0
 ;----ram----
-#include "CheckRam.asm"
+;#include "CheckRam.asm"
 ser r16
 sts SEG1, r16
 sts SEG2, r16
@@ -101,44 +101,45 @@ out OCR2, r16
 ldi r16, 0b00000100 ;F/64
 out TCCR2, r16
 ;
-ldi r16, 0b11010001
-out TIMSK, r16
+;ldi r16, 0b11010001
+;out TIMSK, r16
 ;I2C
-ldi r16, 32
-out TWBR, r16
-out TWSR, CONST_0
-ldi r16, 0b10000100
-out TWCR, r16
+;ldi r16, 32
+;out TWBR, r16
+;out TWSR, CONST_0
+;ldi r16, 0b10000100
+;out TWCR, r16
 ;UART 9600 ODD
-out UCSRA, CONST_0
-ldi r16, 0b11011000
-out UCSRB, r16
-ldi r16, 0b10000110
-out UCSRC, r16
-out UBRRH, CONST_0
-ldi r16, 51
-out UBRRL, r16
+;out UCSRA, CONST_0
+;ldi r16, 0b11011000
+;out UCSRB, r16
+;ldi r16, 0b10000110
+;out UCSRC, r16
+;out UBRRH, CONST_0
+;ldi r16, 51
+;out UBRRL, r16
 ;ADC
-ldi r16, ADMUX_BUTTONS
-out ADMUX, r16
-ldi r16, 0b11011111
-out ADCSRA, r16
+;ldi r16, ADMUX_BUTTONS
+;out ADMUX, r16
+;ldi r16, 0b11011111
+;out ADCSRA, r16
 ;
-rcall init_18b20
+;rcall init_18b20
 ;
-rcall ds1307_init
+;rcall ds1307_init
 ;
 sei
 ;
 .IFNDEF DEBUG
-rcall selfdignostics
+;rcall check_heaters
 .ENDIF
 ;----------main-cycle----------
+sbr ERRORL_REG, 1 << ERRORL_NO18B20
 main_cycle:
 wdr
 ;--18b20--
 sbrs ERRORL_REG, ERRORL_NO18B20
-rjmp l1
+rjmp l1 
  ;18b20 not found
  rcall init_18b20
  rjmp l2
