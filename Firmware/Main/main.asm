@@ -1,3 +1,4 @@
+.EQU DEBUG=1
 #include "RamMapping.asm"
 
 .ORG 0x00 rjmp RESET ; Reset Handler
@@ -101,32 +102,32 @@ out OCR2, r16
 ldi r16, 0b00000100 ;F/64
 out TCCR2, r16
 ;
-;ldi r16, 0b11010001
-;out TIMSK, r16
+ldi r16, 0b11010001
+out TIMSK, r16
 ;I2C
-;ldi r16, 32
-;out TWBR, r16
-;out TWSR, CONST_0
-;ldi r16, 0b10000100
-;out TWCR, r16
+ldi r16, 32
+out TWBR, r16
+out TWSR, CONST_0
+ldi r16, 0b10000100
+out TWCR, r16
 ;UART 9600 ODD
-;out UCSRA, CONST_0
-;ldi r16, 0b11011000
-;out UCSRB, r16
-;ldi r16, 0b10000110
-;out UCSRC, r16
-;out UBRRH, CONST_0
-;ldi r16, 51
-;out UBRRL, r16
+out UCSRA, CONST_0
+ldi r16, 0b11011000
+out UCSRB, r16
+ldi r16, 0b10000110
+out UCSRC, r16;
+out UBRRH, CONST_0
+ldi r16, 51
+out UBRRL, r16
+ldi r16, 0xAA
+out UDR, r16
 ;ADC
-;ldi r16, ADMUX_BUTTONS
-;out ADMUX, r16
-;ldi r16, 0b11011111
-;out ADCSRA, r16
+ldi r16, ADMUX_BUTTONS
+out ADMUX, r16
+ldi r16, 0b11011111
+out ADCSRA, r16
 ;
-;rcall init_18b20
-;
-;rcall ds1307_init
+rcall ds1307_init
 ;
 sei
 ;
@@ -134,6 +135,9 @@ sei
 ;rcall check_heaters
 .ENDIF
 ;----------main-cycle----------
+;ldi r16, 0xE6
+;out OSCCAL, r16
+;
 sbr ERRORL_REG, 1 << ERRORL_NO18B20
 main_cycle:
 wdr
@@ -148,13 +152,13 @@ l1:
  rcall read_18b20
 l2:
 ;--logic--
-rcall logic
+;rcall logic
 ;--display--
 rcall process_display
 ;--modbus--
 lds r16, ACTION
 sbrs r16, ACTION_MODBUS
- rjmp main_cycle
+rjmp main_cycle
 cbr r16, 1 << ACTION_MODBUS
 sts ACTION, r16 
 rcall process_modbus

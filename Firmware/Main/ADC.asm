@@ -22,6 +22,7 @@ breq adc_feedback3
 ;
 out ADMUX, CONST_ADMUX_BUTTONS
 sbi ADCSRA, ADSC
+;
 pop r16
 out SREG, r16
 pop r16
@@ -30,11 +31,7 @@ reti
 ;buttons
 adc_buttons: 
 in r16, ADCH
-lds r17, BUTTONS_TEMP1
-brne adc_buttons1
 sts BUTTONS_ADC, r16
-adc_buttons1:
-sts BUTTONS_TEMP1, r16
 ;
 out ADMUX, CONST_ADMUX_FEEDBACK1
 sbi ADCSRA, ADSC

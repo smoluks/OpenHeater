@@ -56,9 +56,9 @@ clt
 sbic OW_PIN
 set
 ;
-;ldi r16, 38
-;clr r17
-;rcall ipause
+ldi r16, 38
+clr r17
+rcall ipause
 ;
 ow_read_bit_wait:
 sbis OW_PIN
@@ -150,14 +150,12 @@ brne rw1c;
 ;ldi r16, 5
 ;clr r17
 ;rcall ipause
-;pop r17
 clt
 owbwc_error:
+pop r17
 ret
 
 ipause:
-sts SEG1, r16
-sts SEG2, r17
 nop
 nop
 nop

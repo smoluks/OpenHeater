@@ -25,6 +25,16 @@ breq init_18b20_error
 ;configure all 18b20
 rcall set_resolution
 brts init_18b20_error
+;start conversion (all)
+rcall ow_reset
+brts init_18b20_error
+ldi r16, SKIP_ROM
+rcall ow_write_byte
+ldi r16, CONVERT_TEMPERATURE
+rcall ow_write_byte
+;
+sts D18B20_STATE, CONST_0
+cbr ERRORL_REG, 1 << ERRORL_NO18B20
 ret
 init_18b20_error:
 sbr ERRORL_REG, 1 << ERRORL_NO18B20
@@ -60,7 +70,6 @@ brts r181
  ;conversation in progress
  ret
 r181:
-push r22
 push r28
 push r29
 push r30
@@ -71,7 +80,7 @@ ldi TLowL_REG, 0xFF
 ldi THighH_REG, 0x80
 ldi THighL_REG, 0x00
 ;
-lds r22, D18B20_COUNT
+lds r18, D18B20_COUNT
 ldi r28, low(D18B20_TEMPERATURES)
 ldi r29, high(D18B20_TEMPERATURES)
 ldi r30, low(D18B20_ADDRESSES)
@@ -98,7 +107,7 @@ brlt read_18b20_high
  mov THighH_REG, r16 
 ;
 read_18b20_high:
-dec r22
+dec r18
 brne read_18b20_cycle
 ;make new timestamp
 read_18b20_exit:
@@ -113,7 +122,6 @@ pop r31
 pop r30
 pop r29
 pop r28
-pop r22
 ret
 read_18b20_fail:
 sbr ERRORL_REG, 1 << ERRORL_NO18B20
@@ -121,10 +129,15 @@ pop r31
 pop r30
 pop r29
 pop r28
-pop r22
 ret
 
 search_18b20:
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
 push r16
 push r17
 push r18
@@ -139,6 +152,9 @@ push r29
 push r30
 push r31
 ;---search all 18b20---
+;
+sts D18B20_COUNT, r2
+;
 ldi r19, 0xFF ;last cycle last zero-wented branch
 ;handle to store
 ldi r30, low(D18B20_ADDRESSES)
@@ -298,6 +314,12 @@ pop r19
 pop r18
 pop r17
 pop r16
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
 ret
 
 set_resolution:
@@ -333,13 +355,6 @@ breq i21
  sbr ERRORL_REG, 1 << ERRORL_FAKE_18B20
 i21:
 .ENDIF
-;start conversion
-rcall ow_reset
-brts set_resolution_exit
-ldi r16, SKIP_ROM
-rcall ow_write_byte
-ldi r16, CONVERT_TEMPERATURE
-rcall ow_write_byte
 ;
 clt
 set_resolution_exit:
@@ -350,8 +365,10 @@ ret
 read_single_18b20:
 rcall ow_reset
 brts ow_reset_exit
-ld r16, z+
+;
+ldi r16, MATCH_ROM
 rcall ow_write_byte
+;
 ld r16, z+
 rcall ow_write_byte
 ld r16, z+

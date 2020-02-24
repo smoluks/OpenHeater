@@ -23,6 +23,7 @@ Display_handlers:
 process_display:
 cpi DISPLAY_MODE_REG, DISPLAY_MODE_COUNT
 brsh label_error
+;
 ldi r30, low(Display_handlers * 2)
 ldi r31, high(Display_handlers * 2)
 mov r16, DISPLAY_MODE_REG
