@@ -425,7 +425,7 @@ brne ws1
  clr r17
  ret
 ws1:
-cpi r19, 1
+cpi r18, 1
 brne ws2
  ;---target temperature---
  tst r17
@@ -439,7 +439,7 @@ brne ws2
  clr r17
  ret
 ws2:
-cpi r19, 2
+cpi r18, 2
 brne ws3
  ;---mode---
  tst r17
@@ -451,30 +451,41 @@ brne ws3
  clr r17
  ret
 ws3: 
-cpi r19, 3
+cpi r18, 3
 brne ws4
  ;---brightness---
  tst r17
  brne data_error
- cpi r16, MODE_COUNT
- brsh data_error
  out OCR2, r16
  rcall save_brightness
  ;
  clr r17
  ret
 ws4:
-cpi r19, 8
+cpi r18, 8
 brsh ws5
  ;1307 regs
- tst r17
- brne data_error
- mov r17, r18
- rcall i2c_write
- brts not_ready
+ subi r18, 4
+ lsl r18
  ;
- clr r17
- ret
+ cpi r18, 6 ;year
+ brne ws5_1
+  ;-single reg-
+  tst r17
+  brne data_error
+  mov r17, r18
+  rcall i2c_write
+  brts not_ready
+  ;
+  clr r17
+  ret
+  ;-two regs-
+  ws5_1:  
+  rcall i2c_writeword
+  brts not_ready
+  ;
+  clr r17
+  ret
 ws5:
  ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
  ret

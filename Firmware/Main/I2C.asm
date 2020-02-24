@@ -112,6 +112,27 @@ clt
 i2c_read_buffer_exit:
 ret
 
+;in: r16:17 - data, r18 - addr
+i2c_writeword:
+push r16
+push r17
+push r18
+;
+push r17
+mov r17, r18
+rcall i2c_write
+brts i2c_writeword_exit
+;
+pop r16
+inc r17
+rcall i2c_write
+;
+i2c_writeword_exit:
+pop r18
+pop r17
+pop r16
+ret
+
 ;in: r16 - data, r17 - addr
 i2c_write:
 push r16

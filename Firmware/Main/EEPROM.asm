@@ -7,7 +7,7 @@ eeprom_readall:
 ldi r17, MODBUSADDR_TKREG
 rcall EEPROM_read
 cpi r16, 0xFF
-brne era1
+breq era1
  sts MODBUS_ADDRESS, r16
 era1:
 ;target temperatute
@@ -83,5 +83,5 @@ out EEARL, r17
 ; Start eeprom read by writing EERE
 sbi EECR,EERE
 ; Read data from data register
-in r16,EEDR
+in r16, EEDR
 ret

@@ -29,6 +29,9 @@
 
 RESET:
 ;----------init----------
+;ldi r16, 0x98
+;out OSCCAL, r16
+;
 ;stack
 ldi r16, high(RAMEND)
 out SPH, r16
@@ -114,7 +117,7 @@ out TWCR, r16
 out UCSRA, CONST_0
 ldi r16, 0b11011000
 out UCSRB, r16
-ldi r16, 0b10000110
+ldi r16, 0b10110110
 out UCSRC, r16;
 out UBRRH, CONST_0
 ldi r16, 51
@@ -132,12 +135,11 @@ rcall ds1307_init
 sei
 ;
 .IFNDEF DEBUG
-;rcall check_heaters
+rcall check_heaters
 .ENDIF
-;----------main-cycle----------
-;ldi r16, 0xE6
-;out OSCCAL, r16
 ;
+rcall eeprom_readall
+;----------main-cycle----------
 sbr ERRORL_REG, 1 << ERRORL_NO18B20
 main_cycle:
 wdr
@@ -152,7 +154,7 @@ l1:
  rcall read_18b20
 l2:
 ;--logic--
-;rcall logic
+rcall logic
 ;--display--
 rcall process_display
 ;--modbus--
