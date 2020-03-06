@@ -157,6 +157,8 @@ l2:
 rcall logic
 ;--display--
 rcall process_display
+;--events--
+rcall events
 ;--modbus--
 lds r16, ACTION
 sbrs r16, ACTION_MODBUS
@@ -178,3 +180,4 @@ rjmp main_cycle
 #include "I2C.asm"
 #include "DS1307.asm"
 #include "EEPROM.asm"
+#include "Events.asm"
