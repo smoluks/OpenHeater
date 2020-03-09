@@ -9,7 +9,6 @@
 #define CONTROL_TKREG 0x07
 
 ds1307_init:
-;clear event buffer
 ;stop beep 
 ldi r16, 0b00000000
 ldi r17, CONTROL_TKREG
@@ -33,7 +32,6 @@ rjmp ds1307_powerok
  ldi r17, 8
  rcall i2c_flush
  brts ds1307_err
- ret
 ;---no power loss present---
 ds1307_powerok:
 ;check CRC
@@ -42,12 +40,6 @@ ds1307_powerok:
 ;rcall i2c_calccrc
 ;brts ds1307_err
 ;read ds1307 ram
-ldi r18, 56
-ldi r17, 8
-ldi r30, low(EVENTS_CACHE)
-ldi r31, high(EVENTS_CACHE)
-rcall i2c_read_buffer
-brts ds1307_err
 ret
 ds1307_err:
 sbr ERRORL_REG, 1 << ERRORL_I2C

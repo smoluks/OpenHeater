@@ -77,7 +77,7 @@ ldi MODE_REG, MODE_OFF
 ldi DISPLAY_MODE_REG, 0
 ldi DISPLAY_MENU_REG, 0
 ;----ram----
-;#include "CheckRam.asm"
+#include "CheckRam.asm"
 ser r16
 sts SEG1, r16
 sts SEG2, r16

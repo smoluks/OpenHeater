@@ -1,5 +1,5 @@
 #define MODBUS_INPUT_REGS_COUNT 41
-#define MODBUS_HOLDING_REGS_COUNT 8
+#define MODBUS_HOLDING_REGS_COUNT 64
 
 #define READ_COILS 0x01
 #define READ_DISCRETE_INPUTS 0x02
@@ -406,9 +406,19 @@ brsh h5
  rcall i2c_read_pair
  ret
 h5:
+cpi r19, 64
+brsh h6
+ ;event cache
+ mov r17, r19
+ rcall i2c_read
+ mov r17, r16
+ ;
  clr r16
- clr r17 
  ret
+h6:
+clr r16
+clr r17 
+ret
 
 ;in r18 - addr, r17:16 - data
 ;out r17 - error 
@@ -418,7 +428,10 @@ cpi r18, 0
 brne ws1
  ;---modbus address---
  tst r17
- brne data_error
+ breq ws11
+  ldi r17, ERROR_ILLEGAL_DATA_VALUE
+  ret
+ ws11: 
  sts MODBUS_ADDRESS, r16
  rcall save_modbus_address
  ;
@@ -480,13 +493,22 @@ brsh ws5
   clr r17
   ret
   ;-two regs-
-  ws5_1:  
+  ws5_1:   
   rcall i2c_writeword
   brts not_ready
   ;
   clr r17
   ret
 ws5:
+cpi r18, 64
+brsh ws6
+ ;
+ mov r17, r18
+ rcall i2c_write
+ ; 
+ clr r17
+ ret
+ws6:
  ldi r17, ERROR_ILLEGAL_DATA_ADDRESS
  ret
 data_error:
