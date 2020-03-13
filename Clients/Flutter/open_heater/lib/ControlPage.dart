@@ -1,91 +1,85 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-import './DiscoveryPage.dart';
-import 'ControlPage.dart';
+import 'CommandHandler.dart';
 
-class MainPage extends StatefulWidget {
+class ControlPage extends StatefulWidget {
+  final BluetoothDevice selectedDevice;
+
+  const ControlPage({this.selectedDevice});
+
   @override
-  _MainPage createState() => new _MainPage();
+  _ControlPage createState() => new _ControlPage();
 }
 
-class _MainPage extends State<MainPage> {
-  String _error;
+class _ControlPage extends State<ControlPage> {
+  CommandHandler _commandHandler;
+  double temperature;
+
+  bool _isConnected = false;
+  bool _isDiscovering = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Get current state
-    FlutterBluetoothSerial.instance.state.then((state) async {
-      if (!state.isEnabled)
-        await FlutterBluetoothSerial.instance.requestEnable();
-      else
-        _connectToDevice();
-    });
-
-    // Listen for futher state changes
-    FlutterBluetoothSerial.instance
-        .onStateChanged()
-        .listen((BluetoothState state) {
-      if (state.isEnabled)
-        _connectToDevice();
-      else
-        setState(() async {
-          _error = "Bluetooth not enabled";
-        });
+    _commandHandler = new CommandHandler(widget.selectedDevice);
+    _commandHandler.connect().then((_) {
+      _isConnected = true;
     });
   }
 
-  Future<void> _connectToDevice() async {
-    BluetoothDevice selectedDevice;
+  Future<void> updateState() async {
+    if (!_isConnected) return;
 
-    if (true) {
-      selectedDevice = await Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) {
-        return DiscoveryPage();
-      }));
-    }
+    var temperatures = await _commandHandler.GetTemperatures();
 
-    await Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return ControlPage(selectedDevice: selectedDevice);
-    }));
+    setState(() {
+      temperature = temperatures.reduce(min);
+    });
   }
 
   @override
   void dispose() {
-    FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
+    // Avoid memory leak (`setState` after dispose) and cancel discovery
+    _commandHandler.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_error != null) return _getErrorWidget(context);
-
-    return _getLoadingWidget(context);
-  }
-
-  Widget _getLoadingWidget(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: const Text('OpenHeater client')),
-        body: Center(child: Text('Loading')));
-  }
-
-  Widget _getErrorWidget(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: const Text('OpenHeater client')),
-        body: Center(child: Text(_error)));
-  }
-
-  Widget _getMainWidget(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('OpenHeater client'),
+        actions: <Widget>[
+          _isDiscovering
+              ? FittedBox(
+                  child: Container(
+                    margin: new EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white,
+                      ),
+                    ),
+                  ),
+                )
+              : IconButton(
+                  icon: Icon(Icons.replay),
+                  onPressed: updateState,
+                )
+        ],
       ),
       body: Container(
         child: ListView(
           children: <Widget>[
+            ListTile(
+              title: const Text('Temperature'),
+              subtitle: Text(temperature.toString()),
+            ),
+
             // Divider(),
             // ListTile(
             //   title: const Text('General')
@@ -288,37 +282,4 @@ class _MainPage extends State<MainPage> {
       ),
     );
   }
-
-  // void _startChat(BuildContext context, BluetoothDevice server) {
-  //   Navigator.of(context).push(MaterialPageRoute(builder: (context) { return ChatPage(server: server); }));
-  // }
-
-  // Future<void> _startBackgroundTask(BuildContext context, BluetoothDevice server) async {
-  //   try {
-  //     _collectingTask = await BackgroundCollectingTask.connect(server);
-  //     await _collectingTask.start();
-  //   }
-  //   catch (ex) {
-  //     if (_collectingTask != null) {
-  //       _collectingTask.cancel();
-  //     }
-  //     showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           title: const Text('Error occured while connecting'),
-  //           content: Text("${ex.toString()}"),
-  //           actions: <Widget>[
-  //             new FlatButton(
-  //               child: new Text("Close"),
-  //               onPressed: () {
-  //                 Navigator.of(context).pop();
-  //               },
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //     );
-  //   }
-  // }
 }
