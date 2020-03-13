@@ -5,44 +5,43 @@ push r22
 push r23
 ;
 ldi r17, SECONDS_TKREG
-;rcall i2c_read
+rcall i2c_read
 mov r20, r16
 andi r20, 0x7F
 ;
 ldi r17, MINUTES_TKREG
-;rcall i2c_read
+rcall i2c_read
 mov r21, r16
 andi r21, 0x7F
 ;
 ldi r17, HOURS_TKREG
-;rcall i2c_read
+rcall i2c_read
 mov r22, r16
 andi r22, 0x3F
 ;
 ldi r17, DAY_TKREG
-;rcall i2c_read
+rcall i2c_read
 ldi r23, 0x01
 days_cmp0:
 tst r16
-breq events_cycle
+breq cycle
  lsl r23
  dec r16
  rjmp days_cmp0
 ;
+cycle:
 ldi r17, 8
 events_cycle:
-;rcall i2c_read
+rcall i2c_read
 ;check enable
-;sbrs r16, 0
-;rjmp e_next_skip7
+sbrs r16, 0
+rjmp e_next_skip7
 ;check timestamp
-;rcall check_time
-;brts e_next_skip7
+rcall check_time
+brts e_next_skip7
 ;is once?
-;sbrc r16, 1
-;cbr r16, 0b00000001
-ldi r17, 8
-ldi r16, 0xAA
+sbrc r16, 1
+cbr r16, 0b00000001
 rcall i2c_write
 ;mode
 ldi r16, 5
