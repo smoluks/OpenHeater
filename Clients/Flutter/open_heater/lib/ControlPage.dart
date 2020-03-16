@@ -28,6 +28,7 @@ class _ControlPage extends State<ControlPage> {
     _commandHandler = new CommandHandler(widget.selectedDevice);
     _commandHandler.connect().then((_) {
       _isConnected = true;
+      updateState();
     });
   }
 
@@ -49,11 +50,15 @@ class _ControlPage extends State<ControlPage> {
     super.dispose();
   }
 
+  String getCurrentTemperature() {
+    return temperature.toString() + " ºC";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('OpenHeater client'),
+        title: Text(widget.selectedDevice.name ?? "Unknown"),
         actions: <Widget>[
           _isDiscovering
               ? FittedBox(
@@ -76,8 +81,11 @@ class _ControlPage extends State<ControlPage> {
         child: ListView(
           children: <Widget>[
             ListTile(
-              title: const Text('Temperature'),
-              subtitle: Text(temperature.toString()),
+              title: Text(
+                getCurrentTemperature(),
+                style: TextStyle(fontSize: 50),
+              ),
+              subtitle: const Text("Current temperature"),
             ),
 
             // Divider(),
