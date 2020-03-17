@@ -5,17 +5,17 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'modbus.dart';
 
 class BluetoothConnector extends ModbusConnector {
-  BluetoothDevice _device;
   BluetoothConnection _connection;
-  int _address;
+  String _btAddress;
+  int _modbusAddress;
   List<int> _cache = [];
   Timer _timer;
 
-  BluetoothConnector(this._device, this._address);
+  BluetoothConnector(this._btAddress, this._modbusAddress);
 
   @override
   Future<void> connect() async {
-    await BluetoothConnection.toAddress(_device.address).then((connection) {
+    await BluetoothConnection.toAddress(_btAddress).then((connection) {
       print('Connected to the device');
       _connection = connection;
 
@@ -45,7 +45,7 @@ class BluetoothConnector extends ModbusConnector {
     var view = ByteData.view(list.buffer);
 
     int address = view.getUint8(0);
-    if (_address != 0 && _address != address) {
+    if (_modbusAddress != 0 && _modbusAddress != address) {
       _cache.clear();
       return;
     }
@@ -63,7 +63,7 @@ class BluetoothConnector extends ModbusConnector {
   void write(int function, Uint8List data) {
     Uint8List modbusHeader = Uint8List(2);
     ByteData.view(modbusHeader.buffer)
-      ..setUint8(0, _address)
+      ..setUint8(0, _modbusAddress)
       ..setUint8(1, function);
 
     Uint8List data2 = Uint8List.fromList(modbusHeader + data);

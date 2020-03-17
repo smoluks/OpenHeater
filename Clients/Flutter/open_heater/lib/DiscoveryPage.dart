@@ -82,7 +82,7 @@ class _DiscoveryPage extends State<DiscoveryPage> {
 
   onTap(BluetoothDeviceListEntry f) {
     if (f.device.isBonded) {
-      Navigator.of(context).pop(f.device);
+      Navigator.of(context).pop(f.device.address);
       return;
     }
 
@@ -134,7 +134,7 @@ class _DiscoveryPage extends State<DiscoveryPage> {
       _isBonding = false;
 
       if (bonded) {
-        Navigator.of(context).pop(f.device);
+        Navigator.of(context).pop(f.device.address);
       }
     }, onError: (error) {
       Navigator.of(context).pop();

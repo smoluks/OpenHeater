@@ -84,5 +84,5 @@ abstract class ModbusClient {
   Future<void> writeMultipleRegisters(int address, Uint16List values);
 }
 
-ModbusClient createBluetoothClient(BluetoothDevice device) =>
-    ModbusClientImpl(new BluetoothConnector(device, 0));
+ModbusClient createBluetoothClient(String address) =>
+    ModbusClientImpl(new BluetoothConnector(address, 0));

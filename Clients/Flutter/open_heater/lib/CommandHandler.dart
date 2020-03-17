@@ -1,11 +1,10 @@
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:open_heater/Modbus/modbus.dart';
 
 class CommandHandler {
   ModbusClient client;
 
-  CommandHandler(BluetoothDevice selectedDevice) {
-    this.client = createBluetoothClient(selectedDevice);
+  CommandHandler(String address) {
+    this.client = createBluetoothClient(address);
   }
 
   Future<void> connect() async {
@@ -16,18 +15,24 @@ class CommandHandler {
     client.close();
   }
 
-  Future<List<double>> GetTemperatures() async {
+  Future<List<double>> getTemperatures() async {
     var regs = await client.readInputRegisters(0, 11);
     var count = regs[0];
 
     return regs
         .skip(1)
         .take(count)
-        .map((f) => Convert18b20Temperature(f))
+        .map((f) => _convert18b20Temperature(f))
         .toList();
   }
 
-  double Convert18b20Temperature(int f) {
+  Future<Settings> getSettings() async {
+    var regs = await client.readHoldingRegisters(1, 3);
+
+    return new Settings(regs[0], Mode.values[regs[1]], regs[2]);
+  }
+
+  double _convert18b20Temperature(int f) {
     if (f >= 0x8000) {
       //minus
       return (0x10000 - f) / 16;
@@ -36,3 +41,13 @@ class CommandHandler {
     return f / 16;
   }
 }
+
+class Settings {
+  int targetTemp;
+  Mode mode;
+  int brightness;
+
+  Settings(this.targetTemp, this.mode, this.brightness);
+}
+
+enum Mode { None, First, Second, Both, Fan }

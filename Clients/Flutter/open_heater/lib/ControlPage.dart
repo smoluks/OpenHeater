@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 import 'CommandHandler.dart';
 
 class ControlPage extends StatefulWidget {
-  final BluetoothDevice selectedDevice;
+  final String btAddress;
 
-  const ControlPage({this.selectedDevice});
+  const ControlPage({this.btAddress});
 
   @override
   _ControlPage createState() => new _ControlPage();
@@ -16,29 +15,36 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPage extends State<ControlPage> {
   CommandHandler _commandHandler;
-  double temperature;
 
-  bool _isConnected = false;
-  bool _isDiscovering = false;
+  bool _loading = true;
+
+  double temperature;
+  int targetTemperatue;
+  Mode mode;
+  int brightness;
 
   @override
   void initState() {
     super.initState();
 
-    _commandHandler = new CommandHandler(widget.selectedDevice);
+    _commandHandler = new CommandHandler(widget.btAddress);
     _commandHandler.connect().then((_) {
-      _isConnected = true;
       updateState();
+    }, onError: (_) {
+      Navigator.of(context).pop(-1);
     });
   }
 
   Future<void> updateState() async {
-    if (!_isConnected) return;
-
-    var temperatures = await _commandHandler.GetTemperatures();
+    var temperatures = await _commandHandler.getTemperatures();
+    var settings = await _commandHandler.getSettings();
 
     setState(() {
       temperature = temperatures.reduce(min);
+      targetTemperatue = settings.targetTemp;
+      mode = settings.mode;
+      brightness = settings.brightness;
+      _loading = false;
     });
   }
 
@@ -51,16 +57,24 @@ class _ControlPage extends State<ControlPage> {
   }
 
   String getCurrentTemperature() {
-    return temperature.toString() + " ºC";
+    return temperature == null ? "-" : temperature.toString() + " ºC";
+  }
+
+  String getTargetTemperature() {
+    return targetTemperatue == null ? "-" : targetTemperatue.toString() + " ºC";
+  }
+
+  String getMode() {
+    return mode == null ? "-" : mode.toString();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.selectedDevice.name ?? "Unknown"),
+        title: Text("Unknown"),
         actions: <Widget>[
-          _isDiscovering
+          _loading
               ? FittedBox(
                   child: Container(
                     margin: new EdgeInsets.all(16.0),
@@ -87,7 +101,20 @@ class _ControlPage extends State<ControlPage> {
               ),
               subtitle: const Text("Current temperature"),
             ),
-
+            ListTile(
+              title: Text(
+                getTargetTemperature(),
+                style: TextStyle(fontSize: 50),
+              ),
+              subtitle: const Text("Target temperature"),
+            ),
+            ListTile(
+              title: Text(
+                getMode(),
+                style: TextStyle(fontSize: 50),
+              ),
+              subtitle: const Text("Mode"),
+            ),
             // Divider(),
             // ListTile(
             //   title: const Text('General')
