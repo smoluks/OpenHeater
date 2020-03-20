@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 import 'CommandHandler.dart';
 
@@ -23,6 +24,8 @@ class _ControlPage extends State<ControlPage> {
   Mode mode;
   int brightness;
 
+  Timer timer;
+
   @override
   void initState() {
     super.initState();
@@ -30,12 +33,19 @@ class _ControlPage extends State<ControlPage> {
     _commandHandler = new CommandHandler(widget.btAddress);
     _commandHandler.connect().then((_) {
       updateState();
+
+      timer = new Timer.periodic(
+          Duration(seconds: 10), (_) async => await updateState());
     }, onError: (_) {
       Navigator.of(context).pop(-1);
     });
   }
 
   Future<void> updateState() async {
+    setState(() {
+      _loading = true;
+    });
+
     var temperatures = await _commandHandler.getTemperatures();
     var settings = await _commandHandler.getSettings();
 
@@ -51,9 +61,22 @@ class _ControlPage extends State<ControlPage> {
   @override
   void dispose() {
     // Avoid memory leak (`setState` after dispose) and cancel discovery
+    timer.cancel();
     _commandHandler.dispose();
 
     super.dispose();
+  }
+
+  Future<void> setMode(Mode newValue) async {
+    await _commandHandler.setMode(newValue.index);
+
+    await updateState();
+  }
+
+  Future<void> setTargetTemperatuer(num newValue) {}
+
+  String getName() {
+    return "OpenHeater";
   }
 
   String getCurrentTemperature() {
@@ -64,15 +87,30 @@ class _ControlPage extends State<ControlPage> {
     return targetTemperatue == null ? "-" : targetTemperatue.toString() + " ºC";
   }
 
-  String getMode() {
-    return mode == null ? "-" : mode.toString();
+  String getModeText(Mode mode) {
+    if (mode == null) return "-";
+
+    switch (mode) {
+      case Mode.None:
+        return "Off";
+      case Mode.First:
+        return "1";
+      case Mode.Second:
+        return "2";
+      case Mode.Both:
+        return "1+2";
+      case Mode.Fan:
+        return "Fan";
+    }
+
+    return "";
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Unknown"),
+        title: Text(getName()),
         actions: <Widget>[
           _loading
               ? FittedBox(
@@ -102,216 +140,46 @@ class _ControlPage extends State<ControlPage> {
               subtitle: const Text("Current temperature"),
             ),
             ListTile(
-              title: Text(
-                getTargetTemperature(),
-                style: TextStyle(fontSize: 50),
-              ),
+              title: new NumberPicker.integer(
+                  scrollDirection: Axis.horizontal,
+                  infiniteLoop: false,
+                  initialValue: targetTemperatue,
+                  minValue: -39,
+                  maxValue: 75,
+                  onChanged: (newValue) {
+                    setTargetTemperatuer(newValue);
+                  }),
               subtitle: const Text("Target temperature"),
             ),
             ListTile(
-              title: Text(
-                getMode(),
-                style: TextStyle(fontSize: 50),
-              ),
-              subtitle: const Text("Mode"),
-            ),
-            // Divider(),
-            // ListTile(
-            //   title: const Text('General')
-            // ),
-            // SwitchListTile(
-            //   title: const Text('Enable Bluetooth'),
-            //   value: _bluetoothState.isEnabled,
-            //   onChanged: (bool value) {
-            //     // Do the request and update with the true value then
-            //     future() async { // async lambda seems to not working
-            //       if (value)
-            //         await FlutterBluetoothSerial.instance.requestEnable();
-            //       else
-            //         await FlutterBluetoothSerial.instance.requestDisable();
-            //     }
-            //     future().then((_) {
-            //       setState(() {});
-            //     });
-            //   },
-            // ),
-            // ListTile(
-            //   title: const Text('Bluetooth status'),
-            //   subtitle: Text(_bluetoothState.toString()),
-            //   trailing: RaisedButton(
-            //     child: const Text('Settings'),
-            //     onPressed: () {
-            //       FlutterBluetoothSerial.instance.openSettings();
-            //     },
-            //   ),
-            // ),
-            // ListTile(
-            //   title: const Text('Local adapter address'),
-            //   subtitle: Text(_address),
-            // ),
-            // ListTile(
-            //   title: const Text('Local adapter name'),
-            //   subtitle: Text(_name),
-            //   onLongPress: null,
-            // ),
-            // ListTile(
-            //   title: _discoverableTimeoutSecondsLeft == 0 ? const Text("Discoverable") : Text("Discoverable for ${_discoverableTimeoutSecondsLeft}s"),
-            //   subtitle: const Text("PsychoX-Luna"),
-            //   trailing: Row(
-            //     mainAxisSize: MainAxisSize.min,
-            //     children: [
-            //       Checkbox(
-            //         value: _discoverableTimeoutSecondsLeft != 0,
-            //         onChanged: null,
-            //       ),
-            //       IconButton(
-            //         icon: const Icon(Icons.edit),
-            //         onPressed: null,
-            //       ),
-            //       IconButton(
-            //         icon: const Icon(Icons.refresh),
-            //         onPressed: () async {
-            //           print('Discoverable requested');
-            //           final int timeout = await FlutterBluetoothSerial.instance.requestDiscoverable(60);
-            //           if (timeout < 0) {
-            //             print('Discoverable mode denied');
-            //           }
-            //           else {
-            //             print('Discoverable mode acquired for $timeout seconds');
-            //           }
-            //           setState(() {
-            //             _discoverableTimeoutTimer?.cancel();
-            //             _discoverableTimeoutSecondsLeft = timeout;
-            //             _discoverableTimeoutTimer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
-            //               setState(() {
-            //                 if (_discoverableTimeoutSecondsLeft < 0) {
-            //                   FlutterBluetoothSerial.instance.isDiscoverable.then((isDiscoverable) {
-            //                     if (isDiscoverable) {
-            //                       print("Discoverable after timeout... might be infinity timeout :F");
-            //                       _discoverableTimeoutSecondsLeft += 1;
-            //                     }
-            //                   });
-            //                   timer.cancel();
-            //                   _discoverableTimeoutSecondsLeft = 0;
-            //                 }
-            //                 else {
-            //                   _discoverableTimeoutSecondsLeft -= 1;
-            //                 }
-            //               });
-            //             });
-            //           });
-            //         },
-            //       )
-            //     ]
-            //   )
-            // ),
-
-            // Divider(),
-            // ListTile(
-            //   title: const Text('Devices discovery and connection')
-            // ),
-            // SwitchListTile(
-            //   title: const Text('Auto-try specific pin when pairing'),
-            //   subtitle: const Text('Pin 1234'),
-            //   value: _autoAcceptPairingRequests,
-            //   onChanged: (bool value) {
-            //     setState(() {
-            //       _autoAcceptPairingRequests = value;
-            //     });
-            //     if (value) {
-            //       FlutterBluetoothSerial.instance.setPairingRequestHandler((BluetoothPairingRequest request) {
-            //         print("Trying to auto-pair with Pin 1234");
-            //         if (request.pairingVariant == PairingVariant.Pin) {
-            //           return Future.value("1234");
-            //         }
-            //         return null;
-            //       });
-            //     }
-            //     else {
-            //       FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
-            //     }
-            //   },
-            // ),
-            // ListTile(
-            //   title: RaisedButton(
-            //     child: const Text('Explore discovered devices'),
-            //     onPressed: () async {
-            //       // final BluetoothDevice selectedDevice = await Navigator.of(context).push(
-            //       //   MaterialPageRoute(builder: (context) { return DiscoveryPage(); })
-            //       // );
-
-            //       // if (selectedDevice != null) {
-            //       //   print('Discovery -> selected ' + selectedDevice.address);
-            //       // }
-            //       // else {
-            //       //   print('Discovery -> no device selected');
-            //       // }
-            //     }
-            //   ),
-            // ),
-            // ListTile(
-            //   title: RaisedButton(
-            //     child: const Text('Connect to paired device to chat'),
-            //     onPressed: () async {
-            //     //   final BluetoothDevice selectedDevice = await Navigator.of(context).push(
-            //     //     MaterialPageRoute(builder: (context) { return SelectBondedDevicePage(checkAvailability: false); })
-            //     //   );
-
-            //     //   if (selectedDevice != null) {
-            //     //     print('Connect -> selected ' + selectedDevice.address);
-            //     //     _startChat(context, selectedDevice);
-            //     //   }
-            //     //   else {
-            //     //     print('Connect -> no device selected');
-            //     //   }
-            //      },
-            //   ),
-            // ),
-
-            // Divider(),
-            // ListTile(
-            //   title: const Text('Multiple connections example')
-            // ),
-            // ListTile(
-            //   title: RaisedButton(
-            //     child: (
-            //       (_collectingTask != null && _collectingTask.inProgress)
-            //       ? const Text('Disconnect and stop background collecting')
-            //       : const Text('Connect to start background collecting')
-            //     ),
-            //     onPressed: () async {
-            //       if (_collectingTask != null && _collectingTask.inProgress) {
-            //         await _collectingTask.cancel();
-            //         setState(() {/* Update for `_collectingTask.inProgress` */});
-            //       }
-            //       else {
-            //         final BluetoothDevice selectedDevice = await Navigator.of(context).push(
-            //           MaterialPageRoute(builder: (context) { return SelectBondedDevicePage(checkAvailability: false); })
-            //         );
-
-            //         if (selectedDevice != null) {
-            //           await _startBackgroundTask(context, selectedDevice);
-            //           setState(() {/* Update for `_collectingTask.inProgress` */});
-            //         }
-            //       }
-            //     },
-            //   ),
-            // ),
-            // ListTile(
-            //   title: RaisedButton(
-            //     child: const Text('View background collected data'),
-            //     onPressed: (_collectingTask != null) ? () {
-            //       Navigator.of(context).push(
-            //         MaterialPageRoute(builder: (context) {
-            //           return ScopedModel<BackgroundCollectingTask>(
-            //             model: _collectingTask,
-            //             child: BackgroundCollectedPage(),
-            //           );
-            //         })
-            //       );
-            //     } : null,
-            //   )
-            // ),
+                title: DropdownButton<Mode>(
+                  itemHeight: 60,
+                  value: mode,
+                  //icon: Icon(Icons.arrow_downward),
+                  iconSize: 24,
+                  elevation: 16,
+                  style: TextStyle(fontSize: 50, color: Colors.black),
+                  underline: Container(
+                    height: 2,
+                    color: Color(0),
+                  ),
+                  onChanged: (Mode newValue) {
+                    setMode(newValue);
+                  },
+                  items: <Mode>[
+                    Mode.None,
+                    Mode.First,
+                    Mode.Second,
+                    Mode.Both,
+                    Mode.Fan,
+                  ].map<DropdownMenuItem<Mode>>((Mode value) {
+                    return DropdownMenuItem<Mode>(
+                      value: value,
+                      child: Text(getModeText(value)),
+                    );
+                  }).toList(),
+                ),
+                subtitle: const Text("Mode"))
           ],
         ),
       ),

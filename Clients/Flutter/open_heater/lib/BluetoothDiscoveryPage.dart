@@ -2,27 +2,31 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-import './BluetoothDeviceListEntry.dart';
+class BluetoothDeviceListEntry {
+  BluetoothDevice device;
+  int rssi;
 
-class DiscoveryPage extends StatefulWidget {
-  const DiscoveryPage();
-
-  @override
-  _DiscoveryPage createState() => new _DiscoveryPage();
+  BluetoothDeviceListEntry(this.device, this.rssi);
 }
 
-class _DiscoveryPage extends State<DiscoveryPage> {
+class BluetoothDiscoveryPage extends StatefulWidget {
+  const BluetoothDiscoveryPage();
+
+  @override
+  _BluetoothDiscoveryPage createState() => new _BluetoothDiscoveryPage();
+}
+
+class _BluetoothDiscoveryPage extends State<BluetoothDiscoveryPage> {
   StreamSubscription<BluetoothDiscoveryResult> _streamSubscription;
   List<BluetoothDeviceListEntry> results = List<BluetoothDeviceListEntry>();
   bool _isDiscovering = false;
   bool _isBonding = false;
 
-  _DiscoveryPage();
-
   @override
   void initState() {
     super.initState();
 
+    //add all bonded
     FlutterBluetoothSerial.instance
         .getBondedDevices()
         .then((List<BluetoothDevice> bondedDevices) {
@@ -75,7 +79,7 @@ class _DiscoveryPage extends State<DiscoveryPage> {
       if (entry != null) {
         entry.rssi = rssi;
       } else {
-        results.add(new BluetoothDeviceListEntry(device: device, rssi: rssi));
+        results.add(new BluetoothDeviceListEntry(device, rssi));
       }
     });
   }
@@ -90,57 +94,67 @@ class _DiscoveryPage extends State<DiscoveryPage> {
       return;
     }
 
+    showGlobalSpinner("Bonding...");
     _isBonding = true;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: new Container(
-            padding: EdgeInsets.only(
-              top: 20,
-              bottom: 20,
-              left: 20,
-              right: 20,
-            ),
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(4),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10.0,
-                  offset: const Offset(0.0, 10.0),
-                ),
-              ],
-            ),
-            child: Row(
-              children: <Widget>[
-                new CircularProgressIndicator(),
-                new Container(width: 15, height: 0),
-                new Text("Bonding..."),
-              ],
-            ),
-          ),
-        );
-      },
-    );
 
     FlutterBluetoothSerial.instance.bondDeviceAtAddress(f.device.address).then(
         (bonded) {
-      Navigator.of(context).pop();
+      hideGlobalSpinner();
       _isBonding = false;
 
       if (bonded) {
         Navigator.of(context).pop(f.device.address);
       }
     }, onError: (error) {
-      Navigator.of(context).pop();
+      hideGlobalSpinner();
       _isBonding = false;
+
       print("Error occured while bonding : ${error.toString()}");
     });
+  }
+
+  void showGlobalSpinner(String text) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {},
+          child: new AlertDialog(
+            contentPadding: EdgeInsets.only(
+              top: 20,
+              bottom: 20,
+              left: 20,
+              right: 20,
+            ),
+            // decoration: new BoxDecoration(
+            //   color: Colors.white,
+            //   shape: BoxShape.rectangle,
+            //   borderRadius: BorderRadius.circular(4),
+            //   boxShadow: [
+            //     BoxShadow(
+            //       color: Colors.black26,
+            //       blurRadius: 10.0,
+            //       offset: const Offset(0.0, 10.0),
+            //     ),
+            //   ],
+            // ),
+            content: new Row(
+              children: <Widget>[
+                new CircularProgressIndicator(),
+                new Container(width: 15, height: 0),
+                new Text(text),
+              ],
+            ),
+            actions: <Widget>[],
+          ),
+        );
+      },
+    );
+  }
+
+  void hideGlobalSpinner() {
+    Navigator.of(context).pop();
   }
 
   Widget build(BuildContext context) {

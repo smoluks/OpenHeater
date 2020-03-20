@@ -16,7 +16,7 @@ class BluetoothConnector extends ModbusConnector {
   @override
   Future<void> connect() async {
     await BluetoothConnection.toAddress(_btAddress).then((connection) {
-      print('Connected to the device');
+      print('Connected to the device {}');
       _connection = connection;
 
       _connection.input.listen(_onData).onDone(() {

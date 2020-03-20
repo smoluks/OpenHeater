@@ -32,6 +32,10 @@ class CommandHandler {
     return new Settings(regs[0], Mode.values[regs[1]], regs[2]);
   }
 
+  Future<void> setMode(int value) async {
+    await client.writeSingleRegister(2, value);
+  }
+
   double _convert18b20Temperature(int f) {
     if (f >= 0x8000) {
       //minus

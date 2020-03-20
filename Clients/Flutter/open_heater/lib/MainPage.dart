@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import './DiscoveryPage.dart';
+import 'BluetoothDiscoveryPage.dart';
 import 'ControlPage.dart';
 
 enum ConnectionType { bt, tcp }
@@ -85,7 +85,7 @@ class _MainPage extends State<MainPage> {
     if (address == null) {
       address = await Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) {
-        return DiscoveryPage();
+        return BluetoothDiscoveryPage();
       }));
     }
 
