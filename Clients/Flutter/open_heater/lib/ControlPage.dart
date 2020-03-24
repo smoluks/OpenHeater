@@ -16,7 +16,6 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPage extends State<ControlPage> {
   CommandHandler _commandHandler;
-  NumberPicker _targetNumberPicker;
   Timer timer;
 
   bool _firstLoading = true;
@@ -38,7 +37,7 @@ class _ControlPage extends State<ControlPage> {
       timer = new Timer.periodic(
           Duration(seconds: 10), (_) async => await updateState());
     }, onError: (_) {
-      timer.cancel();
+      timer?.cancel();
       Navigator.of(context).pop(-1);
     });
   }
@@ -70,7 +69,7 @@ class _ControlPage extends State<ControlPage> {
   @override
   void dispose() {
     // Avoid memory leak (`setState` after dispose) and cancel discovery
-    timer.cancel();
+    timer?.cancel();
     _commandHandler.dispose();
 
     super.dispose();
@@ -81,19 +80,36 @@ class _ControlPage extends State<ControlPage> {
       await _commandHandler.setMode(newValue.index);
     } catch (ex) {
       print('setMode failed: $ex');
+      return;
     }
 
     updateState();
   }
 
-  Future<void> setTargetTemperature(num newValue) async {
+  Future<void> setTargetTemperature() async {
+    if (_firstLoading) return;
+
+    var value = await showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return new NumberPickerDialog.integer(
+            minValue: -39,
+            maxValue: 75,
+            title: new Text("Pick a new price"),
+            initialIntegerValue: targetTemperatue,
+          );
+        });
+
+    if (value == targetTemperatue) return;
+
     try {
-      await _commandHandler.setTargetTemperature(newValue as int);
+      await _commandHandler.setTargetTemperature(value);
     } catch (ex) {
       print('setMode failed: $ex');
+      return;
     }
 
-    //updateState();
+    updateState();
   }
 
   String getName() {
@@ -161,7 +177,15 @@ class _ControlPage extends State<ControlPage> {
               subtitle: const Text("Current temperature"),
             ),
             ListTile(
-              title: getTargetNumberPicker(),
+              title: new GestureDetector(
+                onTap: () {
+                  setTargetTemperature();
+                },
+                child: Text(
+                  getTargetTemperature(),
+                  style: TextStyle(fontSize: 50),
+                ),
+              ),
               subtitle: const Text("Target temperature"),
             ),
             ListTile(
@@ -197,23 +221,5 @@ class _ControlPage extends State<ControlPage> {
         ),
       ),
     );
-  }
-
-  Widget getTargetNumberPicker() {
-    if (_firstLoading) return Text("");
-
-    if (_targetNumberPicker != null) return _targetNumberPicker;
-
-    _targetNumberPicker = new NumberPicker.integer(
-        scrollDirection: Axis.horizontal,
-        infiniteLoop: false,
-        initialValue: targetTemperatue,
-        minValue: -39,
-        maxValue: 75,
-        onChanged: (newValue) {
-          if (newValue != targetTemperatue) setTargetTemperature(newValue);
-        });
-
-    return _targetNumberPicker;
   }
 }

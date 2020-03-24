@@ -27,7 +27,7 @@ class BluetoothConnector extends ModbusConnector {
 
   @override
   Future<void> close() async {
-    _connection.dispose();
+    _connection?.dispose();
   }
 
   void _onData(Uint8List tcpData) {
