@@ -31,32 +31,32 @@ class BluetoothConnector extends ModbusConnector {
   }
 
   void _onData(Uint8List tcpData) {
-    //
-    //log.finest('RECV: ' + dumpHexToString(tcpData));
+    print('${new DateTime.now().millisecondsSinceEpoch} RECV: ' +
+        dumpHexToString(tcpData));
 
     _cache += tcpData;
 
     if (_timer != null) _timer.cancel();
-    _timer = new Timer(Duration(milliseconds: 300), handleTimeout);
+    _timer = new Timer(Duration(milliseconds: 50), handleTimeout);
   }
 
   void handleTimeout() {
     var list = Uint8List.fromList(_cache);
     var view = ByteData.view(list.buffer);
 
+    _cache.clear();
+
     int address = view.getUint8(0);
     if (_modbusAddress != 0 && _modbusAddress != address) {
-      _cache.clear();
       return;
     }
 
     int function = view.getUint8(1);
 
-    //TODO: check crc
-    int crc = view.getUint16(_cache.length - 2);
+    var crc = _crc(list);
+    if (crc[0] != 0 && crc[1] != 0) onError("Bad CRC", null);
 
     onResponse(function, list.sublist(2, list.length - 2));
-    _cache.clear();
   }
 
   @override
@@ -71,6 +71,9 @@ class BluetoothConnector extends ModbusConnector {
 
     //log.finest('SEND: ' + dumpHexToString(tcpData));
     Uint8List packet = Uint8List.fromList(data2 + crc);
+
+    _cache.clear();
+
     try {
       _connection.output.add(packet);
     } catch (ex) {
@@ -97,5 +100,14 @@ class BluetoothConnector extends ModbusConnector {
     var ret = Uint8List(2);
     ByteData.view(ret.buffer)..setUint8(0, crc & 0x00FF)..setUint8(1, crc >> 8);
     return ret;
+  }
+
+  String dumpHexToString(List<int> data) {
+    StringBuffer sb = StringBuffer();
+    data.forEach((f) {
+      sb.write(f.toRadixString(16).padLeft(2, '0'));
+      sb.write(" ");
+    });
+    return sb.toString();
   }
 }

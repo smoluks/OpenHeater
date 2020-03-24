@@ -16,15 +16,16 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPage extends State<ControlPage> {
   CommandHandler _commandHandler;
+  NumberPicker _targetNumberPicker;
+  Timer timer;
 
+  bool _firstLoading = true;
   bool _loading = true;
 
   double temperature;
   int targetTemperatue;
   Mode mode;
   int brightness;
-
-  Timer timer;
 
   @override
   void initState() {
@@ -37,6 +38,7 @@ class _ControlPage extends State<ControlPage> {
       timer = new Timer.periodic(
           Duration(seconds: 10), (_) async => await updateState());
     }, onError: (_) {
+      timer.cancel();
       Navigator.of(context).pop(-1);
     });
   }
@@ -46,16 +48,23 @@ class _ControlPage extends State<ControlPage> {
       _loading = true;
     });
 
-    var temperatures = await _commandHandler.getTemperatures();
-    var settings = await _commandHandler.getSettings();
+    try {
+      var temperatures = await _commandHandler.getTemperatures();
+      var settings = await _commandHandler.getSettings();
 
-    setState(() {
-      temperature = temperatures.reduce(min);
-      targetTemperatue = settings.targetTemp;
-      mode = settings.mode;
-      brightness = settings.brightness;
-      _loading = false;
-    });
+      setState(() {
+        temperature = temperatures.reduce(min);
+        targetTemperatue = settings.targetTemp;
+        mode = settings.mode;
+        brightness = settings.brightness;
+        _loading = false;
+        _firstLoading = false;
+      });
+    } catch (ex) {
+      timer.cancel();
+      print('updateState failed: $ex');
+      Navigator.of(context).pop(-1);
+    }
   }
 
   @override
@@ -68,12 +77,24 @@ class _ControlPage extends State<ControlPage> {
   }
 
   Future<void> setMode(Mode newValue) async {
-    await _commandHandler.setMode(newValue.index);
+    try {
+      await _commandHandler.setMode(newValue.index);
+    } catch (ex) {
+      print('setMode failed: $ex');
+    }
 
-    await updateState();
+    updateState();
   }
 
-  Future<void> setTargetTemperatuer(num newValue) {}
+  Future<void> setTargetTemperature(num newValue) async {
+    try {
+      await _commandHandler.setTargetTemperature(newValue as int);
+    } catch (ex) {
+      print('setMode failed: $ex');
+    }
+
+    //updateState();
+  }
 
   String getName() {
     return "OpenHeater";
@@ -140,15 +161,7 @@ class _ControlPage extends State<ControlPage> {
               subtitle: const Text("Current temperature"),
             ),
             ListTile(
-              title: new NumberPicker.integer(
-                  scrollDirection: Axis.horizontal,
-                  infiniteLoop: false,
-                  initialValue: targetTemperatue,
-                  minValue: -39,
-                  maxValue: 75,
-                  onChanged: (newValue) {
-                    setTargetTemperatuer(newValue);
-                  }),
+              title: getTargetNumberPicker(),
               subtitle: const Text("Target temperature"),
             ),
             ListTile(
@@ -184,5 +197,23 @@ class _ControlPage extends State<ControlPage> {
         ),
       ),
     );
+  }
+
+  Widget getTargetNumberPicker() {
+    if (_firstLoading) return Text("");
+
+    if (_targetNumberPicker != null) return _targetNumberPicker;
+
+    _targetNumberPicker = new NumberPicker.integer(
+        scrollDirection: Axis.horizontal,
+        infiniteLoop: false,
+        initialValue: targetTemperatue,
+        minValue: -39,
+        maxValue: 75,
+        onChanged: (newValue) {
+          if (newValue != targetTemperatue) setTargetTemperature(newValue);
+        });
+
+    return _targetNumberPicker;
   }
 }

@@ -49,10 +49,15 @@ class _BluetoothDiscoveryPage extends State<BluetoothDiscoveryPage> {
       _isDiscovering = true;
     });
 
-    _streamSubscription =
-        FlutterBluetoothSerial.instance.startDiscovery().listen((result) {
-      _addDevice(result.device, result.rssi);
-    });
+    try {
+      _streamSubscription =
+          FlutterBluetoothSerial.instance.startDiscovery().listen((result) {
+        _addDevice(result.device, result.rssi);
+      });
+    } catch (ex) {
+      print('startDiscovery failed: $ex');
+      Navigator.of(context).pop(null);
+    }
 
     _streamSubscription.onDone(() {
       setState(() {

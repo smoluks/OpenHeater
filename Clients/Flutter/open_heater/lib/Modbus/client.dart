@@ -71,6 +71,12 @@ class ModbusClientImpl extends ModbusClient {
     _nextDataCallBack = callback;
     _sendData(function, Uint8List.fromList(data));
 
+    new Timer(Duration(milliseconds: 5000), () {
+      if (_completer?.isCompleted != true) {
+        //_completer.completeError("Timeout error");
+      }
+    });
+
     return _completer.future;
   }
 
