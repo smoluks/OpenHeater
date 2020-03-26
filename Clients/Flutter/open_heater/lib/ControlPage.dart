@@ -21,10 +21,10 @@ class _ControlPage extends State<ControlPage> {
   bool _firstLoading = true;
   bool _loading = true;
 
-  double temperature;
-  int targetTemperatue;
-  Mode mode;
-  int brightness;
+  double _currentTemperature;
+  int _targetTemperatue;
+  Mode _currentMode;
+  List<Event> _events;
 
   @override
   void initState() {
@@ -33,6 +33,8 @@ class _ControlPage extends State<ControlPage> {
     _commandHandler = new CommandHandler(widget.btAddress);
     _commandHandler.connect().then((_) {
       updateState();
+
+      updateEvents();
 
       timer = new Timer.periodic(
           Duration(seconds: 10), (_) async => await updateState());
@@ -52,18 +54,37 @@ class _ControlPage extends State<ControlPage> {
       var settings = await _commandHandler.getSettings();
 
       setState(() {
-        temperature = temperatures.reduce(min);
-        targetTemperatue = settings.targetTemp;
-        mode = settings.mode;
-        brightness = settings.brightness;
+        _currentTemperature = temperatures.reduce(min);
+        _targetTemperatue = settings.targetTemp;
+        _currentMode = settings.mode;
+
         _loading = false;
         _firstLoading = false;
       });
     } catch (ex) {
-      timer.cancel();
+      timer?.cancel();
       print('updateState failed: $ex');
       Navigator.of(context).pop(-1);
     }
+  }
+
+  Future<void> updateEvents() async {
+    setState(() {
+      _loading = true;
+    });
+
+    var events = await _commandHandler.getEvents();
+
+    setState(() {
+      try {
+        _events = events;
+        _loading = false;
+      } catch (ex) {
+        timer?.cancel();
+        print('updateState failed: $ex');
+        Navigator.of(context).pop(-1);
+      }
+    });
   }
 
   @override
@@ -95,12 +116,12 @@ class _ControlPage extends State<ControlPage> {
           return new NumberPickerDialog.integer(
             minValue: -39,
             maxValue: 75,
-            title: new Text("Pick a new price"),
-            initialIntegerValue: targetTemperatue,
+            title: new Text("New target temperature"),
+            initialIntegerValue: _targetTemperatue,
           );
         });
 
-    if (value == targetTemperatue) return;
+    if (value == _targetTemperatue) return;
 
     try {
       await _commandHandler.setTargetTemperature(value);
@@ -112,16 +133,22 @@ class _ControlPage extends State<ControlPage> {
     updateState();
   }
 
+  void editEvent(Event event) {}
+
   String getName() {
     return "OpenHeater";
   }
 
   String getCurrentTemperature() {
-    return temperature == null ? "-" : temperature.toString() + " ºC";
+    return _currentTemperature == null
+        ? "-"
+        : _currentTemperature.toString() + " ºC";
   }
 
   String getTargetTemperature() {
-    return targetTemperatue == null ? "-" : targetTemperatue.toString() + " ºC";
+    return _targetTemperatue == null
+        ? "-"
+        : _targetTemperatue.toString() + " ºC";
   }
 
   String getModeText(Mode mode) {
@@ -139,8 +166,33 @@ class _ControlPage extends State<ControlPage> {
       case Mode.Fan:
         return "Fan";
     }
+    return "-";
+  }
 
-    return "";
+  String getEventText(Event event) {
+    String result = '';
+
+    result += event.hours == null ? 'xx:' : '${event.hours.toString()}:';
+    result += event.minutes == null ? 'xx:' : '${event.minutes.toString()}:';
+    result += event.seconds == null ? 'xx' : event.seconds.toString();
+
+    if (event.daysOfWeek != null) {
+      if ((event.daysOfWeek & 0x01) == 0x01) result += ' SU';
+      if ((event.daysOfWeek & 0x02) == 0x02) result += ' MO';
+      if ((event.daysOfWeek & 0x04) == 0x04) result += ' TUE';
+      if ((event.daysOfWeek & 0x08) == 0x08) result += ' WED';
+      if ((event.daysOfWeek & 0x10) == 0x10) result += ' THU';
+      if ((event.daysOfWeek & 0x20) == 0x20) result += ' FRI';
+      if ((event.daysOfWeek & 0x40) == 0x40) result += ' SAT';
+    }
+
+    if (event.mode != null) result += ' Mode➞${getModeText(event.mode)}';
+
+    if (event.temperature != null) result += ' t➞${event.temperature}º';
+
+    if (event.once != null) result += ' once';
+
+    return result;
   }
 
   @override
@@ -167,59 +219,96 @@ class _ControlPage extends State<ControlPage> {
         ],
       ),
       body: Container(
-        child: ListView(
-          children: <Widget>[
-            ListTile(
-              title: Text(
-                getCurrentTemperature(),
+        child: new ListView(children: [
+          ListTile(
+            title: Text(
+              getCurrentTemperature(),
+              style: TextStyle(fontSize: 50),
+            ),
+            subtitle: const Text("Current temperature"),
+          ),
+          ListTile(
+            title: new GestureDetector(
+              onTap: () {
+                setTargetTemperature();
+              },
+              child: Text(
+                getTargetTemperature(),
                 style: TextStyle(fontSize: 50),
               ),
-              subtitle: const Text("Current temperature"),
             ),
-            ListTile(
-              title: new GestureDetector(
-                onTap: () {
-                  setTargetTemperature();
+            subtitle: const Text("Target temperature"),
+          ),
+          ListTile(
+              title: DropdownButton<Mode>(
+                itemHeight: 60,
+                value: _currentMode,
+                //icon: Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                style: TextStyle(fontSize: 50, color: Colors.black),
+                underline: Container(
+                  height: 2,
+                  color: Color(0),
+                ),
+                onChanged: (Mode newValue) {
+                  setMode(newValue);
                 },
-                child: Text(
-                  getTargetTemperature(),
-                  style: TextStyle(fontSize: 50),
-                ),
+                items: <Mode>[
+                  Mode.None,
+                  Mode.First,
+                  Mode.Second,
+                  Mode.Both,
+                  Mode.Fan,
+                ].map<DropdownMenuItem<Mode>>((Mode value) {
+                  return DropdownMenuItem<Mode>(
+                    value: value,
+                    child: Text(getModeText(value)),
+                  );
+                }).toList(),
               ),
-              subtitle: const Text("Target temperature"),
-            ),
-            ListTile(
-                title: DropdownButton<Mode>(
-                  itemHeight: 60,
-                  value: mode,
-                  //icon: Icon(Icons.arrow_downward),
-                  iconSize: 24,
-                  elevation: 16,
-                  style: TextStyle(fontSize: 50, color: Colors.black),
-                  underline: Container(
-                    height: 2,
-                    color: Color(0),
-                  ),
-                  onChanged: (Mode newValue) {
-                    setMode(newValue);
-                  },
-                  items: <Mode>[
-                    Mode.None,
-                    Mode.First,
-                    Mode.Second,
-                    Mode.Both,
-                    Mode.Fan,
-                  ].map<DropdownMenuItem<Mode>>((Mode value) {
-                    return DropdownMenuItem<Mode>(
-                      value: value,
-                      child: Text(getModeText(value)),
-                    );
-                  }).toList(),
-                ),
-                subtitle: const Text("Mode"))
-          ],
-        ),
+              subtitle: const Text("Mode")),
+          new Divider(
+            height: 15.0,
+            color: Colors.grey,
+          ),
+          getEventTile(0),
+          Divider(),
+          getEventTile(1),
+          Divider(),
+          getEventTile(2),
+          Divider(),
+          getEventTile(3),
+          Divider(),
+          getEventTile(4),
+          Divider(),
+          getEventTile(5),
+          Divider(),
+          getEventTile(6),
+          Divider(),
+          getEventTile(7),
+        ]),
       ),
     );
+  }
+
+  ListTile getEventTile(int number) {
+    if (_events == null || _events[number] == null)
+      return new ListTile(title: Text('$number: -'));
+
+    return new ListTile(
+        leading: _events[number].enable
+            ? new Image(
+                image: AssetImage("assets/icons/timer.png"),
+                width: 24,
+                height: 24)
+            : new Image(
+                image: AssetImage("assets/icons/timer_disable.png"),
+                width: 24,
+                height: 24),
+        title: Text(getEventText(_events[number])),
+        onTap: () {
+          editEvent(_events[number]);
+        });
   }
 }

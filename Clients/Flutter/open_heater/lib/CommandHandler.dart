@@ -46,6 +46,22 @@ class CommandHandler {
     }
   }
 
+  Future<List<Event>> getEvents() async {
+    await _m.acquire();
+    try {
+      var regs = await client.readHoldingRegisters(8, 56);
+      var result = new List<Event>();
+
+      for (var i = 0; i < 56; i += 7) {
+        result.add(_parceEvent(regs.getRange(i, i + 7).toList()));
+      }
+
+      return result;
+    } finally {
+      _m.release();
+    }
+  }
+
   Future<void> setMode(int value) async {
     await _m.acquire();
     try {
@@ -72,6 +88,38 @@ class CommandHandler {
 
     return f / 16;
   }
+
+  Event _parceEvent(List<int> range) {
+    var event = new Event();
+
+    event.enable = (range[0] & 0x01) == 0x01;
+    event.once = (range[0] & 0x02) == 0x02;
+
+    event.seconds = range[1] == 255 ? null : _convertBCDToInt(range[1]);
+    event.minutes = range[2] == 255 ? null : _convertBCDToInt(range[2]);
+    event.hours = range[3] == 255 ? null : _convertBCDToInt(range[3]);
+    event.daysOfWeek = range[4] == 255 ? null : range[4];
+    event.mode = range[5] == 255 ? null : Mode.values[range[5]];
+    event.temperature = range[6] == 255 ? null : range[6];
+
+    return event;
+  }
+
+  int _convertBCDToInt(int value) {
+    return (value ~/ 16) * 10 + (value % 16);
+  }
+}
+
+class Event {
+  int number;
+  bool enable;
+  bool once;
+  int seconds;
+  int minutes;
+  int hours;
+  int daysOfWeek;
+  Mode mode;
+  int temperature;
 }
 
 class Settings {

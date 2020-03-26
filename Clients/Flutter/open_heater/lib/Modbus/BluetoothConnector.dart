@@ -31,8 +31,8 @@ class BluetoothConnector extends ModbusConnector {
   }
 
   void _onData(Uint8List tcpData) {
-    print('${new DateTime.now().millisecondsSinceEpoch} RECV: ' +
-        dumpHexToString(tcpData));
+    // print('${new DateTime.now().millisecondsSinceEpoch} RECV: ' +
+    //     dumpHexToString(tcpData));
 
     _cache += tcpData;
 
