@@ -1,14 +1,10 @@
-import 'package:mutex/mutex.dart';
 import 'package:open_heater/Modbus/modbus.dart';
 
 class CommandHandler {
   ModbusClient client;
 
-  Mutex _m;
-
   CommandHandler(String address) {
     this.client = createBluetoothClient(address);
-    _m = Mutex();
   }
 
   Future<void> connect() async {
@@ -20,65 +16,44 @@ class CommandHandler {
   }
 
   Future<List<double>> getTemperatures() async {
-    await _m.acquire();
-    try {
-      var regs = await client.readInputRegisters(0, 11);
-      var count = regs[0];
+    var regs = await client.readInputRegisters(0, 11);
+    var count = regs[0];
 
-      return regs
-          .skip(1)
-          .take(count)
-          .map((f) => _convert18b20Temperature(f))
-          .toList();
-    } finally {
-      _m.release();
-    }
+    return regs
+        .skip(1)
+        .take(count)
+        .map((f) => _convert18b20Temperature(f))
+        .toList();
   }
 
   Future<Settings> getSettings() async {
-    await _m.acquire();
-    try {
-      var regs = await client.readHoldingRegisters(1, 3);
+    var regs = await client.readHoldingRegisters(1, 3);
 
-      return new Settings(regs[0], Mode.values[regs[1]], regs[2]);
-    } finally {
-      _m.release();
-    }
+    return new Settings(regs[0], Mode.values[regs[1]], regs[2]);
   }
 
   Future<List<Event>> getEvents() async {
-    await _m.acquire();
-    try {
-      var regs = await client.readHoldingRegisters(8, 56);
-      var result = new List<Event>();
+    var regs = await client.readHoldingRegisters(8, 56);
+    var result = new List<Event>();
 
-      for (var i = 0; i < 56; i += 7) {
-        result.add(_parceEvent(regs.getRange(i, i + 7).toList()));
-      }
-
-      return result;
-    } finally {
-      _m.release();
+    for (var i = 0; i < 56; i += 7) {
+      var event = _parceEvent(regs.getRange(i, i + 7).toList());
+      event.number = i ~/ 7;
+      result.add(event);
     }
+
+    return result;
   }
 
   Future<void> setMode(int value) async {
-    await _m.acquire();
-    try {
-      await client.writeSingleRegister(2, value);
-    } finally {
-      _m.release();
-    }
+    await client.writeSingleRegister(2, value);
   }
 
   Future<void> setTargetTemperature(int value) async {
-    await _m.acquire();
-    try {
-      await client.writeSingleRegister(1, value);
-    } finally {
-      _m.release();
-    }
+    await client.writeSingleRegister(1, value);
   }
+
+  Future<void> UpdateEvent(Event event) {}
 
   double _convert18b20Temperature(int f) {
     if (f >= 0x8000) {
@@ -92,7 +67,7 @@ class CommandHandler {
   Event _parceEvent(List<int> range) {
     var event = new Event();
 
-    event.enable = (range[0] & 0x01) == 0x01;
+    event.enabled = (range[0] & 0x01) == 0x01;
     event.once = (range[0] & 0x02) == 0x02;
 
     event.seconds = range[1] == 255 ? null : _convertBCDToInt(range[1]);
@@ -112,7 +87,7 @@ class CommandHandler {
 
 class Event {
   int number;
-  bool enable;
+  bool enabled;
   bool once;
   int seconds;
   int minutes;
@@ -130,4 +105,14 @@ class Settings {
   Settings(this.targetTemp, this.mode, this.brightness);
 }
 
-enum Mode { None, First, Second, Both, Fan }
+enum Mode { Off, First, Second, Both, Fan }
+
+enum DayOfWeeks {
+  Sunday,
+  Monday,
+  Tuesday,
+  Wednesday,
+  Thursday,
+  Friday,
+  Saturday,
+}

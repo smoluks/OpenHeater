@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
-
 //import 'package:logging/logging.dart';
-
+import 'package:mutex/mutex.dart';
 import 'exceptions.dart';
 import 'modbus.dart';
 
@@ -12,9 +11,10 @@ class ModbusClientImpl extends ModbusClient {
   //final Logger log = new Logger('ModbusClientImpl');
 
   ModbusConnector _connector;
-
   Completer _completer;
   FunctionCallback _nextDataCallBack;
+  Mutex _m = Mutex();
+  final timeout = 5000;
 
   ModbusClientImpl(this._connector) {
     _connector.onResponse = _onConnectorData;
@@ -65,17 +65,22 @@ class ModbusClientImpl extends ModbusClient {
   }
 
   Future<Uint8List> _executeFunctionImpl(
-      int function, Uint8List data, FunctionCallback callback) {
+      int function, Uint8List data, FunctionCallback callback) async {
     _completer = Completer<Uint8List>();
-
     _nextDataCallBack = callback;
-    _sendData(function, Uint8List.fromList(data));
 
-    new Timer(Duration(milliseconds: 5000), () {
-      if (_completer?.isCompleted != true) {
-        //_completer.completeError("Timeout error");
-      }
-    });
+    await _m.acquire();
+    try {
+      _sendData(function, Uint8List.fromList(data));
+
+      new Timer(Duration(milliseconds: timeout), () {
+        //if (_completer?.isCompleted != true) {
+        //  _completer.completeError("Timeout error");
+        //}
+      });
+    } finally {
+      _m.release();
+    }
 
     return _completer.future;
   }
@@ -106,7 +111,6 @@ class ModbusClientImpl extends ModbusClient {
             break;
         }
       }
-
       _completer.complete(responseData);
     });
   }

@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 import 'CommandHandler.dart';
+import 'EventPage.dart';
 
 class ControlPage extends StatefulWidget {
   final String btAddress;
+  final String deviceName;
 
-  const ControlPage({this.btAddress});
+  const ControlPage({this.btAddress, this.deviceName});
 
   @override
   _ControlPage createState() => new _ControlPage();
@@ -16,7 +18,7 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPage extends State<ControlPage> {
   CommandHandler _commandHandler;
-  Timer timer;
+  Timer _timer;
 
   bool _firstLoading = true;
   bool _loading = true;
@@ -36,12 +38,21 @@ class _ControlPage extends State<ControlPage> {
 
       updateEvents();
 
-      timer = new Timer.periodic(
+      _timer = new Timer.periodic(
           Duration(seconds: 10), (_) async => await updateState());
     }, onError: (_) {
-      timer?.cancel();
+      _timer?.cancel();
       Navigator.of(context).pop(-1);
     });
+  }
+
+  @override
+  void dispose() {
+    // Avoid memory leak (`setState` after dispose) and cancel discovery
+    _timer?.cancel();
+    _commandHandler.dispose();
+
+    super.dispose();
   }
 
   Future<void> updateState() async {
@@ -62,7 +73,7 @@ class _ControlPage extends State<ControlPage> {
         _firstLoading = false;
       });
     } catch (ex) {
-      timer?.cancel();
+      _timer?.cancel();
       print('updateState failed: $ex');
       Navigator.of(context).pop(-1);
     }
@@ -80,20 +91,11 @@ class _ControlPage extends State<ControlPage> {
         _events = events;
         _loading = false;
       } catch (ex) {
-        timer?.cancel();
+        _timer?.cancel();
         print('updateState failed: $ex');
         Navigator.of(context).pop(-1);
       }
     });
-  }
-
-  @override
-  void dispose() {
-    // Avoid memory leak (`setState` after dispose) and cancel discovery
-    timer?.cancel();
-    _commandHandler.dispose();
-
-    super.dispose();
   }
 
   Future<void> setMode(Mode newValue) async {
@@ -133,10 +135,16 @@ class _ControlPage extends State<ControlPage> {
     updateState();
   }
 
-  void editEvent(Event event) {}
+  Future<void> editEvent(Event event) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return EventPage(event: event, commandHandler: _commandHandler);
+    }));
+
+    await updateEvents();
+  }
 
   String getName() {
-    return "OpenHeater";
+    return widget.deviceName ?? "OpenHeater";
   }
 
   String getCurrentTemperature() {
@@ -155,7 +163,7 @@ class _ControlPage extends State<ControlPage> {
     if (mode == null) return "-";
 
     switch (mode) {
-      case Mode.None:
+      case Mode.Off:
         return "Off";
       case Mode.First:
         return "1";
@@ -255,7 +263,7 @@ class _ControlPage extends State<ControlPage> {
                   setMode(newValue);
                 },
                 items: <Mode>[
-                  Mode.None,
+                  Mode.Off,
                   Mode.First,
                   Mode.Second,
                   Mode.Both,
@@ -297,7 +305,7 @@ class _ControlPage extends State<ControlPage> {
       return new ListTile(title: Text('$number: -'));
 
     return new ListTile(
-        leading: _events[number].enable
+        leading: _events[number].enabled
             ? new Image(
                 image: AssetImage("assets/icons/timer.png"),
                 width: 24,
