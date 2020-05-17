@@ -1,25 +1,34 @@
 .EQU DEBUG=1
 #include "RamMapping.asm"
 
-.ORG 0x00 rjmp RESET ; Reset Handler
-;.ORG 0x01 rjmp EXT_INT0 ; IRQ0 Handler
-;.ORG 0x02 rjmp EXT_INT1 ; IRQ1 Handler
-.ORG 0x03 rjmp TIM2_COMP ; Timer2 Compare Handler
-.ORG 0x04 rjmp TIM2_OVF ; Timer2 Overflow Handler
-;.ORG 0x05 rjmp TIM1_CAPT ; Timer1 Capture Handler
-.ORG 0x06 rjmp TIM1_COMPA ; Timer1 CompareA Handler
-;.ORG 0x07 rjmp TIM1_COMPB ; Timer1 CompareB Handler
-;.ORG 0x08 rjmp TIM1_OVF ; Timer1 Overflow Handler
-.ORG 0x09 rjmp TIM0_OVF ; Timer0 Overflow Handler
-;.ORG 0x0a rjmp SPI_STC ; SPI Transfer Complete Handler
-.ORG 0x0b rjmp USART_RXC ; USART RX Complete Handler
-;.ORG 0x0c rjmp USART_UDRE ; UDR Empty Handler
-.ORG 0x0d rjmp USART_TXC ; USART TX Complete Handler
-.ORG 0x0e rjmp ADCi ; ADC Conversion Complete Handler
-;.ORG 0x0f rjmp EE_RDY ; EEPROM Ready Handler
-;.ORG 0x10 rjmp ANA_COMP ; Analog Comparator Handler
-;.ORG 0x11 rjmp TWSI ; Two-wire Serial Interface Handler
-;.ORG 0x12 rjmp SPM_RDY ; Store Program Memory Ready Handler
+.ORG 0x00 jmp RESET ; Reset Handler
+;.ORG 0x02 jmp EXT_INT0 ; IRQ0 Handler
+;.ORG 0x04 jmp EXT_INT1 ; IRQ1 Handler
+.ORG 0x06 jmp TIM2_COMP ; Timer2 Compare Handler
+.ORG 0x08 jmp TIM2_OVF ; Timer2 Overflow Handler
+;.ORG 0x0A jmp TIM1_CAPT ; Timer1 Capture Handler
+.ORG 0x0C jmp TIM1_COMPA ; Timer1 CompareA Handler
+;.ORG 0x0E jmp TIM1_COMPB ; Timer1 CompareB Handler
+;.ORG 0x10 jmp TIM1_OVF ; Timer1 Overflow Handler
+.ORG 0x12 jmp TIM0_OVF ; Timer0 Overflow Handler
+;.ORG 0x14 jmp SPI_STC ; SPI Transfer Complete Handler
+.ORG 0x16 jmp USART_RXC ; USART RX Complete Handler
+;.ORG 0x18 jmp USART_UDRE ; UDR Empty Handler
+.ORG 0x1A jmp USART_TXC ; USART TX Complete Handler
+.ORG 0x1C jmp ADCi ; ADC Conversion Complete Handler
+;.ORG 0x1E jmp EE_RDY ; EEPROM Ready Handler
+;.ORG 0x20 jmp ANA_COMP ; Analog Comparator Handler
+;.ORG 0x22 jmp TWSI ; Two-wire Serial Interface Handler
+;.ORG 0x24 jmp EXT_INT2 ; IRQ2 Handler
+;.ORG 0x26 jmp TIM0_COMP ; Timer0 Compare Handler
+;.ORG 0x28 jmp SPM_RDY ; Store Program Memory Ready Handler
+;
+;.ORG 0x2A RESET: ldi r16,high(RAMEND) ; Main program start
+;.ORG 0x2B out SPH,r16 ; Set Stack Pointer to top of RAM
+;.ORG 0x2C ldi r16,low(RAMEND)
+;.ORG 0x2D out SPL,r16
+;.ORG 0x2E sei ; Enable interrupts
+;.ORG 0x2F <instr> xxx
 
 #include "Indication.asm"
 #include "ADC.asm"
@@ -29,9 +38,6 @@
 
 RESET:
 ;----------init----------
-;ldi r16, 0x98
-;out OSCCAL, r16
-;
 ;stack
 ldi r16, high(RAMEND)
 out SPH, r16
@@ -57,17 +63,21 @@ ldi r16, 5
 ldi r17, 10
 movw r12, r16
 ;gpio
-ldi r16, 0b11111111
+ldi r16, 0b00000000
+out PORTA, r16
+ldi r16, 0b00010101
+out DDRA, r16
+ldi r16, 0b00011000
 out PORTB, r16
-ldi r16, 0b11111111
+ldi r16, 0b00001000
 out DDRB, r16
-ldi r16, 0b00110000
+ldi r16, 0b11111111
 out PORTC, r16
-ldi r16, 0b00000101
+ldi r16, 0b11111100
 out DDRC, r16
-ldi r16, 0b11111011
+ldi r16, 0b11111101
 out PORTD, r16
-ldi r16, 0b11110110
+ldi r16, 0b11111101
 out DDRD, r16
 ;----regs----
 clr ERRORL_REG
@@ -102,7 +112,7 @@ out OCR1AL, r16
 out TCNT2, CONST_0
 ldi r16, 128 ;Brightness
 out OCR2, r16
-ldi r16, 0b00000100 ;F/64
+ldi r16, 0b00000101 ;F/128
 out TCCR2, r16
 ;
 ldi r16, 0b11010001
@@ -120,27 +130,31 @@ out UCSRB, r16
 ldi r16, 0b10110110
 out UCSRC, r16;
 out UBRRH, CONST_0
-ldi r16, 51
+ldi r16, 95
 out UBRRL, r16
-ldi r16, 0xAA
-out UDR, r16
+;ldi r16, 0xAA
+;out UDR, r16
 ;ADC
 ldi r16, ADMUX_BUTTONS
 out ADMUX, r16
 ldi r16, 0b11011111
 out ADCSRA, r16
 ;
+rcall init_18b20
+;
 rcall ds1307_init
+;
+rcall eeprom_readall
 ;
 sei
 ;
-.IFNDEF DEBUG
-rcall check_heaters
-.ENDIF
+;.IFNDEF DEBUG
+;rcall check_heaters
+;.ENDIF
 ;
-rcall eeprom_readall
+ldi r16, 0b00001011
+out WDTCR, r16
 ;----------main-cycle----------
-sbr ERRORL_REG, 1 << ERRORL_NO18B20
 main_cycle:
 wdr
 ;--18b20--
@@ -163,11 +177,12 @@ rcall events
 lds r16, ACTION
 sbrs r16, ACTION_MODBUS
 rjmp main_cycle
-cbr r16, 1 << ACTION_MODBUS
-sts ACTION, r16 
-rcall process_modbus
-sbi UCSRB, RXEN
-rjmp main_cycle
+ cbr r16, 1 << ACTION_MODBUS
+ sts ACTION, r16 
+ ;
+ rcall process_modbus
+ sbi UCSRB, RXEN
+ rjmp main_cycle
 
 
 #include "SelfDiagnostics.asm"

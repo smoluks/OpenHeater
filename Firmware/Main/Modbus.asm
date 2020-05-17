@@ -445,9 +445,10 @@ brne ws2
  brne data_error
  cpi r16, MIN_TARGET_TEMP
  brlt data_error
- cpi r16, MAX_TARGET_TEMP+1
+ cpi r16, MAX_TARGET_TEMP
  brge data_error
  mov TTARGET_REG, r16
+ call save_target_temp
  ;
  clr r17
  ret

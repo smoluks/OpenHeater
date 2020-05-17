@@ -17,21 +17,19 @@ breq to2
 cpi r16, 3
 breq to3
 ;----------SEG1----------
- ;cbi portb, 5
+ cbi portc, 7
  ;
  lds r16, SEG1
- andi r16, 0b10001111
- out portb, r16 ;cbi portb, 5 here
- ;
- lds r16, SEG1
+ andi r16, 0b00001111
  lsl r16
- andi r16, 0b11100000
- in r17, portd
- andi r17, 0b00001111
- or r16, r17
+ lsl r16
+ out portc, r16 
+ ;
+ lds r16, SEG1
+ andi r16, 0b11110000
  out portd, r16
  ;
- sbi portb, 6
+ sbi portd, 3
  ;
  pop r16
  out SREG, r16
@@ -40,21 +38,19 @@ breq to3
  reti
  ;----------SEG2----------
  to1:
- ;cbi portb, 6
+ cbi portd, 3
  ;
  lds r16, SEG2
- andi r16, 0b10001111
- out portb, r16 ;cbi portb, 6 here
- ;
- lds r16, SEG2
+ andi r16, 0b00001111
  lsl r16
- andi r16, 0b11100000
- in r17, portd
- andi r17, 0b00001111
- or r16, r17
+ lsl r16
+ out portc, r16 
+ ;
+ lds r16, SEG2
+ andi r16, 0b11110000
  out portd, r16
  ;
- sbi portd, 4
+ sbi portd, 2
 ;
  pop r16
  out SREG, r16
@@ -63,21 +59,19 @@ breq to3
  reti
  ;----------SEG3----------
  to2:
- cbi portd, 4
+ cbi portd, 2
  ;
  lds r16, SEG3
- andi r16, 0b10001111
- out portb, r16
- ;
- lds r16, SEG3
+ andi r16, 0b00001111
  lsl r16
- andi r16, 0b11100000
- in r17, portd
- andi r17, 0b00001111
- or r16, r17
+ lsl r16
+ out portc, r16 
+ ;
+ lds r16, SEG3
+ andi r16, 0b11110000
  out portd, r16
  ;
- sbi portb, 4 
+ sbi portc, 6
 ;
  pop r16
  out SREG, r16
@@ -86,21 +80,19 @@ breq to3
  reti
  ;----------SEG4----------
  to3:
- ;cbi portb, 4
+ cbi portc, 6
  ;
  lds r16, SEG4
- andi r16, 0b10001111
- out portb, r16 ;cbi portb, 4 here
- ;
- lds r16, SEG4
+ andi r16, 0b00001111
  lsl r16
- andi r16, 0b11100000
- in r17, portd
- andi r17, 0b00001111
- or r16, r17
+ lsl r16
+ out portc, r16 
+ ;
+ lds r16, SEG4
+ andi r16, 0b11110000
  out portd, r16
  ;
- sbi portb, 5
+ sbi portc, 7
  ;
  pop r16
  out SREG, r16
@@ -109,8 +101,6 @@ breq to3
  reti
 
 TIM2_COMP:
-cbi portb, 4
-cbi portb, 5
-cbi portb, 6
-cbi portd, 4
+out portc, CONST_0
+out portd, CONST_0
 reti

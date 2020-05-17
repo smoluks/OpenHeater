@@ -8,6 +8,8 @@ ldi r17, MODBUSADDR_TKREG
 rcall EEPROM_read
 cpi r16, 0xFF
 breq era1
+cpi r16, 0x00
+breq era1
  sts MODBUS_ADDRESS, r16
 era1:
 ;target temperatute

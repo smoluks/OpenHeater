@@ -1,7 +1,7 @@
 ;----------------------1Wire routine 8MHz----------------------
-#define OW_DDR ddrd, 3
-#define OW_PORT portd, 3
-#define OW_PIN pind, 3
+#define OW_DDR ddrb, 4
+#define OW_PORT portb, 4
+#define OW_PIN pinb, 4
 
 ow_reset:
 push r16
@@ -81,7 +81,7 @@ brtc w1
  sbi OW_PORT 
 w1:
 clr r17
-ldi r16, 54
+ldi r16, 87
 rcall ipause
 ;
 cbi OW_DDR
@@ -160,11 +160,20 @@ nop
 nop
 nop
 nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
 subi r16, 1
 sbc r17, CONST_0
 brcc ipause;
 ret
 
 pause_1us:
+nop
+nop
 nop
 ret

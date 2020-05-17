@@ -1,2 +1,3 @@
 rollover protection
 radiator overheat protection
+check 1wire line
