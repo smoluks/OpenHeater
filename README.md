@@ -1,7 +1,8 @@
 # OpenHeater
-![Main](https://github.com/smoluks/OpenHeater/blob/master/Docs/Wiki/Assembled.png)
 
-3-channel controller for replacing the mechanical thermostat of oil-filled heaterw
+3-channel controller for replacing  mechanical thermostat of oil-filled heater
+
+![Main](https://github.com/smoluks/OpenHeater/blob/master/Docs/Wiki/Assembled.png)
 
 #### Main features:
 - **Up to 10 1-wire themperature sensors (18b20 and some)** - lowest temperature for control and highest for protection
@@ -12,7 +13,7 @@
 ![Main](https://github.com/smoluks/OpenHeater/blob/master/Docs/Wiki/PCBs.png)
 
 #### Toolchain:
-- Main controller - Atmega16, language AVRASM
+- Main controller - Atmega16, language AVRASM (I'm using VSCODE + plugins, but AVR Studio can be used too)
 - PCB - Diptrace
 - Mobile client - Flutter
 - Heater - polaris PRE C 1129 HF
