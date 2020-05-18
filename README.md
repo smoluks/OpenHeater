@@ -9,6 +9,8 @@
 - **Remote control implemented by modbus over uart** (you may connect HC05 for bluetooth, or ESP8266 with serial-tcp modbus bridge firmware for WIFI, or MAX13487 (replace 5-3.3v dc-dc parts by jumper) for non-halvanic isolation RS485)
 - **Mobile client** (in progress)
 
+![Main](https://github.com/smoluks/OpenHeater/blob/master/Docs/Wiki/PCBs.png)
+
 #### Toolchain:
 - Main controller - Atmega16, language AVRASM
 - PCB - Diptrace
