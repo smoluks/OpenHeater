@@ -1,4 +1,5 @@
 # OpenHeater
+![Main](https://github.com/smoluks/OpenHeater/blob/master/Docs/Wiki/PCBs.png)
 3-channel controller for oil-filled heater
 
 #### Main features:
