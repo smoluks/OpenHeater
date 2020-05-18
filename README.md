@@ -1,25 +1,17 @@
 # OpenHeater
-3-channel controller for oil-filled heater based on ATMEGA8 & 18B20
-![Photo](/Docs/Wiki/PCBs.png)
+![Main](https://github.com/smoluks/OpenHeater/blob/master/Docs/Wiki/PCBs.png)
+
+3-channel controller for oil-filled heater
 
 #### Main features:
-- Precision temperature regulation
-- Remote control over modbus
-- Self-diagnostics
-
-#### Roadmap:
-- [x] PCB
-- [x] Main firmware
-- [x] Monitoring and diagnostics over feedback
-- [x] Additional 18b20 оn J1(on heater) or J5(external sensor)
-- [x] Remote control over Modbus on J3
-- [ ] Time-based programs
-- [ ] Wifi Modbus TCP-Uart bridge
-#### WARNING: external sensor cause electric shock in current version of power pcb with LNK306. Use alternate power source such as phone charger
+- Up to 10 1-wire themperature sensors (18b20 and some) - lowest temperature for control and highest for protection
+- 8 time events for selecting mode/temperature (specific or any seconds, minutes, hours and day of week)
+- Remote control implemented by modbus over uart (you may connect HC05 for bluetooth, or ESP8266 with serial-tcp modbus bridge firmware for WIFI, or MAX13487 (do not solder 5-3.3v dc-dc parts) for non-halvanic isolation RS485)
+- Mobile client (in progress)
 
 #### Toolchain:
-PCB - Diptrace  
-Firmware - AVRASM
+Main controller - Atmega16, language AVRASM
+PCB - Diptrace
 Heater - polaris PRE C 1129 HF
 
 #### Building:
