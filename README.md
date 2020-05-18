@@ -10,10 +10,10 @@
 - **Mobile client** (in progress)
 
 #### Toolchain:
-Main controller - Atmega16, language AVRASM
-PCB - Diptrace
-Mobile client - Flutter
-Heater - polaris PRE C 1129 HF
+- Main controller - Atmega16, language AVRASM
+- PCB - Diptrace
+- Mobile client - Flutter
+- Heater - polaris PRE C 1129 HF
 
 #### Building:
 [See wiki](https://github.com/smoluks/OpenHeater/wiki)
